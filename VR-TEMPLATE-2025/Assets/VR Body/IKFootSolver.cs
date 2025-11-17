@@ -30,6 +30,7 @@ public class IKFootSolver : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log(gameObject.name);
         footSpacing = transform.localPosition.x;
         currentPosition = newPosition = oldPosition = transform.position;
         currentNormal = newNormal = oldNormal = transform.up;

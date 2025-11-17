@@ -21,6 +21,9 @@ TagManager:
   - d
   - h
   - s
+  - Particle
+  - BossRainProjectile
+  - RainTargetMarker
   layers:
   - Default
   - TransparentFX
