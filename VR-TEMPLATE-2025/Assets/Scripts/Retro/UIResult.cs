@@ -33,8 +33,15 @@ public class UIResult : MonoBehaviour
         musicLength = length;
         SetSlider();
     }
-    public void UpdateResult(float result) => resultText.text = result.ToString();
-    public void UpdateConsecutive(float consecutive) => consecutiveText.text = consecutive.ToString();
-    public void UpdateError(float error) => errorText.text = error.ToString();
+    public void UpdateResult(int result) => resultText.text = result.ToString();
+    public void UpdateConsecutive(int consecutive) => consecutiveText.text = consecutive.ToString();
+    public void UpdateError(int error) => errorText.text = error.ToString();
     public void UpdateMusicName(string name) => musicNameText.text = name;
+
+    private void Start()
+    {
+        PointController.Instance.OnAcceptInt += UpdateResult;
+        PointController.Instance.OnConsecutiveInt += UpdateConsecutive;
+        PointController.Instance.OnErrorInt += UpdateError;
+    }
 }

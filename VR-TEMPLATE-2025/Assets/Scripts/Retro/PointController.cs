@@ -14,10 +14,10 @@ public class PointController : MonoBehaviour
             {
                 _accept = value;
                 OnAcceptEvent();
-                UIResult.Instance.UpdateResult(_accept);
             }
         }
     }
+    public event Action<int> OnAcceptInt;
     public event Action OnAccept;
     #endregion
 
@@ -32,11 +32,11 @@ public class PointController : MonoBehaviour
             {
                 _consecutives = value;
                 OnConsecutiveEvent();
-                UIResult.Instance.UpdateConsecutive(_consecutives);
             }
         }
     }
-    public event Action<int> OnConsecutive;
+    public event Action OnConsecutive;
+    public event Action<int> OnConsecutiveInt;
     #endregion
 
     #region Erros
@@ -50,10 +50,10 @@ public class PointController : MonoBehaviour
             {
                 _errors = value;
                 OnErrorEvent();
-                UIResult.Instance.UpdateError(_errors);
             }
         }
     }
+    public event Action<int> OnErrorInt;
     public event Action OnError;
     #endregion
 
@@ -70,11 +70,22 @@ public class PointController : MonoBehaviour
     }
 
     #region Events
-    public void OnErrorEvent() => OnError.Invoke();
+    public void OnErrorEvent()
+    {
+        OnError?.Invoke();
+        OnErrorInt?.Invoke(Errors);
+    }
+    public void OnConsecutiveEvent()
+    {
+        OnConsecutive?.Invoke();
+        OnConsecutiveInt?.Invoke(Consecutives);
+    }
 
-    public void OnConsecutiveEvent() => OnConsecutive.Invoke(_consecutives);
-
-    public void OnAcceptEvent() => OnAccept.Invoke();
+    public void OnAcceptEvent()
+    {
+        OnAccept?.Invoke();
+        OnAcceptInt?.Invoke(Accept);
+    }
     #endregion
 
 }
