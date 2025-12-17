@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40c40296d663c884a82611dbd501f0cf, type: 3}
+  m_Name: Stage2 1
+  m_EditorClassIdentifier: 
+  GameMode: 0
+  GameMusic: {fileID: 8300000, guid: 90685a146ec1c47caa952e9d908d23c0, type: 3}
+  SceneSettings:
+    SkyboxMaterial: {fileID: 2100000, guid: a09e2e60f7cbcfb469fd9ba84e6bb618, type: 2}
+    GroundMaterial: {fileID: 2100000, guid: b8ec9440f06384746a94b6d5afa3230e, type: 2}
+    PlataformMaterial: {fileID: 2100000, guid: 1c5362e6da8e57648a72257d61422d6a, type: 2}
+    WallMaterial: {fileID: 2100000, guid: bc066615580b0c74ea6ab176b3c96d4a, type: 2}
+  BuildSettings:
+    PrimaryColor: {r: 0, g: 1.5849056, b: 0.43262595, a: 1}
+    SecondaryColor: {r: 0.016375974, g: 0.70382243, b: 3.4716983, a: 1}

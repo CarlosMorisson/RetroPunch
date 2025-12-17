@@ -8,6 +8,7 @@ public class ObjectPooler : MonoBehaviour
     [System.Serializable]
     public class Pool
     {
+        public Transform Parent;
         public string tag;
         public GameObject prefab;
         public int size;
@@ -39,7 +40,7 @@ public class ObjectPooler : MonoBehaviour
 
             for (int i = 0; i < pool.size; i++)
             {
-                GameObject obj = Instantiate(pool.prefab);
+                GameObject obj = Instantiate(pool.prefab, pool.Parent);
                 obj.SetActive(false); 
                 objectPool.Enqueue(obj);
             }

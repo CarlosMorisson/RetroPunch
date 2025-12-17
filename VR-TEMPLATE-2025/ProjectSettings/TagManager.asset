@@ -24,6 +24,11 @@ TagManager:
   - Particle
   - BossRainProjectile
   - RainTargetMarker
+  - FinalBoost
+  - Wall
+  - Ground
+  - PrimaryColor
+  - SecondaryColor
   layers:
   - Default
   - TransparentFX
@@ -34,8 +39,8 @@ TagManager:
   - Ignore
   - Player
   - CollideWithHands
-  - 
-  - 
+  - Feedback
+  - Box
   - 
   - 
   - 
