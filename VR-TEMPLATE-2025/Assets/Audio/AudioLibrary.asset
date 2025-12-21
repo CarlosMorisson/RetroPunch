@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf54f9e307aee2d47b6088931b4ff179, type: 3}
+  m_Name: AudioLibrary
+  m_EditorClassIdentifier: 
+  audios:
+  - audioName: Evolution Impasse
+    clip: {fileID: 8300000, guid: 90685a146ec1c47caa952e9d908d23c0, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 0.56
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Romancing The Storm
+    clip: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 0.53
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
