@@ -1628,7 +1628,7 @@ MonoBehaviour:
   songClip: {fileID: 0}
   spectrumSize: 512
   maxVolumeBoostPercent: 0.25
-  maxPitchBoost: 0.05
+  maxPitchBoost: -0.2
 --- !u!4 &288705380
 Transform:
   m_ObjectHideFlags: 0
@@ -2161,6 +2161,7 @@ GameObject:
   - component: {fileID: 390539070}
   - component: {fileID: 390539072}
   - component: {fileID: 390539071}
+  - component: {fileID: 390539073}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: SecondaryColor
@@ -2236,6 +2237,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 390539069}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &390539073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390539069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 1
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &413787211
 GameObject:
   m_ObjectHideFlags: 0
@@ -3193,6 +3209,7 @@ GameObject:
   - component: {fileID: 615395884}
   - component: {fileID: 615395887}
   - component: {fileID: 615395886}
+  - component: {fileID: 615395888}
   m_Layer: 0
   m_Name: Build
   m_TagString: PrimaryColor
@@ -3268,6 +3285,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 615395883}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &615395888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 615395883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 0
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &634485302
 GameObject:
   m_ObjectHideFlags: 0
@@ -3369,7 +3401,7 @@ MonoBehaviour:
   LeftList: []
   audioSource: {fileID: 0}
   spectrumSize: 128
-  amplitude: 30
+  amplitude: 200
   smoothSpeed: 8
   scaleMultiplier: 200
 --- !u!4 &655903908
@@ -4490,6 +4522,7 @@ GameObject:
   - component: {fileID: 808649644}
   - component: {fileID: 808649646}
   - component: {fileID: 808649645}
+  - component: {fileID: 808649647}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: SecondaryColor
@@ -4565,6 +4598,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 808649643}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &808649647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 808649643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 1
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &839567883
 GameObject:
   m_ObjectHideFlags: 0
@@ -5194,15 +5242,15 @@ MonoBehaviour:
   initialIntensity: 0.3
   initialDuration: 0.08
   intensityStep: 0.05
-  durationStep: 0.01
+  durationStep: 2
   maxIntensity: 1
   maxDuration: 0.2
   impactParticles: {fileID: 1931933701}
   initialEmission: 100
   maxEmission: 500
   emissionStep: 25
-  currentIntensity: 0
-  currentDuration: 0
+  currentIntensity: 0.05
+  currentDuration: 0.2
   currentEmission: 0
 --- !u!1 &855258112
 GameObject:
@@ -5215,6 +5263,7 @@ GameObject:
   - component: {fileID: 855258113}
   - component: {fileID: 855258115}
   - component: {fileID: 855258114}
+  - component: {fileID: 855258116}
   m_Layer: 0
   m_Name: Top (1)
   m_TagString: PrimaryColor
@@ -5290,6 +5339,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 855258112}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &855258116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 855258112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 0
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &859732114
 GameObject:
   m_ObjectHideFlags: 0
@@ -5301,6 +5365,7 @@ GameObject:
   - component: {fileID: 859732115}
   - component: {fileID: 859732117}
   - component: {fileID: 859732116}
+  - component: {fileID: 859732118}
   m_Layer: 0
   m_Name: Top
   m_TagString: PrimaryColor
@@ -5376,6 +5441,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 859732114}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &859732118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 859732114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 0
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &861066832
 GameObject:
   m_ObjectHideFlags: 0
@@ -6020,6 +6100,7 @@ GameObject:
   - component: {fileID: 933058171}
   - component: {fileID: 933058173}
   - component: {fileID: 933058172}
+  - component: {fileID: 933058174}
   m_Layer: 0
   m_Name: Build
   m_TagString: SecondaryColor
@@ -6095,6 +6176,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 933058170}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &933058174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 933058170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 1
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &944067533
 GameObject:
   m_ObjectHideFlags: 0
@@ -6160,7 +6256,7 @@ MonoBehaviour:
   LeftList: []
   audioSource: {fileID: 0}
   spectrumSize: 128
-  amplitude: 30
+  amplitude: 200
   smoothSpeed: 10
   scaleMultiplier: 200
 --- !u!4 &967403848
@@ -6534,6 +6630,7 @@ Transform:
   - {fileID: 670368839}
   - {fileID: 40249158}
   - {fileID: 1158239657}
+  - {fileID: 1200786410}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1039228118
@@ -7633,6 +7730,7 @@ GameObject:
   - component: {fileID: 1189616864}
   - component: {fileID: 1189616866}
   - component: {fileID: 1189616865}
+  - component: {fileID: 1189616867}
   m_Layer: 0
   m_Name: RightBase
   m_TagString: PrimaryColor
@@ -7708,6 +7806,69 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1189616863}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1189616867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1189616863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 0
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
+--- !u!1 &1200786409
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1200786410}
+  - component: {fileID: 1200786411}
+  m_Layer: 0
+  m_Name: ColorController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1200786410
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1200786409}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1038605974}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1200786411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1200786409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1cd362ef1a3b0740992a63bdceeda8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorLerpSpeed: 50
+  frequencyMultiplier: 150
+  CurrentPrimary: {r: 0, g: 0, b: 0, a: 0}
+  CurrentSecondary: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1235876769
 GameObject:
   m_ObjectHideFlags: 0
@@ -8769,6 +8930,7 @@ GameObject:
   - component: {fileID: 1306926215}
   - component: {fileID: 1306926217}
   - component: {fileID: 1306926216}
+  - component: {fileID: 1306926218}
   m_Layer: 10
   m_Name: PunchArea
   m_TagString: PrimaryColor
@@ -8844,6 +9006,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1306926214}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1306926218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306926214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 0
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &1351135337
 GameObject:
   m_ObjectHideFlags: 0
@@ -9468,6 +9645,7 @@ GameObject:
   - component: {fileID: 1409495512}
   - component: {fileID: 1409495514}
   - component: {fileID: 1409495513}
+  - component: {fileID: 1409495515}
   m_Layer: 0
   m_Name: Build
   m_TagString: SecondaryColor
@@ -9543,6 +9721,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1409495511}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1409495515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1409495511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 1
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &1420027382
 GameObject:
   m_ObjectHideFlags: 0
@@ -11171,6 +11364,7 @@ Transform:
   m_Children:
   - {fileID: 1515567230}
   - {fileID: 1138885518}
+  - {fileID: 1717225510}
   m_Father: {fileID: 797393146}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1554351881
@@ -12349,6 +12543,7 @@ GameObject:
   - component: {fileID: 1658447288}
   - component: {fileID: 1658447290}
   - component: {fileID: 1658447289}
+  - component: {fileID: 1658447291}
   m_Layer: 0
   m_Name: Plane
   m_TagString: PrimaryColor
@@ -12424,6 +12619,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1658447287}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1658447291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1658447287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 0
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &1687463711
 GameObject:
   m_ObjectHideFlags: 0
@@ -12715,6 +12925,77 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1709121577}
   m_CullTransparentMesh: 1
+--- !u!1001 &1717225509
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1554351876}
+    m_Modifications:
+    - target: {fileID: 1000011396044746, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_Name
+      value: ElectricalSparks
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198000012283690144, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198000012283690144, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+      propertyPath: lengthInSec
+      value: 0.2
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects:
+    - {fileID: 1568518749535582, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+--- !u!4 &1717225510 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4000012832170722, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
+  m_PrefabInstance: {fileID: 1717225509}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1740772373
 GameObject:
   m_ObjectHideFlags: 0
@@ -12726,6 +13007,7 @@ GameObject:
   - component: {fileID: 1740772374}
   - component: {fileID: 1740772377}
   - component: {fileID: 1740772376}
+  - component: {fileID: 1740772378}
   m_Layer: 0
   m_Name: Build
   m_TagString: PrimaryColor
@@ -12801,6 +13083,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1740772373}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1740772378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1740772373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 0
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &1743903553
 GameObject:
   m_ObjectHideFlags: 0
@@ -13015,6 +13312,7 @@ GameObject:
   - component: {fileID: 1798420564}
   - component: {fileID: 1798420566}
   - component: {fileID: 1798420565}
+  - component: {fileID: 1798420567}
   m_Layer: 0
   m_Name: LeftBase
   m_TagString: PrimaryColor
@@ -13090,6 +13388,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1798420563}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1798420567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798420563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 0
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &1800198547
 GameObject:
   m_ObjectHideFlags: 0
@@ -15059,6 +15372,7 @@ GameObject:
   - component: {fileID: 2005046555}
   - component: {fileID: 2005046553}
   - component: {fileID: 2005046554}
+  - component: {fileID: 2005046556}
   m_Layer: 10
   m_Name: PunchCube
   m_TagString: SecondaryColor
@@ -15225,6 +15539,21 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &2005046556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005046548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e9ee1951c3e7f449fcb9b2e5c48449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorType: 1
+  colorProperty: _Color
+  emissionProperty: _EmissionColor
 --- !u!1 &2009662264
 GameObject:
   m_ObjectHideFlags: 0

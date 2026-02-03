@@ -20,5 +20,15 @@ MonoBehaviour:
     PlataformMaterial: {fileID: 2100000, guid: a4115c037cd9c4f4c9b1b73355446825, type: 2}
     WallMaterial: {fileID: 2100000, guid: 195c694c13c958e4a991db661418d01a, type: 2}
   BuildSettings:
-    PrimaryColor: {r: 3.2452831, g: 0.38269842, b: 1.5667002, a: 1}
-    SecondaryColor: {r: 0.32894272, g: 0.64363647, b: 6.3396225, a: 1}
+    PrimaryColorLight: {r: 0.9122374, g: 0.2320754, b: 1, a: 1}
+    PrimaryColorDark: {r: 1, g: 0, b: 0.48120308, a: 1}
+    SecondaryColorLight: {r: 0, g: 0.34151268, b: 1, a: 1}
+    SecondaryColorDark: {r: 0, g: 0.09842662, b: 0.7490196, a: 1}
+    PrimaryColorFreezeLight: {r: 0, g: 0, b: 0, a: 0}
+    PrimaryColorFreezeDark: {r: 0, g: 0, b: 0, a: 0}
+    SecondaryColorFreezeLight: {r: 0, g: 0, b: 0, a: 0}
+    SecondaryColorFreezeDark: {r: 0, g: 0, b: 0, a: 0}
+    PrimaryColorPowerLight: {r: 0, g: 0, b: 0, a: 0}
+    PrimaryColorPowerDark: {r: 0, g: 0, b: 0, a: 0}
+    SecondaryColorPowerLight: {r: 0, g: 0, b: 0, a: 0}
+    SecondaryColorPowerDark: {r: 0, g: 0, b: 0, a: 0}

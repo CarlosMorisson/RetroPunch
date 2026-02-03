@@ -103,6 +103,17 @@ public class AudioController : MonoBehaviour
         if (sources.TryGetValue(audioName, out var source))
             source.pitch = pitch;
     }
+    public List<AudioSource> GetPlayingSources()
+    {
+        List<AudioSource> playing = new();
 
+        foreach (var source in sources.Values)
+        {
+            if (source != null && source.isPlaying)
+                playing.Add(source);
+        }
+
+        return playing;
+    }
     #endregion
 }

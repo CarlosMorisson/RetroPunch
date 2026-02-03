@@ -28,10 +28,38 @@ public class SceneSettings
 [System.Serializable]
 public class BuildSettings
 {
+    [Header("Cores base da fase")]
     [ColorUsage(true, true)]
-    public Color PrimaryColor;
+    public Color PrimaryColorLight;
     [ColorUsage(true, true)]
-    public Color SecondaryColor;
+    public Color PrimaryColorDark;
+    [Space(10)]
+    [ColorUsage(true, true)]
+    public Color SecondaryColorLight;
+    [ColorUsage(true, true)]
+    public Color SecondaryColorDark;
+    [Space(10)]
+    [Header("Cores do freeze time")]
+    [ColorUsage(true, true)]
+    public Color PrimaryColorFreezeLight;
+    [ColorUsage(true, true)]
+    public Color PrimaryColorFreezeDark;
+    [Space(10)]
+    [ColorUsage(true, true)]
+    public Color SecondaryColorFreezeLight;
+    [ColorUsage(true, true)]
+    public Color SecondaryColorFreezeDark;
+    [Space(10)]
+    [Header("Cores do power time")]
+    [ColorUsage(true, true)]
+    public Color PrimaryColorPowerLight;
+    [ColorUsage(true, true)]
+    public Color PrimaryColorPowerDark;
+    [Space(10)]
+    [ColorUsage(true, true)]
+    public Color SecondaryColorPowerLight;
+    [ColorUsage(true, true)]
+    public Color SecondaryColorPowerDark;
 }
 public enum GameType
 {

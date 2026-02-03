@@ -90,7 +90,7 @@ public class SkyboxVisual : MonoBehaviour
     {
         if (songController == null || skyboxMaterial == null) return;
 
-        float freq = songController.GetFrequency();
+        float freq = songController.GetGlobalFrequencyMultiplicative();
         float target = freq * intensityMultiplier;
 
         smoothedFrequency = Mathf.Lerp(smoothedFrequency, target, Time.deltaTime * smoothSpeed);

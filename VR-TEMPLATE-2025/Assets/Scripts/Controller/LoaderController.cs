@@ -15,9 +15,6 @@ public class LoaderController : MonoBehaviour
     [SerializeField] private SongController SongGame;
     [SerializeField] private SkyboxVisual SkyboxVisual;
 
-    private const string PRIMARY_COLOR = "PrimaryColor";
-    private const string SECONDARY_COLOR = "SecondaryColor";
-
     private void Awake()
     {
         Instance = this;
@@ -27,7 +24,7 @@ public class LoaderController : MonoBehaviour
         SceneLoad();
         LoadSong();
 
-        ApplySceneColors(); 
+        ColorController.Instance.Initialize(LoadGame.BuildSettings);
     }
 
     private void LoadSong()
@@ -49,67 +46,4 @@ public class LoaderController : MonoBehaviour
         );
     }
 
-    // =========================================================
-    // =========================================================
-    private void ApplySceneColors()
-    {
-        ApplyColorByTag(PRIMARY_COLOR, LoadGame.BuildSettings.PrimaryColor);
-        ApplyColorByTag(SECONDARY_COLOR, LoadGame.BuildSettings.SecondaryColor);
-    }
-
-    private void ApplyColorByTag(string tag, Color hdrColor)
-    {
-        GameObject[] objs = GameObject.FindGameObjectsWithTag(tag);
-
-        foreach (GameObject obj in objs)
-        {
-            Renderer r = obj.GetComponent<Renderer>();
-            if (r == null) continue;
-
-            Material instancedMat = CreateMaterialWithColor(r.sharedMaterial, hdrColor);
-            r.material = instancedMat;
-        }
-    }
-
-    // =========================================================
-    // =========================================================
-    public Material GetPrimaryMaterial(Material baseMaterial)
-    {
-        return CreateMaterialWithColor(
-            baseMaterial,
-            LoadGame.BuildSettings.PrimaryColor
-        );
-    }
-
-    // =========================================================
-    // =========================================================
-    public Material GetSecondaryMaterial(Material baseMaterial)
-    {
-        return CreateMaterialWithColor(
-            baseMaterial,
-            LoadGame.BuildSettings.SecondaryColor
-        );
-    }
-
-    // =========================================================
-    // =========================================================
-    private Material CreateMaterialWithColor(Material source, Color hdrColor)
-    {
-        if (source == null) return null;
-
-        Material mat = new Material(source);
-
-        // Cor base
-        if (mat.HasProperty("_Color"))
-            mat.SetColor("_Color", hdrColor);
-
-        // Emission (HDR / Bloom)
-        if (mat.HasProperty("_EmissionColor"))
-        {
-            mat.EnableKeyword("_EMISSION");
-            mat.SetColor("_EmissionColor", hdrColor);
-        }
-
-        return mat;
-    }
 }

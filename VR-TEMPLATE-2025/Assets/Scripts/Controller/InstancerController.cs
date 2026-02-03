@@ -34,7 +34,7 @@ public class InstancerController : MonoBehaviour
         if (prefabs == null || prefabs.Length == 0 || songController == null || spawnParent == null)
             return;
 
-        float freq = Mathf.Clamp01(songController.GetFrequency());
+        float freq = Mathf.Clamp01(songController.GetGlobalFrequencyMultiplicative());
 
         float dynamicRate = baseSpawnRate - (freq * spawnRateMultiplier);
         dynamicRate = Mathf.Clamp(dynamicRate, MIN_RATE, MAX_RATE);

@@ -18,31 +18,42 @@ public class ProgressEffectVisual : MonoBehaviour
     [SerializeField] private float maxEmission = 500f;
     [SerializeField] private float emissionStep = 25f;
 
-
     [Header("Runtime (Debug)")]
     [SerializeField] private float currentIntensity;
     [SerializeField] private float currentDuration;
     [SerializeField] private float currentEmission;
 
     private ParticleSystem.EmissionModule emissionModule;
-    private void Awake() => Instance = this;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
         if (impactParticles != null)
         {
             emissionModule = impactParticles.emission;
-            emissionModule.rateOverTime = initialEmission;
         }
 
         ResetValues();
-        LoaderController.Instance.GetPrimaryMaterial(impactParticles.GetComponent<ParticleSystemRenderer>().material);
+
+        if (impactParticles != null)
+        {
+            ColorController.Instance
+                .GetPrimaryMaterial(
+                    impactParticles.GetComponent<ParticleSystemRenderer>().material
+                );
+        }
     }
 
+    [ContextMenu("TrySuccess")]
     public void Success()
     {
         currentIntensity = Mathf.Min(currentIntensity + intensityStep, maxIntensity);
         currentDuration = Mathf.Min(currentDuration + durationStep, maxDuration);
+
         SongController.Instance.ImpactBoost(currentIntensity, currentDuration);
 
         currentEmission = Mathf.Min(currentEmission + emissionStep, maxEmission);
@@ -55,11 +66,17 @@ public class ProgressEffectVisual : MonoBehaviour
     {
         ResetValues();
     }
+
     private void ResetValues()
     {
         currentIntensity = initialIntensity;
         currentDuration = initialDuration;
-
         currentEmission = initialEmission;
+
+        if (impactParticles != null)
+        {
+            emissionModule.rateOverTime = currentEmission;
+            impactParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
     }
 }

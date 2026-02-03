@@ -15,7 +15,7 @@ public class SongController : MonoBehaviour
 
     [Header("Impact FX")]
     [Range(0f, 1f)] public float maxVolumeBoostPercent = 0.25f; // +25%
-    [Range(0f, 0.2f)] public float maxPitchBoost = 0.05f;       // pitch leve
+    [Range(-0.2f, 0.2f)] public float maxPitchBoost = 0.05f;       // pitch leve
 
     public AudioSource audioSource { get; private set; }
 
@@ -113,6 +113,31 @@ public class SongController : MonoBehaviour
 
         impactRoutine = null;
     }
+    public float GetGlobalFrequency()
+    {
+        var sources = AudioController.Instance.GetPlayingSources();
+        if (sources.Count == 0)
+            return 0f;
+
+        if (spectrumData == null || spectrumData.Length != spectrumSize)
+            spectrumData = new float[spectrumSize];
+
+        float totalEnergy = 0f;
+
+        foreach (var source in sources)
+        {
+            source.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
+
+            float sum = 0f;
+            for (int i = 0; i < spectrumData.Length; i++)
+                sum += spectrumData[i];
+
+            // pondera pelo volume do som
+            totalEnergy += sum * source.volume;
+        }
+
+        return totalEnergy;
+    }
 
     public float GetFrequency()
     {
@@ -125,6 +150,49 @@ public class SongController : MonoBehaviour
             sum += spectrumData[i];
 
         return sum * 10f;
+    }
+    public float GetGlobalFrequencyMultiplicative()
+    {
+        var sources = AudioController.Instance.GetPlayingSources();
+        if (sources.Count == 0)
+            return 0f;
+
+        float result = 1f;
+
+        foreach (var source in sources)
+        {
+            source.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
+
+            float peak = 0f;
+            foreach (var v in spectrumData)
+                if (v > peak) peak = v;
+
+            result *= Mathf.Clamp(peak * 10f, 0.8f, 1.5f);
+        }
+
+        return result;
+    }
+    public float[] GetGlobalSpectrum()
+    {
+        var sources = AudioController.Instance.GetPlayingSources();
+        if (sources.Count == 0)
+            return null;
+
+        if (spectrumData == null || spectrumData.Length != spectrumSize)
+            spectrumData = new float[spectrumSize];
+
+        System.Array.Clear(spectrumData, 0, spectrumData.Length);
+
+        foreach (var source in sources)
+        {
+            float[] temp = new float[spectrumSize];
+            source.GetSpectrumData(temp, 0, FFTWindow.BlackmanHarris);
+
+            for (int i = 0; i < spectrumSize; i++)
+                spectrumData[i] += temp[i] * source.volume;
+        }
+
+        return spectrumData;
     }
 
     public float GetPeakFrequency()

@@ -17,11 +17,29 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 90685a146ec1c47caa952e9d908d23c0, type: 3}
     loop: 0
     volume: 1
-    pitch: 0.56
+    pitch: 1
     mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
   - audioName: Romancing The Storm
     clip: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
     loop: 0
-    volume: 1
-    pitch: 0.53
+    volume: 0.04
+    pitch: 1
     mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Hit1
+    clip: {fileID: 8300000, guid: 11cf461ebe3c6f064aab396acdbba57a, type: 3}
+    loop: 0
+    volume: 0.04
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Hit2
+    clip: {fileID: 8300000, guid: e2a7ade5995117f45ab28d0ae6680f79, type: 3}
+    loop: 0
+    volume: 0.04
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Hit3
+    clip: {fileID: 8300000, guid: 4b5967a1eb69c6dd5b90a8cbcfb2a5fa, type: 3}
+    loop: 0
+    volume: 0.04
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
