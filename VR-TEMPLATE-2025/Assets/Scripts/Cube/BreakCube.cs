@@ -38,33 +38,28 @@ public class BreakCube : MonoBehaviour
     /// </summary>
     private void Explode()
     {
-        Vector3 center = explosionCenter.position - transform.forward * 0.3f;
+        Vector3 center = explosionCenter.position;
 
-        for (int i = 0; i < targets.Count; i++)
+        foreach (var rb in targets)
         {
-            Rigidbody rb = targets[i];
             if (rb == null) continue;
 
             rb.useGravity = true;
 
-            Vector3 direction = rb.worldCenterOfMass - center;
-            float distance = direction.magnitude;
+            Vector3 dir = rb.worldCenterOfMass - center;
+            float distance = dir.magnitude;
 
-            if (distance > explosionRadius)
+            if (distance > explosionRadius || distance <= 0.001f)
                 continue;
 
-            if (direction.sqrMagnitude < 0.001f)
-                direction = (rb.transform.position - center);
+            float strength = Mathf.Pow(1f - (distance / explosionRadius), 2f);
+            Vector3 forceDir = dir.normalized;
 
-            direction.Normalize();
+            Vector3 force = forceDir * explosionForce * strength;
 
-            float strength = 1f - (distance / explosionRadius);
+            force += Vector3.up * upwardsModifier * strength;
 
-            Vector3 force =
-                direction * explosionForce * strength +
-                Vector3.up * upwardsModifier * strength;
-
-            rb.AddForce(-force, ForceMode.Impulse);
+            rb.AddForceAtPosition(force, rb.worldCenterOfMass, ForceMode.Impulse);
         }
     }
 

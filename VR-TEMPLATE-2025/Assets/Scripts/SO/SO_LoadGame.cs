@@ -9,9 +9,6 @@ public class SO_LoadGame : ScriptableObject
     [Header("Game Music")]
     public AudioClip GameMusic;
     [Space(20)]
-    [Header("Configuracoes De Cena")]
-    public SceneSettings SceneSettings;
-    [Space(20)]
     [Header("Configuracao de Construcoes")]
     public BuildSettings BuildSettings;
 }
@@ -38,6 +35,9 @@ public class BuildSettings
     public Color SecondaryColorLight;
     [ColorUsage(true, true)]
     public Color SecondaryColorDark;
+    [Space(20)]
+    [Header("Configuracoes De Cena Base")]
+    public SceneSettings BaseSceneSettings;
     [Space(10)]
     [Header("Cores do freeze time")]
     [ColorUsage(true, true)]
@@ -49,6 +49,9 @@ public class BuildSettings
     public Color SecondaryColorFreezeLight;
     [ColorUsage(true, true)]
     public Color SecondaryColorFreezeDark;
+    [Space(20)]
+    [Header("Configuracoes De Cena Freeze")]
+    public SceneSettings FreezeSceneSettings;
     [Space(10)]
     [Header("Cores do power time")]
     [ColorUsage(true, true)]
@@ -60,6 +63,9 @@ public class BuildSettings
     public Color SecondaryColorPowerLight;
     [ColorUsage(true, true)]
     public Color SecondaryColorPowerDark;
+    [Space(20)]
+    [Header("Configuracoes De Cena Power")]
+    public SceneSettings PowerSceneSettings;
 }
 public enum GameType
 {

@@ -14,11 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameMode: 0
   GameMusic: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
-  SceneSettings:
-    SkyboxMaterial: {fileID: 2100000, guid: bc956c2a94277984ab315b9e44015434, type: 2}
-    GroundMaterial: {fileID: 2100000, guid: d9d66429d76d45e4588709a0f48707ed, type: 2}
-    PlataformMaterial: {fileID: 2100000, guid: d9d66429d76d45e4588709a0f48707ed, type: 2}
-    WallMaterial: {fileID: 2100000, guid: 94eebd9d324eddd49be6e843f56d7ec0, type: 2}
   BuildSettings:
-    PrimaryColor: {r: 1024, g: 922.19727, b: 0, a: 1}
-    SecondaryColor: {r: 0, g: 0, b: 0, a: 1}
+    PrimaryColorLight: {r: 0, g: 0, b: 0, a: 0}
+    PrimaryColorDark: {r: 0, g: 0, b: 0, a: 0}
+    SecondaryColorLight: {r: 0, g: 0, b: 0, a: 0}
+    SecondaryColorDark: {r: 0, g: 0, b: 0, a: 0}
+    BaseSceneSettings:
+      SkyboxMaterial: {fileID: 0}
+      GroundMaterial: {fileID: 0}
+      PlataformMaterial: {fileID: 0}
+      WallMaterial: {fileID: 0}
+    PrimaryColorFreezeLight: {r: 0, g: 0.27607727, b: 0.6075471, a: 1}
+    PrimaryColorFreezeDark: {r: 0, g: 0.6882615, b: 1, a: 1}
+    SecondaryColorFreezeLight: {r: 1, g: 1, b: 1, a: 1}
+    SecondaryColorFreezeDark: {r: 0.82641506, g: 0.80302596, b: 0.80302596, a: 1}
+    FreezeSceneSettings:
+      SkyboxMaterial: {fileID: 0}
+      GroundMaterial: {fileID: 0}
+      PlataformMaterial: {fileID: 0}
+      WallMaterial: {fileID: 0}
+    PrimaryColorPowerLight: {r: 0.90021396, g: 1, b: 0.27735847, a: 1}
+    PrimaryColorPowerDark: {r: 0.32935095, g: 0.3660378, b: 0, a: 1}
+    SecondaryColorPowerLight: {r: 1, g: 0.41826248, b: 0.2396226, a: 1}
+    SecondaryColorPowerDark: {r: 1, g: 0.1741546, b: 0.118867874, a: 1}
+    PowerSceneSettings:
+      SkyboxMaterial: {fileID: 0}
+      GroundMaterial: {fileID: 0}
+      PlataformMaterial: {fileID: 0}
+      WallMaterial: {fileID: 0}

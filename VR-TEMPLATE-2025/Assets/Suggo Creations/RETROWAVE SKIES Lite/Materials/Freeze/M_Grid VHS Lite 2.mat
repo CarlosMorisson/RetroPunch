@@ -81,9 +81,9 @@ Material:
     - _ZWrite: 1
     - _ZWriteControl: 0
     m_Colors:
-    - _GridColor: {r: 0, g: 2.4993374, b: 0.5707766, a: 1}
+    - _GridColor: {r: 3.336812, g: 3.336812, b: 3.336812, a: 1}
     - _GridSpeed: {r: 0, g: -0.1, b: 0, a: 0}
-    - _GroundColor: {r: 0.6039216, g: 0.9152208, b: 1, a: 1}
+    - _GroundColor: {r: 0.2999999, g: 0.6049552, b: 1, a: 1}
     - _Parallax_Color: {r: 0, g: 2.101961, b: 2.9960785, a: 1}
     - _Tiling: {r: 0.1, g: 0.1, b: 0, a: 0}
   m_BuildTextureStacks: []

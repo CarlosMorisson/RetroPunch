@@ -1,5 +1,10 @@
+
 using UnityEngine;
 using System;
+using UnityEngine.Events;
+using System.Linq;
+using System.Collections.Generic;
+
 public class PointController : MonoBehaviour
 {
     public static PointController Instance;
@@ -57,7 +62,17 @@ public class PointController : MonoBehaviour
     public event Action OnError;
     #endregion
 
+    public List<EventOnConsecutives> EventsTrigger = new();
+
     private void Awake() => Instance = this;
+    private void OnEnable()
+    {
+        OnConsecutiveInt += CheckConsecutiveEvents;
+    }
+    private void OnDisable()
+    {
+        OnConsecutiveInt -= CheckConsecutiveEvents;
+    }
     public void IncreasePoint()
     {
         Accept++;
@@ -88,4 +103,32 @@ public class PointController : MonoBehaviour
     }
     #endregion
 
+    public void CheckConsecutiveEvents(int consecutives)
+    {
+        if (consecutives <= 0 || EventsTrigger == null || EventsTrigger.Count == 0)
+            return;
+
+        for (int i = 0; i < EventsTrigger.Count; i++)
+        {
+            var evt = EventsTrigger[i];
+
+            if (evt == null || evt.PointTrigger <= 0)
+                continue;
+
+            // dispara em múltiplos do PointTrigger
+            if (consecutives >= evt.PointTrigger &&
+                consecutives % evt.PointTrigger == 0)
+            {
+                evt.EventTrigger?.Invoke();
+            }
+        }
+    }
+}
+[System.Serializable]
+public class EventOnConsecutives
+{
+    [Header("Point Trigger")]
+    public int PointTrigger;
+    [Header("Event On Trigger")]
+    public UnityEvent EventTrigger;
 }

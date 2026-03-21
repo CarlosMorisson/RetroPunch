@@ -34,15 +34,10 @@ public class LoaderController : MonoBehaviour
 
     private void SceneLoad()
     {
-        SkyboxVisual.SetLoadMaterial(
-            LoadGame.SceneSettings.SkyboxMaterial,
-            LoadGame.SceneSettings.GroundMaterial,
-            LoadGame.SceneSettings.PlataformMaterial
-        );
-
-        SkyboxVisual.SetObjectsMaterial(
-            LoadGame.SceneSettings.PlataformMaterial,
-            LoadGame.SceneSettings.WallMaterial
+        SkyboxVisual.InitializeSceneMaterials(
+            LoadGame.BuildSettings.BaseSceneSettings,
+            LoadGame.BuildSettings.FreezeSceneSettings,
+            LoadGame.BuildSettings.PowerSceneSettings
         );
     }
 

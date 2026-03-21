@@ -1,107 +1,217 @@
+using System.Collections;
 using UnityEngine;
+using DG.Tweening;
+
 [System.Serializable]
 public class SkyboxSettings
 {
     [Header("Horizontal Strenght")]
     public float StartHorizontalStrenght;
     public float MultiplierHorizontalStrenght;
-    [Space(15)]
+
     [Header("Horizon SkyHeight")]
     public float StartHorizontalSkyHeight;
     public float MultiplierHorizontalSkyHeight;
-    [Space(15)]
+
     [Header("Start Density")]
     public float StartStarDensity;
     public float MultiplierStartDensity;
-    [Space(15)]
+
     [Header("Sun Size")]
     public float StartDiscSize;
     public float MultiplierDiscSize;
-    [Space(15)]
+
     [Header("Cor")]
     public float MinColor;
     public float MaxColor;
-    [Space(15)]
+
     [Header("Ground")]
     public float StartGround;
     public float MultiplierGround;
 }
+
 public class SkyboxVisual : MonoBehaviour
 {
     [Header("References")]
-    public SongController songController;       
-    public Material skyboxMaterial;
-    public Material groundMaterial;
-    public Material plataformMaterial;
+    public SongController songController;
+
+    [Header("Renderers")]
     public MeshRenderer plataformRenderer;
     public MeshRenderer groundRenderer;
-
-    [Header("DetailMaterial")]
     public MeshRenderer playerPlataformRenderer;
     public MeshRenderer wallRenderer;
 
     [Header("Frequency Response")]
-    public float intensityMultiplier = 1f;      
+    public float intensityMultiplier = 1f;
     public float smoothSpeed = 5f;
 
     [Header("Skybox Settings")]
     public SkyboxSettings SkyboxSettings;
+
     private float smoothedFrequency;
+
+    private SceneSettings baseScene;
+    private SceneSettings freezeScene;
+    private SceneSettings powerScene;
 
     private Material skyboxInstance;
     private Material groundInstance;
     private Material plataformInstance;
+    private Material wallInstance;
+
     private Color baseSkyColor;
 
     private const string COLOR_NAME = "_SkyColor";
 
-    /// <summary>
-    /// Settar Novos Materials na ordem skybox, ground, plataform
-    /// </summary>
+    private bool isTransitioning = false;
 
-    public void SetLoadMaterial(Material skybox, Material ground, Material plataform)
+
+    public void InitializeSceneMaterials(
+        SceneSettings baseSceneSettings,
+        SceneSettings freezeSceneSettings,
+        SceneSettings powerSceneSettings)
     {
-        skyboxMaterial = skybox;
-        groundMaterial = ground;
-        plataformMaterial = plataform;
+        baseScene = baseSceneSettings;
+        freezeScene = freezeSceneSettings;
+        powerScene = powerSceneSettings;
+
+        ApplySceneInstant(baseScene);
     }
-    /// <summary>
-    /// Settar Novos Materials na ordem plataform, wall
-    /// </summary>
-    public void SetObjectsMaterial(Material plataform, Material wall)
+
+    void ApplySceneInstant(SceneSettings scene)
     {
-        playerPlataformRenderer.material = plataform;
-        wallRenderer.material = wall;
+        skyboxInstance = new Material(scene.SkyboxMaterial);
+        groundInstance = new Material(scene.GroundMaterial);
+        plataformInstance = new Material(scene.PlataformMaterial);
+        wallInstance = new Material(scene.WallMaterial);
+
+        RenderSettings.skybox = skyboxInstance;
+
+        groundRenderer.material = groundInstance;
+        plataformRenderer.material = plataformInstance;
+        playerPlataformRenderer.material = plataformInstance;
+        wallRenderer.material = wallInstance;
+
+        baseSkyColor = skyboxInstance.GetColor(COLOR_NAME);
     }
-    void Start()
+
+    public void SetBaseSkybox() => SmoothTransition(baseScene);
+    public void SetFreezeSkybox() => SmoothTransition(freezeScene);
+    public void SetPowerSkybox() => SmoothTransition(powerScene);
+
+
+    void SmoothTransition(SceneSettings target, float duration = 0.2f)
     {
-        if (skyboxMaterial != null)
+        DOTween.Kill(this);
+
+        isTransitioning = true;
+
+        Material targetSky = target.SkyboxMaterial;
+        Material targetGround = target.GroundMaterial;
+        Material targetPlatform = target.PlataformMaterial;
+        Material targetWall = target.WallMaterial;
+
+        CopyTextures(targetSky, skyboxInstance);
+        CopyTextures(targetGround, groundInstance);
+        CopyTextures(targetPlatform, plataformInstance);
+        CopyTextures(targetWall, wallInstance);
+
+        Sequence seq = DOTween.Sequence().SetTarget(this);
+
+        seq.Join(TweenMaterialColor(skyboxInstance, targetSky, "_SkyColor", duration));
+
+        seq.Join(TweenMaterialColor(groundInstance, targetGround, "_GridColor", duration));
+        seq.Join(TweenMaterialColor(groundInstance, targetGround, "_GroundColor", duration));
+
+        seq.Join(TweenMaterialColor(plataformInstance, targetPlatform, "_GridColor", duration));
+        seq.Join(TweenMaterialColor(plataformInstance, targetPlatform, "_GroundColor", duration));
+
+        seq.Join(TweenMaterialColor(wallInstance, targetWall, "_Color", duration));
+
+        seq.Join(TweenFloat(skyboxInstance, targetSky, "_HorizonStrength", duration));
+        seq.Join(TweenFloat(skyboxInstance, targetSky, "_HorizonSkyHeight", duration));
+        seq.Join(TweenFloat(skyboxInstance, targetSky, "_StarSize", duration));
+        seq.Join(TweenFloat(skyboxInstance, targetSky, "_SunMaskSize", duration));
+
+        seq.OnComplete(() =>
         {
-            skyboxInstance = new Material(skyboxMaterial); 
-            RenderSettings.skybox = skyboxInstance;
             baseSkyColor = skyboxInstance.GetColor(COLOR_NAME);
-            groundInstance = new Material(groundMaterial);
-            groundRenderer.material = groundInstance;
-            plataformInstance = new Material(plataformMaterial);
-            plataformRenderer.material = plataformInstance;
+            isTransitioning = false;
+        });
+
+        RenderSettings.skybox = skyboxInstance;
+    }
+
+    Tween TweenMaterialColor(Material current, Material target, string property, float duration)
+    {
+        if (!current.HasProperty(property) || !target.HasProperty(property))
+            return null;
+
+        Color start = current.GetColor(property);
+        Color end = target.GetColor(property);
+
+        return DOTween.To(() => start, x =>
+        {
+            start = x;
+            current.SetColor(property, x);
+        }, end, duration).SetEase(Ease.InOutSine);
+    }
+
+    Tween TweenFloat(Material current, Material target, string property, float duration)
+    {
+        if (!current.HasProperty(property) || !target.HasProperty(property))
+            return null;
+
+        float start = current.GetFloat(property);
+        float end = target.GetFloat(property);
+
+        return DOTween.To(() => start, x =>
+        {
+            start = x;
+            current.SetFloat(property, x);
+        }, end, duration).SetEase(Ease.InOutSine);
+    }
+
+    void CopyTextures(Material from, Material to)
+    {
+        foreach (var name in from.GetTexturePropertyNames())
+        {
+            to.SetTexture(name, from.GetTexture(name));
         }
     }
+
     void Update()
     {
-        if (songController == null || skyboxMaterial == null) return;
+        if (isTransitioning)
+            return;
+
+        if (songController == null || skyboxInstance == null)
+            return;
 
         float freq = songController.GetGlobalFrequencyMultiplicative();
         float target = freq * intensityMultiplier;
 
-        smoothedFrequency = Mathf.Lerp(smoothedFrequency, target, Time.deltaTime * smoothSpeed);
+        smoothedFrequency = Mathf.Lerp(
+            smoothedFrequency,
+            target,
+            Time.deltaTime * smoothSpeed
+        );
 
-        skyboxInstance.SetFloat("_HorizonStrength", SkyboxSettings.StartHorizontalStrenght + smoothedFrequency * SkyboxSettings.MultiplierHorizontalStrenght);
+        skyboxInstance.SetFloat("_HorizonStrength",
+            SkyboxSettings.StartHorizontalStrenght +
+            smoothedFrequency * SkyboxSettings.MultiplierHorizontalStrenght);
 
-        skyboxInstance.SetFloat("_HorizonSkyHeight", SkyboxSettings.StartHorizontalSkyHeight + smoothedFrequency * SkyboxSettings.MultiplierHorizontalStrenght);
+        skyboxInstance.SetFloat("_HorizonSkyHeight",
+            SkyboxSettings.StartHorizontalSkyHeight +
+            smoothedFrequency * SkyboxSettings.MultiplierHorizontalSkyHeight);
 
-        skyboxInstance.SetFloat("_StarSize", SkyboxSettings.StartStarDensity + smoothedFrequency * SkyboxSettings.MultiplierStartDensity);
+        skyboxInstance.SetFloat("_StarSize",
+            SkyboxSettings.StartStarDensity +
+            smoothedFrequency * SkyboxSettings.MultiplierStartDensity);
 
-        skyboxInstance.SetFloat("_SunMaskSize", SkyboxSettings.StartDiscSize + smoothedFrequency * SkyboxSettings.MultiplierDiscSize);
+        skyboxInstance.SetFloat("_SunMaskSize",
+            SkyboxSettings.StartDiscSize +
+            smoothedFrequency * SkyboxSettings.MultiplierDiscSize);
 
         float colorT = Mathf.Clamp01(smoothedFrequency);
 
@@ -116,14 +226,13 @@ public class SkyboxVisual : MonoBehaviour
 
         skyboxInstance.SetColor(COLOR_NAME, reactiveColor);
 
-        RenderSettings.skybox = skyboxInstance;
+        Vector2 gridSpeed = new Vector2(
+            0,
+            SkyboxSettings.StartGround +
+            smoothedFrequency * SkyboxSettings.MultiplierGround
+        );
 
-        groundInstance.SetVector("_GridSpeed", new Vector2(0, SkyboxSettings.StartGround + smoothedFrequency * SkyboxSettings.MultiplierGround) );
-
-        groundRenderer.material = groundInstance;
-
-        plataformInstance.SetVector("_GridSpeed", new Vector2(0, SkyboxSettings.StartGround + smoothedFrequency * SkyboxSettings.MultiplierGround));
-
-        plataformRenderer.material = plataformInstance;
+        groundInstance.SetVector("_GridSpeed", gridSpeed);
+        plataformInstance.SetVector("_GridSpeed", gridSpeed);
     }
 }
