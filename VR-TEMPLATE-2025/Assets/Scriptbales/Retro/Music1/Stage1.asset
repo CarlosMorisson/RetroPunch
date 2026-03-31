@@ -33,12 +33,12 @@ MonoBehaviour:
       GroundMaterial: {fileID: 2100000, guid: 1c5362e6da8e57648a72257d61422d6a, type: 2}
       PlataformMaterial: {fileID: 2100000, guid: 71143569593237840adb157ab69f7919, type: 2}
       WallMaterial: {fileID: 2100000, guid: bc066615580b0c74ea6ab176b3c96d4a, type: 2}
-    PrimaryColorPowerLight: {r: 0.90021396, g: 1, b: 0.27735847, a: 1}
-    PrimaryColorPowerDark: {r: 0.32935095, g: 0.3660378, b: 0, a: 1}
-    SecondaryColorPowerLight: {r: 1, g: 0.41826248, b: 0.2396226, a: 1}
-    SecondaryColorPowerDark: {r: 1, g: 0.1741546, b: 0.118867874, a: 1}
+    PrimaryColorPowerLight: {r: 1, g: 0.9182916, b: 0, a: 1}
+    PrimaryColorPowerDark: {r: 0.3647059, g: 0.25963974, b: 0, a: 1}
+    SecondaryColorPowerLight: {r: 1, g: 0.09755004, b: 0, a: 1}
+    SecondaryColorPowerDark: {r: 0.90943396, g: 0, b: 0.025736807, a: 1}
     PowerSceneSettings:
-      SkyboxMaterial: {fileID: 0}
-      GroundMaterial: {fileID: 0}
-      PlataformMaterial: {fileID: 0}
-      WallMaterial: {fileID: 0}
+      SkyboxMaterial: {fileID: 2100000, guid: 8af2f7fe1cff1c34a96fe0f1dbd1b0f5, type: 2}
+      GroundMaterial: {fileID: 2100000, guid: 47d6cc12055c1fb4992224c98d9c0755, type: 2}
+      PlataformMaterial: {fileID: 2100000, guid: 75ed59a0d73662d4ca45c4b354ba97fe, type: 2}
+      WallMaterial: {fileID: 2100000, guid: 0d52b3950ee858b42b7c41a413a3e242, type: 2}

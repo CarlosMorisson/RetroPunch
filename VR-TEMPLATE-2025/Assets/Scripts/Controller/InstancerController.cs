@@ -1,12 +1,24 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class InstancerController : MonoBehaviour
 {
+    [System.Serializable]
+    public class PrefabSpawnChance
+    {
+        [Header("PrefabToInstance")]
+        public string prefabTag;
+
+        [Header("ChanceToSpawn")]
+        [Range(0f, 100f)]
+        public float spawnChance;
+    }
+
     [Header("References")]
     public SongController songController;
 
-    [Header("Prefabs (Pool IDs)")]
-    public string[] prefabs;
+    [Header("Prefabs With Chance")]
+    public List<PrefabSpawnChance> prefabs = new();
 
     [Header("Spawn Settings")]
     public Transform spawnParent;
@@ -26,12 +38,12 @@ public class InstancerController : MonoBehaviour
 
     private float spawnTimer;
 
-    private const float MAX_RATE=10;
+    private const float MAX_RATE = 10;
     private const float MIN_RATE = 0.05f;
 
     void Update()
     {
-        if (prefabs == null || prefabs.Length == 0 || songController == null || spawnParent == null)
+        if (prefabs == null || prefabs.Count == 0 || songController == null || spawnParent == null)
             return;
 
         float freq = Mathf.Clamp01(songController.GetGlobalFrequencyMultiplicative());
@@ -50,13 +62,15 @@ public class InstancerController : MonoBehaviour
 
     void SpawnObject(float freq)
     {
-        string prefabId = prefabs[Random.Range(0, prefabs.Length)];
+        string prefabId = GetRandomPrefabByChance();
+
+        if (string.IsNullOrEmpty(prefabId))
+            return;
 
         Vector3 pos = spawnParent.position;
 
         pos.x += Random.Range(randomX.x, randomX.y);
         pos.y += Random.Range(randomY.x, randomY.y);
-
         pos.z += fixedZOffset;
 
         GameObject obj = ObjectPooler.Instance.SpawnFromPool(
@@ -67,8 +81,52 @@ public class InstancerController : MonoBehaviour
 
         obj.transform.SetParent(spawnParent, true);
 
-        //float scale = baseScale + freq * scaleMultiplier;
-        //obj.transform.localScale = Vector3.one * scale;
+        // opcional
+        // float scale = baseScale + freq * scaleMultiplier;
+        // obj.transform.localScale = Vector3.one * scale;
+    }
+
+
+    string GetRandomPrefabByChance()
+    {
+        float random = Random.Range(0f, 100f);
+        float cumulative = 0f;
+
+        foreach (var p in prefabs)
+        {
+            cumulative += p.spawnChance;
+
+            if (random <= cumulative)
+                return p.prefabTag;
+        }
+
+        return prefabs[0].prefabTag; 
+    }
+
+    private void OnValidate()
+    {
+        if (prefabs == null || prefabs.Count == 0)
+            return;
+
+        float total = 0f;
+
+        foreach (var p in prefabs)
+            total += p.spawnChance;
+
+        if (total == 0f)
+            return;
+
+        if (Mathf.Abs(total - 100f) > 0.01f)
+        {
+            for (int i = 0; i < prefabs.Count; i++)
+            {
+                prefabs[i].spawnChance = (prefabs[i].spawnChance / total) * 100f;
+            }
+
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+#endif
+        }
     }
 
     void OnDrawGizmosSelected()
