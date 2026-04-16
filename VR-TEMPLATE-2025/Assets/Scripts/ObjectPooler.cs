@@ -78,8 +78,20 @@ public class ObjectPooler : MonoBehaviour
             Debug.LogWarning("Pool with tag " + tag + " doesn't exist.");
             return;
         }
-
+        ResetAllRigidbodies(obj);
         obj.SetActive(false);
 
+    }
+    public void ResetAllRigidbodies(GameObject obj)
+    {
+        Rigidbody[] rigidbodies = obj.GetComponentsInChildren<Rigidbody>();
+
+        foreach (Rigidbody rb in rigidbodies)
+        {
+            rb.linearVelocity = Vector3.zero; 
+            rb.angularVelocity = Vector3.zero;
+
+            rb.Sleep();
+        }
     }
 }

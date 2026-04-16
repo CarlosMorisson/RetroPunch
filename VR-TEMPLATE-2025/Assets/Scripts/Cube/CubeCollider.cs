@@ -46,7 +46,7 @@ public class CubeCollider : MonoBehaviour
         if (parent != null)
         {
             CubeMovemment move = parent.GetComponent<CubeMovemment>();
-            if (move != null)
+            if (move != null && move.enableSpeed!=0)
             {
                 move.normalSpeed = move.enableSpeed;
             }

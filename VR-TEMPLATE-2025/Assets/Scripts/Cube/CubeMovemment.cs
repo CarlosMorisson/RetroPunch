@@ -17,7 +17,7 @@ public class CubeMovemment : MonoBehaviour
     public float normalSpeed = 2f;
     public float boostSpeed = 10f;
     [HideInInspector]
-    public float enableSpeed;
+    public float enableSpeed = 2f;
 
     [Header("Boost Control")]
     public Transform boostEndPoint;

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,6 +17,8 @@ public class BreakCube : MonoBehaviour
     [Header("Debug")]
     public bool drawGizmos = true;
 
+    private const float ACTIVE_TIME = 3f;
+
     [ContextMenu("Trigger")]
     public void TestExplosion()
     {
@@ -31,8 +34,16 @@ public class BreakCube : MonoBehaviour
             explosionCenter.position = position;
         GetTargets();
         Explode();
+        StartCoroutine(WaitToActive());
     }
-
+    private IEnumerator WaitToActive()
+    {
+        yield return new WaitForSeconds(ACTIVE_TIME);
+        foreach (Transform child in targetParents)
+        {
+            child.gameObject.SetActive(false);
+        }
+    }
     /// <summary>
     /// Aplica força de explosão nos objetos da lista
     /// </summary>

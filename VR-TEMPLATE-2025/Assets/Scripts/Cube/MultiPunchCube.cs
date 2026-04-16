@@ -35,6 +35,7 @@ public class MultiPunchCube : CubeCollider
 
     private Renderer cachedRenderer;
     private Material originalMaterial;
+    private Vector3 collisionLocation;
 
     private bool hasMisstaken = false;
 
@@ -100,7 +101,7 @@ public class MultiPunchCube : CubeCollider
 
         if (collision.gameObject.CompareTag(WALL_TAG))
         {
-            HandleFail();
+            //HandleFail();
             return;
         }
 
@@ -117,11 +118,12 @@ public class MultiPunchCube : CubeCollider
                 if (AllPointsTouched())
                 {
                     HandleSuccess();
+                    collisionLocation = collision.contacts[0].point;
                 }
             }
             else
             {
-                HandleFail();
+                //HandleFail();
             }
         }
     }
@@ -138,7 +140,11 @@ public class MultiPunchCube : CubeCollider
             point.particle.Play();
 
         if (point.feedback != null)
-            point.feedback.SendMessage("PlayFeedback", SendMessageOptions.DontRequireReceiver);
+        {
+            point.feedback.gameObject.SetActive(true);
+            point.feedback.gameObject.GetComponent<BreakCube>().TriggerExplosion(collisionLocation);
+        }
+            
         point.sphere.transform.DOScale(Vector3.zero, 0.5f);
     }
 
@@ -193,7 +199,10 @@ public class MultiPunchCube : CubeCollider
             mainParticle.Play();
 
         if (mainFeedback != null)
-            mainFeedback.SendMessage("PlayFeedback", SendMessageOptions.DontRequireReceiver);
+        {
+            mainFeedback.gameObject.SetActive(true);
+            mainFeedback.GetComponent<BreakCube>().TriggerExplosion(collisionLocation);
+        }
 
         gameObject.SetActive(false);
     }

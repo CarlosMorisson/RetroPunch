@@ -28,6 +28,7 @@ public class FeedbackCube : MonoBehaviour
 
     private void OnEnable()
     {
+        ResetCube();
         hasCollided = false;
         tweenFinished = false;
         transform.localPosition = initialLocalPosition;
@@ -57,6 +58,8 @@ public class FeedbackCube : MonoBehaviour
         {
             tweenFinished = true;
             manager?.NotifyFinished();
+            gameObject.SetActive(false);
+            ResetCube();
         });
     }
 
