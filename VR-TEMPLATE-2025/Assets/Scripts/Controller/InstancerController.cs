@@ -36,6 +36,7 @@ public class InstancerController : MonoBehaviour
     public float baseScale = 1f;
     public float scaleMultiplier = 2f;
 
+    private bool stop;
     private float spawnTimer;
 
     private const float MAX_RATE = 10;
@@ -43,7 +44,7 @@ public class InstancerController : MonoBehaviour
 
     void Update()
     {
-        if (prefabs == null || prefabs.Count == 0 || songController == null || spawnParent == null)
+        if (prefabs == null || prefabs.Count == 0 || songController == null || spawnParent == null || stop)
             return;
 
         float freq = Mathf.Clamp01(songController.GetGlobalFrequencyMultiplicative());
@@ -59,7 +60,7 @@ public class InstancerController : MonoBehaviour
             SpawnObject(freq);
         }
     }
-
+    public void SetStop(bool value)=>stop = value;
     void SpawnObject(float freq)
     {
         string prefabId = GetRandomPrefabByChance();

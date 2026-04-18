@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class SongController : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class SongController : MonoBehaviour
     [Header("Song Data (Auto)")]
     public string songName;
     public float songDuration;
-
+    private bool wasPlaying = false;
     [Header("Config")]
     public AudioClip songClip;
     public int spectrumSize = 512;
@@ -29,11 +30,17 @@ public class SongController : MonoBehaviour
     {
         Instance = this;
     }
-
+    private bool isPaused = false;
     private void Update()
     {
         if (audioSource != null)
+        {
             UIResult.Instance.UpdateSlider(audioSource.time);
+            if (wasPlaying && !audioSource.isPlaying && audioSource.time == 0)
+            {
+                FinishSong();
+            }
+        }
     }
 
     /// <summary>
@@ -59,7 +66,31 @@ public class SongController : MonoBehaviour
         basePitch = audioSource.pitch;
     }
 
+    public void PauseSong()
+    {
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Pause();
+            isPaused = true;
+            Debug.Log("Música Pausada");
+        }
+    }
+    public void ResumeSong()
+    {
+        if (audioSource != null && isPaused)
+        {
+            audioSource.UnPause();
+            isPaused = false;
+            Debug.Log("Música Retomada");
+        }
+    }
 
+    private void FinishSong()
+    {
+        wasPlaying = false;
+        isPaused = false;
+        GameState.Instance.GameStateEnd();
+    }
     public void ImpactBoost(float intensity, float duration)
     {
         if (audioSource == null || !audioSource.isPlaying)

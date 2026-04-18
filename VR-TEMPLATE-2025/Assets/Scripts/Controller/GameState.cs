@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GameState : MonoBehaviour
 {
@@ -8,7 +9,8 @@ public class GameState : MonoBehaviour
     {
         Game,
         Menu,
-        Pause
+        Pause,
+        End
     };
     [Header("State da cena")]
     public State SceneState;
@@ -35,6 +37,11 @@ public class GameState : MonoBehaviour
         Hard
     };
     public Difficulty difficulty;
+    [Space(10f)]
+    public UnityEvent OnMenuEvent;
+    public UnityEvent OnGameEvent;
+    public UnityEvent OnPauseEvent;
+    public UnityEvent OnEndEvent;
 
 
     void Awake()
@@ -63,6 +70,7 @@ public class GameState : MonoBehaviour
     public void GameStateMenu() => CurrentState = State.Menu;
 
     public void GameStatePause() => CurrentState = State.Pause;
+    public void GameStateEnd() => CurrentState = State.End;
 
     #endregion
     void GameStateChanged(State newState)
@@ -71,13 +79,16 @@ public class GameState : MonoBehaviour
         switch (newState)
         {
             case State.Game:
-
+                OnGameEvent.Invoke();
                 break;
             case State.Pause:
-
+                OnPauseEvent.Invoke();
                 break;
             case State.Menu:
-
+                OnMenuEvent.Invoke();
+                break;
+            case State.End:
+                OnEndEvent.Invoke();
                 break;
         }
     }
