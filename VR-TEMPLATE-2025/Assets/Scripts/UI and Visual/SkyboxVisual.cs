@@ -187,8 +187,7 @@ public class SkyboxVisual : MonoBehaviour
 
         if (songController == null || skyboxInstance == null)
             return;
-
-        float freq = songController.GetGlobalFrequencyMultiplicative();
+        float freq = songController.GetPeakFrequency();
         float target = freq * intensityMultiplier;
 
         smoothedFrequency = Mathf.Lerp(

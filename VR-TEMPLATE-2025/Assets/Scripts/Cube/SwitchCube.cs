@@ -86,15 +86,21 @@ public class SwitchCube : MonoBehaviour
 
     private void LoadCube()
     {
+        if (modeDictionary == null) return; 
+
         foreach (var obj in modeDictionary.Values)
         {
-            if (obj != null)
+            if (obj != null && obj.activeSelf)
                 obj.SetActive(false);
         }
 
         if (modeDictionary.TryGetValue(GameMode, out GameObject match))
         {
-            match.SetActive(true);
+            if (match != null)
+            {
+                if (!match.activeSelf)
+                    match.SetActive(true);
+            }
         }
     }
 }

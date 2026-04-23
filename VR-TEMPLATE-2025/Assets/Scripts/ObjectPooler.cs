@@ -40,9 +40,13 @@ public class ObjectPooler : MonoBehaviour
 
             for (int i = 0; i < pool.size; i++)
             {
-                GameObject obj = Instantiate(pool.prefab, pool.Parent);
-                obj.SetActive(false); 
-                objectPool.Enqueue(obj);
+                if (pool.prefab != null)
+                {
+                    GameObject obj = Instantiate(pool.prefab, pool.Parent);
+                    obj.SetActive(false);
+                    objectPool.Enqueue(obj);
+                }
+                
             }
             poolDictionary.Add(pool.tag, objectPool);
         }

@@ -35,12 +35,39 @@ public class UIResult : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI blockDestructedPercentText;
 
+    private Vector3 _resultTextInitialScale,
+        _errorTextInitialScale,
+        _consecutiveTextInitialScale;
+
+    private Vector3 _resultScale,
+        _errorScale,
+        _consecutiveScale;
+
 
     private const float MULTIPLIER_VALUE = 1.2f;
-    private const float PUNCH_TIME=0.5f;
+    private const float PUNCH_TIME=0.1f;
     private void Awake()
     {
         Instance = this;
+        CacheInitialScale();
+    }
+    private void CacheInitialScale()
+    {
+        _resultTextInitialScale=resultText.transform.localScale;
+        _errorTextInitialScale=errorText.transform.localScale; 
+        _consecutiveTextInitialScale=consecutiveText.transform.localScale;
+
+        _resultScale= new Vector3(resultText.transform.localScale.x*MULTIPLIER_VALUE,
+            resultText.transform.localScale.y * MULTIPLIER_VALUE,
+            resultText.transform.localScale.z * MULTIPLIER_VALUE);
+
+        _errorScale = new Vector3(errorText.transform.localScale.x * MULTIPLIER_VALUE,
+            errorText.transform.localScale.y * MULTIPLIER_VALUE,
+            errorText.transform.localScale.z * MULTIPLIER_VALUE);
+
+        _consecutiveScale = new Vector3(consecutiveText.transform.localScale.x * MULTIPLIER_VALUE,
+            consecutiveText.transform.localScale.y * MULTIPLIER_VALUE,
+            consecutiveText.transform.localScale.z * MULTIPLIER_VALUE);
     }
     public void UpdateSlider(float time) => musicSlider.value = time;
     public void SetSlider()
@@ -56,17 +83,20 @@ public class UIResult : MonoBehaviour
     public void UpdateResult(int result)
     {
         resultText.text = result.ToString();
-        resultText.transform.DOPunchScale(resultText.transform.localScale * MULTIPLIER_VALUE, PUNCH_TIME);
+        resultText.transform.DOPunchScale(_resultScale, PUNCH_TIME).
+            OnComplete(()=> resultText.transform.localScale=_resultTextInitialScale);
     }
     public void UpdateConsecutive(int consecutive)
     {
         consecutiveText.text = consecutive.ToString();
-        consecutiveText.transform.DOPunchScale(consecutiveText.transform.localScale * MULTIPLIER_VALUE, PUNCH_TIME);
+        consecutiveText.transform.DOPunchScale(_consecutiveScale, PUNCH_TIME).
+             OnComplete(() => consecutiveText.transform.localScale = _consecutiveTextInitialScale); ;
     }
     public void UpdateError(int error)
     {
         errorText.text = error.ToString();
-        errorText.transform.DOPunchScale(errorText.transform.localScale * MULTIPLIER_VALUE, PUNCH_TIME);
+        errorText.transform.DOPunchScale(_errorScale, PUNCH_TIME).
+                    OnComplete(() => errorText.transform.localScale = _errorTextInitialScale);
     }
     public void UpdateMusicName(string name)
     {

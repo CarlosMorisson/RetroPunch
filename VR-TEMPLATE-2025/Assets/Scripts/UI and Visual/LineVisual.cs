@@ -23,7 +23,10 @@ public class LineEffectWaveform : MonoBehaviour
     private LineRenderer lr;
     private float[] audioBuffer; 
     private float[] pointsValues; 
-    private float[] smooth;      
+    private float[] smooth;
+
+    private const float AMPLITUDE_VALUE = 50;
+    private const float WIDTH_VALUE = 20;
 
     void Awake()
     {
@@ -49,7 +52,12 @@ public class LineEffectWaveform : MonoBehaviour
             audioSource.spatialBlend = 0f; 
     }
 
-    private void Start() => audioSource = SongController.Instance.audioSource;
+    private void Start()
+    {
+        audioSource = SongController.Instance.audioSource;
+        amplitude = AMPLITUDE_VALUE;
+        width = WIDTH_VALUE;
+    }
     void Update()
     {
         if (audioSource == null) return;

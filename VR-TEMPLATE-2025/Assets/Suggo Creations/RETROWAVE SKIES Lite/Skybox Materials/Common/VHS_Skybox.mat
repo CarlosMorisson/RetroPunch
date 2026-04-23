@@ -75,8 +75,8 @@ Material:
     - BOOLEAN_FF1E9D2611CF4E959316C577475EA27F: 1
     - BOOLEAN_GLITCHYMOON: 1
     - BOOLEAN_PREVENTSTARS: 1
-    - Vector1_7d421ef4d57f45e586330be25bfb5941: 13.55
-    - Vector1_a770b768a8ca40a9b814a01444e6b850: 2.31
+    - Vector1_7d421ef4d57f45e586330be25bfb5941: 50
+    - Vector1_a770b768a8ca40a9b814a01444e6b850: 5
     - _AddPrecomputedVelocity: 0
     - _AlphaCutoffEnable: 0
     - _AlphaDstBlend: 0
@@ -98,7 +98,7 @@ Material:
     - _FogContrast: 30
     - _FogHeight: -5.8
     - _FogPower: 1
-    - _HorizonHeight: 0.438
+    - _HorizonHeight: 1
     - _HorizonStrength: 6.011619
     - _LinesMaskPower: 8.5
     - _LinesSpeed: 1
@@ -110,7 +110,7 @@ Material:
     - _RenderQueueType: 1
     - _SrcBlend: 1
     - _StarDensity: 30
-    - _StarSize: 39.883812
+    - _StarSize: 30
     - _StencilRef: 0
     - _StencilRefDepth: 0
     - _StencilRefDistortionVec: 4
@@ -121,8 +121,8 @@ Material:
     - _StencilWriteMaskDistortionVec: 4
     - _StencilWriteMaskGBuffer: 14
     - _StencilWriteMaskMV: 40
-    - _SunMaskSize: -0.5
-    - _SunMaskSpherize: 0
+    - _SunMaskSize: -1.08
+    - _SunMaskSpherize: 20.5
     - _SunSize: 1
     - _SurfaceType: 0
     - _TransparentBackfaceEnable: 0
@@ -145,8 +145,8 @@ Material:
     - _LinesColor: {r: 0, g: 0.93333316, b: 1, a: 1}
     - _SkyColor: {r: 1, g: 0, b: 1, a: 1}
     - _StarColor: {r: 0, g: 3.5648696, b: 2.8691857, a: 0}
-    - _SunColorOne: {r: 0.57254905, g: 0.96470594, b: 0.3019608, a: 1}
-    - _SunColorTwo: {r: 0.9803922, g: 0.96470594, b: 0.22352943, a: 1}
+    - _SunColorOne: {r: 1, g: 1, b: 1, a: 1}
+    - _SunColorTwo: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &1132991449442311136

@@ -18,7 +18,7 @@ public class SongController : MonoBehaviour
     [Range(0f, 1f)] public float maxVolumeBoostPercent = 0.25f; // +25%
     [Range(-0.2f, 0.2f)] public float maxPitchBoost = 0.05f;       // pitch leve
 
-    public AudioSource audioSource { get; private set; }
+    public AudioSource audioSource { get;  set; }
 
     private float[] spectrumData;
     private Coroutine impactRoutine;
