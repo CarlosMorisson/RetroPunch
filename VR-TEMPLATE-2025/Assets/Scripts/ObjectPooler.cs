@@ -66,7 +66,6 @@ public class ObjectPooler : MonoBehaviour
         {
             Debug.LogWarning($"Pool '{tag}' is exhausted. Reusing oldest object. Consider increasing pool size.");
         }
-
         objectToSpawn.SetActive(true);
         objectToSpawn.transform.position = position;
         objectToSpawn.transform.rotation = rotation;
@@ -84,7 +83,6 @@ public class ObjectPooler : MonoBehaviour
         }
         ResetAllRigidbodies(obj);
         obj.SetActive(false);
-
     }
     public void ResetAllRigidbodies(GameObject obj)
     {

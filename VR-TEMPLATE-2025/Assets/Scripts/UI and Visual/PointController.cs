@@ -27,6 +27,8 @@ public class PointController : MonoBehaviour
     #endregion
 
     #region Consecutivos
+    private int _bestConsecutives;
+    private int _bestConsecutiveInScene;
     private int _consecutives;
     public int Consecutives
     {
@@ -42,6 +44,26 @@ public class PointController : MonoBehaviour
     }
     public event Action OnConsecutive;
     public event Action<int> OnConsecutiveInt;
+    private const string CONSECUTIVES_SAVE_NAME = "BestConsecutive";
+    #endregion
+
+    #region TotalCube
+    private string _sucessPercentage;
+    private int _totalCube;
+    public int TotalCube
+    {
+        get => _totalCube;
+        set
+        {
+            if (_totalCube != value)
+            {
+                _totalCube = value;
+                OnTotalCubeEvent();
+            }
+        }
+    }
+    public event Action<int> OnTotalCubeInt;
+    public event Action OnTotalCube;
     #endregion
 
     #region Erros
@@ -65,25 +87,58 @@ public class PointController : MonoBehaviour
     public List<EventOnConsecutives> EventsTrigger = new();
 
     private void Awake() => Instance = this;
+    private void Start()
+    {
+        _bestConsecutives = PlayerPrefs.GetInt(CONSECUTIVES_SAVE_NAME, 0);
+    }
     private void OnEnable()
     {
         OnConsecutiveInt += CheckConsecutiveEvents;
+        OnConsecutiveInt += CheckBestSceneConsecutive;
+        OnConsecutive += CheckBestConsecutive;
     }
     private void OnDisable()
     {
         OnConsecutiveInt -= CheckConsecutiveEvents;
+        OnConsecutiveInt -= CheckBestSceneConsecutive;
+        OnConsecutive -= CheckBestConsecutive;
+
     }
     public void IncreasePoint()
     {
         Accept++;
         Consecutives++;
+        TotalCube++;
     }
     public void IncreaseError()
     {
         Errors++;
         Consecutives = 0;
+        TotalCube++;
     }
+    [ContextMenu("Teste Porcentagem")]
+    public void CalculateSucessPercentage()
+    {
+        if (TotalCube <= 0)
+        {
+            _sucessPercentage = "0%";
+            return;
+        }
 
+        float percentage = (float)Accept * 100 / TotalCube;
+
+        _sucessPercentage = percentage.ToString("F2") + "%";
+
+        Debug.Log($"Taxa de Sucesso: {_sucessPercentage} (Acertos: {Accept} / Total: {TotalCube})");
+    }
+    public void CheckBestConsecutive()
+    {
+        if (_bestConsecutiveInScene > _bestConsecutives)
+        {
+            _bestConsecutives= _bestConsecutiveInScene;
+            PlayerPrefs.SetInt(CONSECUTIVES_SAVE_NAME, _bestConsecutives);
+        }
+    }
     #region Events
     public void OnErrorEvent()
     {
@@ -101,6 +156,11 @@ public class PointController : MonoBehaviour
         OnAccept?.Invoke();
         OnAcceptInt?.Invoke(Accept);
     }
+    public void OnTotalCubeEvent()
+    {
+        OnTotalCube?.Invoke();
+        OnTotalCubeInt?.Invoke(TotalCube);
+    }
     #endregion
 
     public void CheckConsecutiveEvents(int consecutives)
@@ -115,12 +175,18 @@ public class PointController : MonoBehaviour
             if (evt == null || evt.PointTrigger <= 0)
                 continue;
 
-            // dispara em múltiplos do PointTrigger
             if (consecutives >= evt.PointTrigger &&
                 consecutives % evt.PointTrigger == 0)
             {
                 evt.EventTrigger?.Invoke();
             }
+        }
+    }
+    public void CheckBestSceneConsecutive(int consecutives)
+    {
+        if (consecutives > _bestConsecutiveInScene)
+        {
+            _bestConsecutiveInScene = consecutives;
         }
     }
 }

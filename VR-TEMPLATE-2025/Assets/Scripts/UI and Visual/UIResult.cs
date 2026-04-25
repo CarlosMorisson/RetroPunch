@@ -109,5 +109,6 @@ public class UIResult : MonoBehaviour
         PointController.Instance.OnAcceptInt += UpdateResult;
         PointController.Instance.OnConsecutiveInt += UpdateConsecutive;
         PointController.Instance.OnErrorInt += UpdateError;
+        
     }
 }
