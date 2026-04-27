@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class VRCalorieEstimator : MonoBehaviour
 {
- 
+    public static VRCalorieEstimator Instance;
     [Header("Configurações de Usuário")]
     [SerializeField] private float userWeightKg = 70f; 
 
@@ -22,14 +22,9 @@ public class VRCalorieEstimator : MonoBehaviour
     private Vector3 lastLeftHandPos;
     private Vector3 lastRightHandPos;
     public bool Stop { private get; set; }
-
-    public void SetStop()
-    {
-        Stop = true;
-        UIResult.Instance.UpdateCalorie(GetTotalCalories());
-    }
     void Start()
     {
+        Instance = this;
         if (head) lastHeadPos = head.localPosition;
         if (leftHand) lastLeftHandPos = leftHand.localPosition;
         if (rightHand) lastRightHandPos = rightHand.localPosition;
@@ -62,6 +57,9 @@ public class VRCalorieEstimator : MonoBehaviour
         lastLeftHandPos = leftHand.localPosition;
         lastRightHandPos = rightHand.localPosition;
     }
-    public float GetTotalCalories() => totalCaloriesBurned;
-    
+    public float GetTotalCalories()
+    {
+        Stop = true;
+        return totalCaloriesBurned;
+    }
 }

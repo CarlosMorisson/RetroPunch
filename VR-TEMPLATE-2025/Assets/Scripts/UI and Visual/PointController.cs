@@ -4,6 +4,7 @@ using System;
 using UnityEngine.Events;
 using System.Linq;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 public class PointController : MonoBehaviour
 {
@@ -29,6 +30,8 @@ public class PointController : MonoBehaviour
     #region Consecutivos
     private int _bestConsecutives;
     private int _bestConsecutiveInScene;
+    public event Action OnBestConsecutiveInScene;
+    public event Action<int> OnBestConsecutiveInSceneInt;
     private int _consecutives;
     public int Consecutives
     {
@@ -49,6 +52,7 @@ public class PointController : MonoBehaviour
 
     #region TotalCube
     private string _sucessPercentage;
+    private int _percentageInt;
     private int _totalCube;
     public int TotalCube
     {
@@ -96,25 +100,29 @@ public class PointController : MonoBehaviour
         OnConsecutiveInt += CheckConsecutiveEvents;
         OnConsecutiveInt += CheckBestSceneConsecutive;
         OnConsecutive += CheckBestConsecutive;
+        OnBestConsecutiveInSceneInt += CheckBestSceneConsecutive;
     }
     private void OnDisable()
     {
         OnConsecutiveInt -= CheckConsecutiveEvents;
         OnConsecutiveInt -= CheckBestSceneConsecutive;
         OnConsecutive -= CheckBestConsecutive;
-
+        OnBestConsecutiveInSceneInt -= CheckBestSceneConsecutive;
+        OnTotalCube -= CalculateSucessPercentage;
     }
     public void IncreasePoint()
     {
         Accept++;
         Consecutives++;
         TotalCube++;
+        CalculateSucessPercentage();
     }
     public void IncreaseError()
     {
         Errors++;
         Consecutives = 0;
         TotalCube++;
+        CalculateSucessPercentage();
     }
     [ContextMenu("Teste Porcentagem")]
     public void CalculateSucessPercentage()
@@ -126,11 +134,12 @@ public class PointController : MonoBehaviour
         }
 
         float percentage = (float)Accept * 100 / TotalCube;
-
+        _percentageInt = (int)percentage;
         _sucessPercentage = percentage.ToString("F2") + "%";
 
-        Debug.Log($"Taxa de Sucesso: {_sucessPercentage} (Acertos: {Accept} / Total: {TotalCube})");
     }
+    public float GetPercentageSucessInt() => _percentageInt;
+    public string GetPercentageSucessString() => _sucessPercentage;
     public void CheckBestConsecutive()
     {
         if (_bestConsecutiveInScene > _bestConsecutives)
@@ -150,7 +159,6 @@ public class PointController : MonoBehaviour
         OnConsecutive?.Invoke();
         OnConsecutiveInt?.Invoke(Consecutives);
     }
-
     public void OnAcceptEvent()
     {
         OnAccept?.Invoke();
@@ -189,6 +197,8 @@ public class PointController : MonoBehaviour
             _bestConsecutiveInScene = consecutives;
         }
     }
+    public int GetBestConsecutiveInScene() {  return _bestConsecutiveInScene; }
+    public int GetBestConsecutive() { return _bestConsecutives; }
 }
 [System.Serializable]
 public class EventOnConsecutives
