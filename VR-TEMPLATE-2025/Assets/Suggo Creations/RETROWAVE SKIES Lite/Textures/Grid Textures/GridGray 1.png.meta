@@ -1,13 +1,5 @@
 fileFormatVersion: 2
-guid: 93420f2b832493a45ae0c78c42e30a71
-AssetOrigin:
-  serializedVersion: 1
-  productId: 282063
-  packageName: RETROWAVE SKIES Lite - Dynamic Skybox Asset Pack
-  packageVersion: 1.0.0
-  assetPath: Assets/Suggo Creations/RETROWAVE SKIES Lite/Textures/Grid Textures/Grid_Lines_Base
-    Color Lite.png
-  uploadId: 693758
+guid: 8216407dd92eeed49b1cacaee59084c5
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -129,6 +121,19 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: WindowsStoreApps
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
     maxTextureSize: 8192
     resizeAlgorithm: 0
     textureFormat: -1

@@ -7,6 +7,7 @@ public class TextMeshReactiveColor : MonoBehaviour
 {
     private TMP_Text _textElement;
     private const float WAIT_TIME = 0.2f;
+    public bool NotOppositeColor;
 
     private void Awake()
     {
@@ -20,14 +21,19 @@ public class TextMeshReactiveColor : MonoBehaviour
             StartCoroutine(WaitToGetColor());
             return;
         }
-
-        UpdateTextGradient();
+        if (NotOppositeColor)
+            UpdateWithNormalColor();
+        else
+            UpdateTextGradient();
     }
 
     private IEnumerator WaitToGetColor()
     {
         yield return new WaitForSeconds(WAIT_TIME);
-        UpdateTextGradient();
+        if (NotOppositeColor)
+            UpdateWithNormalColor();
+        else
+            UpdateTextGradient();
     }
     public void UpdateWithNormalColor()
     {
