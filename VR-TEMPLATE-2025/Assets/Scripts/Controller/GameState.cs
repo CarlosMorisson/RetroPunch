@@ -10,6 +10,7 @@ public class GameState : MonoBehaviour
         Game,
         Menu,
         Pause,
+        Tutorial,
         End
     };
     [Header("State da cena")]
@@ -42,12 +43,16 @@ public class GameState : MonoBehaviour
     public UnityEvent OnGameEvent;
     public UnityEvent OnPauseEvent;
     public UnityEvent OnEndEvent;
-
+    public UnityEvent OnTutorialEvent;
 
     void Awake()
     {
         Instance = this;
-
+        
+    }
+    private void Start()
+    {
+        GameStateTutorial();
     }
     void OnEnable()
     {
@@ -71,6 +76,7 @@ public class GameState : MonoBehaviour
 
     public void GameStatePause() => CurrentState = State.Pause;
     public void GameStateEnd() => CurrentState = State.End;
+    public void GameStateTutorial() => CurrentState = State.Tutorial;
 
     #endregion
     void GameStateChanged(State newState)
@@ -89,6 +95,9 @@ public class GameState : MonoBehaviour
                 break;
             case State.End:
                 OnEndEvent.Invoke();
+                break;
+            case State.Tutorial:
+                OnTutorialEvent.Invoke();
                 break;
         }
     }
