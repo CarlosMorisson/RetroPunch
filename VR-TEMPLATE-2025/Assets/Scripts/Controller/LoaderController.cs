@@ -22,12 +22,11 @@ public class LoaderController : MonoBehaviour
         GameMode = LoadGame.GameMode;
 
         SceneLoad();
-        LoadSong();
 
         ColorController.Instance.Initialize(LoadGame.BuildSettings);
     }
 
-    private void LoadSong()
+    public void LoadSong()
     {
         SongGame.LoadSong(LoadGame.GameMusic);
     }

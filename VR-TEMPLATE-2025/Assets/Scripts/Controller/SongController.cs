@@ -88,7 +88,7 @@ public class SongController : MonoBehaviour
     private void FinishSong()
     {
         wasPlaying = false;
-        isPaused = false;
+        isPaused = true;
         GameState.Instance.GameStateEnd();
     }
     public void ImpactBoost(float intensity, float duration)

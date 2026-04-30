@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class FadeIEffect : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class FadeIEffect : MonoBehaviour
 
     private Material _instancedMaterial;
 
+    private const string GAME_SCENE= "BasicScene";
+    private const string MENU_SCENE = "BasicScene";
     private void Awake()
     {
         if (SourceMaterial != null)
@@ -68,6 +71,10 @@ public class FadeIEffect : MonoBehaviour
                 .DOScale(Vector3.one, scaleDuration)
                 .SetEase(Ease.OutBack)
         );
+        seq.OnComplete(() =>
+        {
+            RestartScene();
+        });
     }
 
     private void SetAlpha(float value)
@@ -77,6 +84,7 @@ public class FadeIEffect : MonoBehaviour
         c.a = value;
         _instancedMaterial.color = c;
     }
+    public void RestartScene() => SceneManager.LoadScene(GAME_SCENE);
 
     private void OnDestroy()
     {

@@ -21,7 +21,7 @@ public class TutorialController : MonoBehaviour
         _currentIndex = 0;
         PlayStepAnimation(_currentIndex);
     }
-
+    [ContextMenu("Advance")]
     public void AdvanceTutorial()
     {
         if (_currentIndex >= 0 && _currentIndex < TutorialSteps.Count)
@@ -38,6 +38,7 @@ public class TutorialController : MonoBehaviour
         else
         {
             Debug.Log("Tutorial Concluído!");
+            GameState.Instance.GameStateGame();
         }
     }
 

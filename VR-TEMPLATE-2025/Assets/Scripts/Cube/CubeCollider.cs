@@ -1,6 +1,8 @@
-using UnityEngine;
+using DG.Tweening;
 using System;
 using System.Collections;
+using Unity.Tutorials.Core.Editor;
+using UnityEngine;
 
 public class CubeCollider : MonoBehaviour
 {
@@ -41,21 +43,51 @@ public class CubeCollider : MonoBehaviour
     protected virtual void OnEnable()
     {
         OnEnabled?.Invoke();
-
+        GameState.OnGameStateChanged += GameStateChanged;
+        StartRun();
+    }
+    public void StartRun()
+    {
         Transform parent = transform.parent;
         if (parent != null)
         {
             CubeMovemment move = parent.GetComponent<CubeMovemment>();
-            if (move != null && move.enableSpeed!=0)
+            if (move != null && move.enableSpeed != 0)
             {
                 move.normalSpeed = move.enableSpeed;
             }
         }
     }
-
-
+    public void StopRun()
+    {
+        GameObject parent = transform.parent.gameObject;
+        parent.GetComponent<CubeMovemment>().normalSpeed = 0;
+    }
+    public void FinishRun()
+    {
+        StopRun();
+        transform.DOScale(Vector3.zero, 1f)
+            .SetEase(Ease.InBack);
+    }
+    void GameStateChanged(State newState)
+    {
+        Debug.Log("Novo estado do jogo: " + newState);
+        switch (newState)
+        {
+            case State.Game:
+                StartRun();
+                break;
+            case State.Pause:
+                StopRun();
+                break;
+            case State.End:
+                FinishRun();
+                break;
+        }
+    }
     protected virtual void OnDisable()
     {
+        GameState.OnGameStateChanged -= GameStateChanged;
         OnDisabled?.Invoke();
     }
 
@@ -70,8 +102,7 @@ public class CubeCollider : MonoBehaviour
 
             HandleFail();
         }
-        GameObject parent = transform.parent.gameObject;
-        parent.GetComponent<CubeMovemment>().normalSpeed = 0;
+        StopRun();
     }
 
     protected virtual void OnCollisionStay(Collision collision)

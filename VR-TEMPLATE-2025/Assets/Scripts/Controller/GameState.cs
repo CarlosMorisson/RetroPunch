@@ -2,17 +2,17 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
+public enum State
+{
+    Game,
+    Menu,
+    Pause,
+    Tutorial,
+    End
+};
 public class GameState : MonoBehaviour
 {
     public static GameState Instance;
-    public enum State
-    {
-        Game,
-        Menu,
-        Pause,
-        Tutorial,
-        End
-    };
     [Header("State da cena")]
     public State SceneState;
     public static event Action<State> OnGameStateChanged;
