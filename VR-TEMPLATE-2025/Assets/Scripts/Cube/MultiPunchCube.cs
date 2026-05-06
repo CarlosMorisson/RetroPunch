@@ -26,9 +26,9 @@ public class MultiPunchCube : CubeCollider
 
     [Header("Fail Feedback")]
     public Material failMaterial;
-    public float blinkInterval = 0.1f;
+    public float blinkInterval = 0.04f;
     public int blinkCount = 3;
-    public float scaleDownDuration = 0.4f;
+    public float scaleDownDuration = 0.1f;
 
     [Header("General")]
     public string PrefabTag;
@@ -36,6 +36,8 @@ public class MultiPunchCube : CubeCollider
     private Renderer cachedRenderer;
     private Material originalMaterial;
     private Vector3 collisionLocation;
+
+    private BuildMovemmentVisual[] visualBoosters;
 
     private bool hasMisstaken = false;
 
@@ -64,11 +66,24 @@ public class MultiPunchCube : CubeCollider
         OnSuccess += FinalSuccess;
         OnFail += FailFeedback;
 
+        visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
+
+        foreach (var booster in visualBoosters)
+        {
+            if (booster == null) continue;
+
+            OnSuccess += booster.TriggerBoost;
+            OnFail += booster.TriggerDeBoost;
+        }
+
         OnSuccess += PointController.Instance.IncreasePoint;
         OnFail += PointController.Instance.IncreaseError;
 
         OnSuccess += ProgressEffectVisual.Instance.Success;
         OnFail += ProgressEffectVisual.Instance.Error;
+
+        OnSuccess += ColorController.Instance.TriggerSuccessFlash;
+        OnFail += ColorController.Instance.TriggerFailDim;
 
         StartCoroutine(LifeTime());
     }
@@ -83,6 +98,19 @@ public class MultiPunchCube : CubeCollider
 
         OnSuccess -= ProgressEffectVisual.Instance.Success;
         OnFail -= ProgressEffectVisual.Instance.Error;
+
+        OnSuccess -= ColorController.Instance.TriggerSuccessFlash;
+        OnFail -= ColorController.Instance.TriggerFailDim;
+
+        visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
+
+        foreach (var booster in visualBoosters)
+        {
+            if (booster == null) continue;
+
+            OnSuccess -= booster.TriggerBoost;
+            OnFail -= booster.TriggerDeBoost;
+        }
     }
 
     IEnumerator LifeTime()

@@ -27,6 +27,8 @@ public class PunchCube : CubeCollider
     private Quaternion initialRotation;
     private Vector3 initialScale;
 
+    private BuildMovemmentVisual[] visualBoosters;
+
     private Renderer cachedRenderer;
     private Material originalMaterial;
 
@@ -52,6 +54,15 @@ public class PunchCube : CubeCollider
         transform.localRotation = initialRotation;
         transform.localScale = initialScale;
         feedbackRotate.localRotation = initialRotation;
+        visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
+
+        foreach (var booster in visualBoosters)
+        {
+            if (booster == null) continue;
+
+            OnSuccess +=booster.TriggerBoost;
+            OnFail += booster.TriggerDeBoost;
+        }
 
         OnSuccess += SucessFeedback;
         OnFail += FailFeedback;
@@ -61,6 +72,9 @@ public class PunchCube : CubeCollider
 
         OnSuccess += ProgressEffectVisual.Instance.Success;
         OnFail += ProgressEffectVisual.Instance.Error;
+
+        OnSuccess += ColorController.Instance.TriggerSuccessFlash;
+        OnFail += ColorController.Instance.TriggerFailDim;
 
         RandomRotation();
         StartCoroutine(LifeTime());
@@ -76,6 +90,20 @@ public class PunchCube : CubeCollider
 
         OnSuccess -= ProgressEffectVisual.Instance.Success;
         OnFail -= ProgressEffectVisual.Instance.Error;
+
+        visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
+
+        foreach (var booster in visualBoosters)
+        {
+            if (booster == null) continue;
+
+            OnSuccess -= booster.TriggerBoost;
+            OnFail -= booster.TriggerDeBoost;
+        }
+
+        OnSuccess -= ColorController.Instance.TriggerSuccessFlash;
+        OnFail -= ColorController.Instance.TriggerFailDim;
+
     }
 
 

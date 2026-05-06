@@ -6,12 +6,13 @@ using System.Collections;
 public class TextMeshReactiveColor : MonoBehaviour
 {
     private TMP_Text _textElement;
-    private const float WAIT_TIME = 0.2f;
+    private const float WAIT_TIME = 0.5f;
     public bool NotOppositeColor;
 
     private void Awake()
     {
         _textElement = GetComponent<TMP_Text>();
+        StartCoroutine(WaitToGetColor());
     }
 
     private void OnEnable()

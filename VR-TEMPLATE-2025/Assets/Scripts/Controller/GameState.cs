@@ -70,12 +70,15 @@ public class GameState : MonoBehaviour
     #endregion
     //Metodo De troca de State
     #region Metodo de troca Game State
+    [ContextMenu("Game")]
     public void GameStateGame() => CurrentState = State.Game;
-
+    [ContextMenu("Menu")]
     public void GameStateMenu() => CurrentState = State.Menu;
-
+    [ContextMenu("Pause")]
     public void GameStatePause() => CurrentState = State.Pause;
+    [ContextMenu("End")]
     public void GameStateEnd() => CurrentState = State.End;
+    [ContextMenu("Tutorial")]
     public void GameStateTutorial() => CurrentState = State.Tutorial;
 
     #endregion

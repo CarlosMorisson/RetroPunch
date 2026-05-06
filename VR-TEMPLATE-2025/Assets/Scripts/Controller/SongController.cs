@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class SongController : MonoBehaviour
 {
@@ -9,7 +10,6 @@ public class SongController : MonoBehaviour
     [Header("Song Data (Auto)")]
     public string songName;
     public float songDuration;
-    private bool wasPlaying = false;
     [Header("Config")]
     public AudioClip songClip;
     public int spectrumSize = 512;
@@ -17,6 +17,14 @@ public class SongController : MonoBehaviour
     [Header("Impact FX")]
     [Range(0f, 1f)] public float maxVolumeBoostPercent = 0.25f; // +25%
     [Range(-0.2f, 0.2f)] public float maxPitchBoost = 0.05f;       // pitch leve
+
+    [Space(15)]
+    [Header("Touch Effect")]
+    public List<AudioClip> touchAudio;
+    public AudioSource TouchAudioSource;
+
+    private List<AudioClip> playedTouchAudios = new List<AudioClip>();
+
 
     public AudioSource audioSource { get;  set; }
 
@@ -36,7 +44,7 @@ public class SongController : MonoBehaviour
         if (audioSource != null)
         {
             UIResult.Instance.UpdateSlider(audioSource.time);
-            if (wasPlaying && !audioSource.isPlaying && audioSource.time == 0)
+            if (!audioSource.isPlaying && audioSource.time ==0)
             {
                 FinishSong();
             }
@@ -87,7 +95,6 @@ public class SongController : MonoBehaviour
 
     private void FinishSong()
     {
-        wasPlaying = false;
         isPaused = true;
         GameState.Instance.GameStateEnd();
     }
@@ -98,12 +105,37 @@ public class SongController : MonoBehaviour
 
         intensity = Mathf.Clamp01(intensity);
 
+        PlayTouchEffect();
         if (impactRoutine != null)
             StopCoroutine(impactRoutine);
 
         impactRoutine = StartCoroutine(ImpactRoutine(intensity, duration));
     }
+    private void PlayTouchEffect()
+    {
+        if (touchAudio == null || touchAudio.Count == 0 || TouchAudioSource == null) return;
+        if (playedTouchAudios.Count >= touchAudio.Count)
+        {
+            playedTouchAudios.Clear();
+        }
 
+        List<AudioClip> availableAudios = new List<AudioClip>();
+        foreach (var clip in touchAudio)
+        {
+            if (!playedTouchAudios.Contains(clip))
+            {
+                availableAudios.Add(clip);
+            }
+        }
+        if (availableAudios.Count > 0)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, availableAudios.Count);
+            AudioClip selectedClip = availableAudios[randomIndex];
+
+            playedTouchAudios.Add(selectedClip);
+            TouchAudioSource.PlayOneShot(selectedClip);
+        }
+    }
     private IEnumerator ImpactRoutine(float intensity, float duration)
     {
         float targetVolume = baseVolume * (1f + maxVolumeBoostPercent * intensity);

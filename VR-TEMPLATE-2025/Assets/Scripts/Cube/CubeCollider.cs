@@ -1,7 +1,6 @@
 using DG.Tweening;
 using System;
 using System.Collections;
-using Unity.Tutorials.Core.Editor;
 using UnityEngine;
 
 public class CubeCollider : MonoBehaviour
@@ -82,6 +81,7 @@ public class CubeCollider : MonoBehaviour
                 break;
             case State.End:
                 FinishRun();
+                print("chamou");
                 break;
         }
     }
