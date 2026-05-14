@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Events;
 
 public class PunchCube : CubeCollider
 {
@@ -20,6 +21,8 @@ public class PunchCube : CubeCollider
     public float blinkInterval = 0.1f;
     public int blinkCount = 3;
     public float scaleDownDuration = 0.4f;
+
+    public UnityEvent OnSucessLocal;
 
     private bool overlapReached;
     private Vector3 collisionLocation;
@@ -76,6 +79,8 @@ public class PunchCube : CubeCollider
         OnSuccess += ColorController.Instance.TriggerSuccessFlash;
         OnFail += ColorController.Instance.TriggerFailDim;
 
+        OnSuccess += OnSucessLocal.Invoke;
+
         RandomRotation();
         StartCoroutine(LifeTime());
     }
@@ -90,6 +95,8 @@ public class PunchCube : CubeCollider
 
         OnSuccess -= ProgressEffectVisual.Instance.Success;
         OnFail -= ProgressEffectVisual.Instance.Error;
+
+        OnSuccess -= OnSucessLocal.Invoke;
 
         visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
 
@@ -137,11 +144,13 @@ public class PunchCube : CubeCollider
             if (ConcludeCondition(collision.gameObject) && !hasMisstaken)
             {
                 collisionLocation = collision.contacts[0].point;
-                print(collisionLocation);
+                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
+                print(collision.gameObject.name);
                 HandleSuccess();
             }
             else
             {
+                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, false);
                 FailFeedback();
             }
         }

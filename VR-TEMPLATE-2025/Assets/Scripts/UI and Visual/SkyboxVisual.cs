@@ -32,6 +32,7 @@ public class SkyboxSettings
 
 public class SkyboxVisual : MonoBehaviour
 {
+    public static SkyboxVisual Instance;
     [Header("References")]
     public SongController songController;
 
@@ -44,6 +45,12 @@ public class SkyboxVisual : MonoBehaviour
     [Header("Frequency Response")]
     public float intensityMultiplier = 1f;
     public float smoothSpeed = 5f;
+
+    [Header("Impact Settings")]
+    public float successBoostIntensity = 0.5f; 
+    public float failDeboostIntensity = -0.3f;
+    public float impactReturnSpeed = 8f;
+    private float currentImpactBoost = 0f;
 
     [Header("Skybox Settings")]
     public SkyboxSettings SkyboxSettings;
@@ -65,6 +72,21 @@ public class SkyboxVisual : MonoBehaviour
 
     private bool isTransitioning = false;
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+    public void TriggerSuccessBoost()
+    {
+        if (isTransitioning) return;
+        currentImpactBoost = successBoostIntensity;
+    }
+
+    public void TriggerFailDeboost()
+    {
+        if (isTransitioning) return;
+        currentImpactBoost = failDeboostIntensity;
+    }
 
     public void InitializeSceneMaterials(
         SceneSettings baseSceneSettings,
@@ -105,6 +127,7 @@ public class SkyboxVisual : MonoBehaviour
         DOTween.Kill(this);
 
         isTransitioning = true;
+        currentImpactBoost = 0;
 
         Material targetSky = target.SkyboxMaterial;
         Material targetGround = target.GroundMaterial;
@@ -119,13 +142,10 @@ public class SkyboxVisual : MonoBehaviour
         Sequence seq = DOTween.Sequence().SetTarget(this);
 
         seq.Join(TweenMaterialColor(skyboxInstance, targetSky, "_SkyColor", duration));
-
         seq.Join(TweenMaterialColor(groundInstance, targetGround, "_GridColor", duration));
         seq.Join(TweenMaterialColor(groundInstance, targetGround, "_GroundColor", duration));
-
         seq.Join(TweenMaterialColor(plataformInstance, targetPlatform, "_GridColor", duration));
         seq.Join(TweenMaterialColor(plataformInstance, targetPlatform, "_GroundColor", duration));
-
         seq.Join(TweenMaterialColor(wallInstance, targetWall, "_Color", duration));
 
         seq.Join(TweenFloat(skyboxInstance, targetSky, "_HorizonStrength", duration));
@@ -182,11 +202,14 @@ public class SkyboxVisual : MonoBehaviour
 
     void Update()
     {
+        currentImpactBoost = Mathf.Lerp(currentImpactBoost, 0f, Time.deltaTime * impactReturnSpeed);
+
         if (isTransitioning)
             return;
 
         if (songController == null || skyboxInstance == null)
             return;
+
         float freq = songController.GetPeakFrequency();
         float target = freq * intensityMultiplier;
 
@@ -196,23 +219,25 @@ public class SkyboxVisual : MonoBehaviour
             Time.deltaTime * smoothSpeed
         );
 
+        float finalReaction = smoothedFrequency + currentImpactBoost;
+
         skyboxInstance.SetFloat("_HorizonStrength",
             SkyboxSettings.StartHorizontalStrenght +
-            smoothedFrequency * SkyboxSettings.MultiplierHorizontalStrenght);
+            finalReaction * SkyboxSettings.MultiplierHorizontalStrenght);
 
         skyboxInstance.SetFloat("_HorizonSkyHeight",
             SkyboxSettings.StartHorizontalSkyHeight +
-            smoothedFrequency * SkyboxSettings.MultiplierHorizontalSkyHeight);
+            finalReaction * SkyboxSettings.MultiplierHorizontalSkyHeight);
 
         skyboxInstance.SetFloat("_StarSize",
             SkyboxSettings.StartStarDensity +
-            smoothedFrequency * SkyboxSettings.MultiplierStartDensity);
+            finalReaction * SkyboxSettings.MultiplierStartDensity);
 
         skyboxInstance.SetFloat("_SunMaskSize",
             SkyboxSettings.StartDiscSize +
-            smoothedFrequency * SkyboxSettings.MultiplierDiscSize);
+            finalReaction * SkyboxSettings.MultiplierDiscSize);
 
-        float colorT = Mathf.Clamp01(smoothedFrequency);
+        float colorT = Mathf.Clamp01(finalReaction);
 
         float intensity = Mathf.Lerp(
             SkyboxSettings.MinColor,
@@ -228,7 +253,7 @@ public class SkyboxVisual : MonoBehaviour
         Vector2 gridSpeed = new Vector2(
             0,
             SkyboxSettings.StartGround +
-            smoothedFrequency * SkyboxSettings.MultiplierGround
+            finalReaction * SkyboxSettings.MultiplierGround
         );
 
         groundInstance.SetVector("_GridSpeed", gridSpeed);

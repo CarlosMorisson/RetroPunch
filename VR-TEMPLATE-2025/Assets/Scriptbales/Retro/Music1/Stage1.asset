@@ -23,7 +23,7 @@ MonoBehaviour:
       SkyboxMaterial: {fileID: 2100000, guid: 20fca97cf5b8e92459331b3cd74c4be1, type: 2}
       GroundMaterial: {fileID: 2100000, guid: a4115c037cd9c4f4c9b1b73355446825, type: 2}
       PlataformMaterial: {fileID: 2100000, guid: a4115c037cd9c4f4c9b1b73355446825, type: 2}
-      WallMaterial: {fileID: 2100000, guid: 195c694c13c958e4a991db661418d01a, type: 2}
+      WallMaterial: {fileID: 2100000, guid: 07d3f86d3ccea2a4cb9b80044174c061, type: 2}
     PrimaryColorFreezeLight: {r: 0, g: 0.27607727, b: 0.6075471, a: 1}
     PrimaryColorFreezeDark: {r: 0, g: 0.6882615, b: 1, a: 1}
     SecondaryColorFreezeLight: {r: 1, g: 1, b: 1, a: 1}

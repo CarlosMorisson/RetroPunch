@@ -25,3 +25,9 @@ MonoBehaviour:
     volume: 0.04
     pitch: 1
     mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Hit
+    clip: {fileID: 8300000, guid: 8817cf217412a0849a474bace71ae587, type: 3}
+    loop: 0
+    volume: 0.04
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}

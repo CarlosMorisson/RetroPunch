@@ -22,9 +22,12 @@ public class SongController : MonoBehaviour
     [Header("Touch Effect")]
     public List<AudioClip> touchAudio;
     public AudioSource TouchAudioSource;
+    [Space(15)]
+    public List<AudioClip> failAudio;
+    public AudioSource FailAudioSource;
 
     private List<AudioClip> playedTouchAudios = new List<AudioClip>();
-
+    private List<AudioClip> playedFailAudio = new List<AudioClip>();
 
     public AudioSource audioSource { get;  set; }
 
@@ -134,6 +137,31 @@ public class SongController : MonoBehaviour
 
             playedTouchAudios.Add(selectedClip);
             TouchAudioSource.PlayOneShot(selectedClip);
+        }
+    }
+    public void PlayFailEffect()
+    {
+        if (failAudio == null || failAudio.Count == 0 || FailAudioSource == null) return;
+        if (playedFailAudio.Count >= failAudio.Count)
+        {
+            playedTouchAudios.Clear();
+        }
+
+        List<AudioClip> availableAudios = new List<AudioClip>();
+        foreach (var clip in failAudio)
+        {
+            if (!playedFailAudio.Contains(clip))
+            {
+                availableAudios.Add(clip);
+            }
+        }
+        if (availableAudios.Count > 0)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, availableAudios.Count);
+            AudioClip selectedClip = availableAudios[randomIndex];
+
+            playedFailAudio.Add(selectedClip);
+            FailAudioSource.PlayOneShot(selectedClip);
         }
     }
     private IEnumerator ImpactRoutine(float intensity, float duration)
@@ -260,6 +288,8 @@ public class SongController : MonoBehaviour
 
     public float GetPeakFrequency()
     {
+        if(audioSource == null)
+            return 0f;
         audioSource.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
 
         float maxValue = 0f;

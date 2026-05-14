@@ -5,7 +5,11 @@ public class ColorReactiveRenderer : MonoBehaviour
     public enum ColorType
     {
         Primary,
-        Secondary
+        Secondary,
+        PrimaryFreeze,
+        SecondaryFreeze,
+        PrimaryPower, 
+        SecondaryPower
     }
 
     [Header("Config")]
@@ -28,9 +32,28 @@ public class ColorReactiveRenderer : MonoBehaviour
     {
         if (ColorController.Instance == null || r == null)
             return;
-        Color targetColor = colorType == ColorType.Primary
-                ? ColorController.Instance.CurrentPrimary
-                : ColorController.Instance.CurrentSecondary;
+        Color targetColor=Color.black;
+        switch (colorType)
+        {
+            case ColorType.Primary:
+                targetColor = ColorController.Instance.CurrentPrimary;
+                break;
+            case ColorType.Secondary:
+                targetColor = ColorController.Instance.CurrentSecondary;
+                break;
+            case ColorType.PrimaryFreeze:
+                targetColor = ColorController.Instance.PrimaryFreezeColor;
+                break;
+            case ColorType.SecondaryFreeze:
+                targetColor = ColorController.Instance.SecondaryFreezeColor;
+                break;
+            case ColorType.PrimaryPower:
+                targetColor = ColorController.Instance.PrimaryPowerColor;
+                break;
+            case ColorType.SecondaryPower:
+                targetColor = ColorController.Instance.SecondaryPowerColor;
+                break;
+        }
 
         if (isOpositeColor)
         {

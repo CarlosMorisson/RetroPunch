@@ -102,6 +102,7 @@ public class CubeCollider : MonoBehaviour
 
             HandleFail();
         }
+        AudioController.Instance.Play("Hit");
         StopRun();
     }
 

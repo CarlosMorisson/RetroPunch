@@ -27,8 +27,8 @@ public class MultiPunchCube : CubeCollider
     [Header("Fail Feedback")]
     public Material failMaterial;
     public float blinkInterval = 0.04f;
-    public int blinkCount = 3;
-    public float scaleDownDuration = 0.1f;
+    public int blinkCount = 1;
+    public float scaleDownDuration = 0.05f;
 
     [Header("General")]
     public string PrefabTag;
@@ -85,6 +85,9 @@ public class MultiPunchCube : CubeCollider
         OnSuccess += ColorController.Instance.TriggerSuccessFlash;
         OnFail += ColorController.Instance.TriggerFailDim;
 
+        OnSuccess += SkyboxVisual.Instance.TriggerSuccessBoost;
+        OnFail += SkyboxVisual.Instance.TriggerFailDeboost;
+
         StartCoroutine(LifeTime());
     }
 
@@ -101,6 +104,9 @@ public class MultiPunchCube : CubeCollider
 
         OnSuccess -= ColorController.Instance.TriggerSuccessFlash;
         OnFail -= ColorController.Instance.TriggerFailDim;
+
+        OnSuccess -= SkyboxVisual.Instance.TriggerSuccessBoost;
+        OnFail -= SkyboxVisual.Instance.TriggerFailDeboost;
 
         visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
 
@@ -129,7 +135,7 @@ public class MultiPunchCube : CubeCollider
 
         if (collision.gameObject.CompareTag(WALL_TAG))
         {
-            //HandleFail();
+            HandleFail();
             return;
         }
 
@@ -141,17 +147,20 @@ public class MultiPunchCube : CubeCollider
 
             if (point != null && !point.isTouched && !hasMisstaken)
             {
+        
                 HitPoint(point);
 
                 if (AllPointsTouched())
                 {
+                    HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
                     HandleSuccess();
                     collisionLocation = collision.contacts[0].point;
                 }
             }
             else
             {
-                //HandleFail();
+                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, false);
+                HandleFail();
             }
         }
     }

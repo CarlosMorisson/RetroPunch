@@ -64,6 +64,7 @@ public class ProgressEffectVisual : MonoBehaviour
 
     public void Error()
     {
+        SongController.Instance.PlayFailEffect();
         ResetValues();
     }
 

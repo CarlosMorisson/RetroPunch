@@ -16,23 +16,23 @@ MonoBehaviour:
   GameMusic: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
   BuildSettings:
     PrimaryColorLight: {r: 0, g: 1, b: 0.06371808, a: 1}
-    PrimaryColorDark: {r: 0, g: 0.79141355, b: 1, a: 1}
-    SecondaryColorLight: {r: 0, g: 1, b: 0.29385662, a: 1}
+    PrimaryColorDark: {r: 0, g: 0.6377357, b: 0.075583234, a: 1}
+    SecondaryColorLight: {r: 0, g: 1, b: 0.81035876, a: 1}
     SecondaryColorDark: {r: 0, g: 0.2997682, b: 1, a: 1}
     BaseSceneSettings:
-      SkyboxMaterial: {fileID: 0}
-      GroundMaterial: {fileID: 0}
-      PlataformMaterial: {fileID: 0}
-      WallMaterial: {fileID: 0}
+      SkyboxMaterial: {fileID: 2100000, guid: a09e2e60f7cbcfb469fd9ba84e6bb618, type: 2}
+      GroundMaterial: {fileID: 2100000, guid: b8ec9440f06384746a94b6d5afa3230e, type: 2}
+      PlataformMaterial: {fileID: 2100000, guid: b8ec9440f06384746a94b6d5afa3230e, type: 2}
+      WallMaterial: {fileID: 2100000, guid: 2da34fab77e314448b4ef40d570d1669, type: 2}
     PrimaryColorFreezeLight: {r: 0, g: 0.27607727, b: 0.6075471, a: 1}
     PrimaryColorFreezeDark: {r: 0, g: 0.6882615, b: 1, a: 1}
     SecondaryColorFreezeLight: {r: 1, g: 1, b: 1, a: 1}
     SecondaryColorFreezeDark: {r: 0.82641506, g: 0.80302596, b: 0.80302596, a: 1}
     FreezeSceneSettings:
-      SkyboxMaterial: {fileID: 0}
-      GroundMaterial: {fileID: 0}
-      PlataformMaterial: {fileID: 0}
-      WallMaterial: {fileID: 0}
+      SkyboxMaterial: {fileID: 2100000, guid: 3d57089665287cb499069c09d990af16, type: 2}
+      GroundMaterial: {fileID: -8305591140102761474, guid: ec6c5ca9f8e90d940997d9715c3e0c61, type: 3}
+      PlataformMaterial: {fileID: 2100000, guid: 71143569593237840adb157ab69f7919, type: 2}
+      WallMaterial: {fileID: 2100000, guid: 444fa3341639ad041bc6de89554d8ee5, type: 2}
     PrimaryColorPowerLight: {r: 0.90021396, g: 1, b: 0.27735847, a: 1}
     PrimaryColorPowerDark: {r: 0.32935095, g: 0.3660378, b: 0, a: 1}
     SecondaryColorPowerLight: {r: 1, g: 0.41826248, b: 0.2396226, a: 1}

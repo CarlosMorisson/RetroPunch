@@ -24,6 +24,12 @@ public class ColorController : MonoBehaviour
     public Color CurrentPrimary;
     public Color CurrentSecondary;
 
+    public Color PrimaryFreezeColor;
+    public Color SecondaryFreezeColor;
+
+    public Color PrimaryPowerColor;
+    public Color SecondaryPowerColor;
+
     private BuildSettings settings;
     private Color _currentPrimaryColorLight;
     private Color _currentPrimaryColorDark;
@@ -62,6 +68,12 @@ public class ColorController : MonoBehaviour
     {
         settings = buildSettings;
         SetCommonColor();
+
+        PrimaryFreezeColor = settings.PrimaryColorFreezeLight;
+        SecondaryFreezeColor = settings.SecondaryColorFreezeLight;
+
+        PrimaryPowerColor   = settings.PrimaryColorPowerLight;
+        SecondaryPowerColor = settings.SecondaryColorPowerLight;
     }
 
     private void Update()
