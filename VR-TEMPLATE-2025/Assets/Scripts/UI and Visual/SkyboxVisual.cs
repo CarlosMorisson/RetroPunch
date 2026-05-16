@@ -146,7 +146,6 @@ public class SkyboxVisual : MonoBehaviour
         seq.Join(TweenMaterialColor(groundInstance, targetGround, "_GroundColor", duration));
         seq.Join(TweenMaterialColor(plataformInstance, targetPlatform, "_GridColor", duration));
         seq.Join(TweenMaterialColor(plataformInstance, targetPlatform, "_GroundColor", duration));
-        seq.Join(TweenMaterialColor(wallInstance, targetWall, "_Color", duration));
 
         seq.Join(TweenFloat(skyboxInstance, targetSky, "_HorizonStrength", duration));
         seq.Join(TweenFloat(skyboxInstance, targetSky, "_HorizonSkyHeight", duration));

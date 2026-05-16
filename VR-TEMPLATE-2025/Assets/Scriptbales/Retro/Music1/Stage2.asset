@@ -30,7 +30,7 @@ MonoBehaviour:
     SecondaryColorFreezeDark: {r: 0.82641506, g: 0.80302596, b: 0.80302596, a: 1}
     FreezeSceneSettings:
       SkyboxMaterial: {fileID: 2100000, guid: 3d57089665287cb499069c09d990af16, type: 2}
-      GroundMaterial: {fileID: -8305591140102761474, guid: ec6c5ca9f8e90d940997d9715c3e0c61, type: 3}
+      GroundMaterial: {fileID: 2100000, guid: 71143569593237840adb157ab69f7919, type: 2}
       PlataformMaterial: {fileID: 2100000, guid: 71143569593237840adb157ab69f7919, type: 2}
       WallMaterial: {fileID: 2100000, guid: 444fa3341639ad041bc6de89554d8ee5, type: 2}
     PrimaryColorPowerLight: {r: 0.90021396, g: 1, b: 0.27735847, a: 1}
@@ -38,7 +38,7 @@ MonoBehaviour:
     SecondaryColorPowerLight: {r: 1, g: 0.41826248, b: 0.2396226, a: 1}
     SecondaryColorPowerDark: {r: 1, g: 0.1741546, b: 0.118867874, a: 1}
     PowerSceneSettings:
-      SkyboxMaterial: {fileID: 0}
-      GroundMaterial: {fileID: 0}
-      PlataformMaterial: {fileID: 0}
-      WallMaterial: {fileID: 0}
+      SkyboxMaterial: {fileID: 2100000, guid: daadad2f907da7e4a9b9ac511b8fa361, type: 2}
+      GroundMaterial: {fileID: 2100000, guid: 75ed59a0d73662d4ca45c4b354ba97fe, type: 2}
+      PlataformMaterial: {fileID: 2100000, guid: 75ed59a0d73662d4ca45c4b354ba97fe, type: 2}
+      WallMaterial: {fileID: 2100000, guid: 7000f5599057dc64ba2d3139f157d8e3, type: 2}

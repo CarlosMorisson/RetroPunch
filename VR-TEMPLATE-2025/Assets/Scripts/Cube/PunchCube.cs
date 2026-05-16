@@ -141,6 +141,14 @@ public class PunchCube : CubeCollider
 
         if (collision.gameObject.CompareTag(PLAYER_TAG))
         {
+            if (PowerEffect.Instance.isPowered)
+            {
+                collisionLocation = collision.contacts[0].point;
+                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
+                print(collision.gameObject.name);
+                HandleSuccess();
+                return;
+            }
             if (ConcludeCondition(collision.gameObject) && !hasMisstaken)
             {
                 collisionLocation = collision.contacts[0].point;
@@ -151,7 +159,7 @@ public class PunchCube : CubeCollider
             else
             {
                 HandTouchFeedback.Instance.HandFeedback(collision.gameObject, false);
-                FailFeedback();
+                HandleFail();
             }
         }
     }

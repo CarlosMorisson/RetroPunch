@@ -156,6 +156,7 @@ public class CubeCollider : MonoBehaviour
 
     protected virtual void HandleFail()
     {
+        gameObject.GetComponent<Rigidbody>().useGravity = true;
         OnFail?.Invoke();
     }
 

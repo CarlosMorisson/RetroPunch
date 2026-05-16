@@ -144,6 +144,13 @@ public class MultiPunchCube : CubeCollider
             Transform hit = collision.transform;
 
             PunchPoint point = GetClosestPoint(hit.position);
+            if (PowerEffect.Instance.isPowered)
+            {
+                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
+                HandleSuccess();
+                collisionLocation = collision.contacts[0].point;
+                return;
+            }
 
             if (point != null && !point.isTouched && !hasMisstaken)
             {

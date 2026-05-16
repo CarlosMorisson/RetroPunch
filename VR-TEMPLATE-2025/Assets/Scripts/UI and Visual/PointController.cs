@@ -30,8 +30,6 @@ public class PointController : MonoBehaviour
     #region Consecutivos
     private int _bestConsecutives;
     private int _bestConsecutiveInScene;
-    public event Action OnBestConsecutiveInScene;
-    public event Action<int> OnBestConsecutiveInSceneInt;
     private int _consecutives;
     public int Consecutives
     {
@@ -100,14 +98,13 @@ public class PointController : MonoBehaviour
         OnConsecutiveInt += CheckConsecutiveEvents;
         OnConsecutiveInt += CheckBestSceneConsecutive;
         OnConsecutive += CheckBestConsecutive;
-        OnBestConsecutiveInSceneInt += CheckBestSceneConsecutive;
+        OnTotalCube += CalculateSucessPercentage;
     }
     private void OnDisable()
     {
         OnConsecutiveInt -= CheckConsecutiveEvents;
         OnConsecutiveInt -= CheckBestSceneConsecutive;
         OnConsecutive -= CheckBestConsecutive;
-        OnBestConsecutiveInSceneInt -= CheckBestSceneConsecutive;
         OnTotalCube -= CalculateSucessPercentage;
     }
     public void IncreasePoint()
@@ -142,7 +139,7 @@ public class PointController : MonoBehaviour
     public string GetPercentageSucessString() => _sucessPercentage;
     public void CheckBestConsecutive()
     {
-        if (_bestConsecutiveInScene > _bestConsecutives)
+        if (_bestConsecutiveInScene >= _bestConsecutives)
         {
             _bestConsecutives= _bestConsecutiveInScene;
             PlayerPrefs.SetInt(CONSECUTIVES_SAVE_NAME, _bestConsecutives);

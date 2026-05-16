@@ -14,10 +14,19 @@ public class BreakCube : MonoBehaviour
     public float explosionRadius = 5f;
     public float upwardsModifier = 0.5f;
 
+    [Header("Color")]
+    public ParticleSystem FeedbackParticle;
+    private Material particleMaterial;
+    public Color ParticleColor;
+
     [Header("Debug")]
     public bool drawGizmos = true;
 
+    private const float SHADOW_TIME = 1f;
+
     private const float ACTIVE_TIME = 3f;
+
+    private static readonly int EmissionColorProperty = Shader.PropertyToID("_EmissionColor");
 
     [ContextMenu("Trigger")]
     public void TestExplosion()
@@ -33,11 +42,42 @@ public class BreakCube : MonoBehaviour
         if (explosionCenter != null)
             explosionCenter.position = position;
         GetTargets();
+        Color primaryColor = ColorController.Instance.CurrentPrimary;
+        SetupParticleMaterial(primaryColor);
         Explode();
         StartCoroutine(WaitToActive());
     }
+    /// <summary>
+    /// Instancia o material do ParticleSystemRenderer e muda a cor da emissão
+    /// </summary>
+    private void SetupParticleMaterial(Color colorToApply)
+    {
+        if (FeedbackParticle == null) return;
+
+        if (FeedbackParticle.TryGetComponent<ParticleSystemRenderer>(out ParticleSystemRenderer psRenderer))
+        {
+            if (particleMaterial == null && psRenderer.material != null)
+            {
+                particleMaterial = new Material(psRenderer.material);
+                psRenderer.material = particleMaterial;
+            }
+            if (particleMaterial != null)
+            {
+                particleMaterial.EnableKeyword("_EMISSION");
+                particleMaterial.SetColor(EmissionColorProperty, colorToApply);
+            }
+        }
+    }
     private IEnumerator WaitToActive()
     {
+        yield return new WaitForSeconds(ACTIVE_TIME);
+        foreach (Transform child in targetParents)
+        {
+            if (child.gameObject.TryGetComponent<MeshTrailEmitter>(out MeshTrailEmitter trailEmitter))
+            {
+                trailEmitter.enabled = true;
+            }
+        }
         yield return new WaitForSeconds(ACTIVE_TIME);
         foreach (Transform child in targetParents)
         {
@@ -81,6 +121,10 @@ public class BreakCube : MonoBehaviour
     {
         foreach(Transform child in targetParents)
         {
+            if (child.gameObject.TryGetComponent<MeshTrailEmitter>(out MeshTrailEmitter trailEmitter))
+            {
+                trailEmitter.enabled = false;
+            }
             targets.Add(child.GetComponent<Rigidbody>());
         }
     }

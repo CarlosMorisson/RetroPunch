@@ -42,7 +42,7 @@ Material:
     - _InnerFrameWidth: 0.156
     - _InnerIntensity: 2.06
     - _MeshExpand: 1.53
-    - _NoiseScale: 3.8
+    - _NoiseScale: 16
     - _NoiseSpeed: 1.26
     - _Opacity: 1
     - _OuterFrameWidth: 0.01

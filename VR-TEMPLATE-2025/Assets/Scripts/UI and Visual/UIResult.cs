@@ -35,8 +35,6 @@ public class UIResult : MonoBehaviour
     [SerializeField]
     private Image blockImagePorcent;
     [SerializeField]
-    private TextMeshProUGUI bestConsectiveText;
-    [SerializeField]
     private TextMeshProUGUI musicFinalNameText;
     [SerializeField]
     private TextMeshProUGUI finalErrorText;
@@ -94,6 +92,13 @@ public class UIResult : MonoBehaviour
     public void AnimateResultPanel()
     {
         PreparePanelsForAnimation();
+
+        PointController.Instance.CheckBestConsecutive();
+
+        finalResultText.text = PointController.Instance.Accept.ToString();
+        finalConsecutiveText.text = PointController.Instance.GetBestConsecutiveInScene().ToString();
+        highConsecutiveText.text = PointController.Instance.GetBestConsecutive().ToString();
+        finalErrorText.text = PointController.Instance.Errors.ToString();
 
         FinalResultPanel.SetActive(true);
         ResultPanel.SetActive(false);
@@ -205,10 +210,11 @@ public class UIResult : MonoBehaviour
         consecutiveText.text = consecutive.ToString();
         consecutiveText.transform.DOPunchScale(_consecutiveScale, PUNCH_TIME).
              OnComplete(() => consecutiveText.transform.localScale = _consecutiveTextInitialScale); ;
+        UpdateConsecutiveInScene(consecutive);
     }
     public void UpdateConsecutiveInScene(int consecutive)
     {
-        if (consecutive > PointController.Instance.GetBestConsecutiveInScene())
+        if (consecutive >= PointController.Instance.GetBestConsecutiveInScene())
         {
             finalConsecutiveText.text=consecutive.ToString();
             UpdateBestConsecutive(consecutive);
@@ -221,7 +227,7 @@ public class UIResult : MonoBehaviour
     }
     public void UpdateBestConsecutive(int consecutive)
     {
-        if (consecutive > PointController.Instance.GetBestConsecutive())
+        if (consecutive >= PointController.Instance.GetBestConsecutive())
         {
             highConsecutiveText.text=consecutive.ToString();
         }
@@ -245,6 +251,5 @@ public class UIResult : MonoBehaviour
         PointController.Instance.OnAcceptInt += UpdateResult;
         PointController.Instance.OnConsecutiveInt += UpdateConsecutive;
         PointController.Instance.OnErrorInt += UpdateError;
-        PointController.Instance.OnConsecutiveInt += UpdateConsecutiveInScene;
     }
 }
