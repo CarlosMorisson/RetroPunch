@@ -21,8 +21,8 @@ public class CubeMovemment : MonoBehaviour
 
     [Header("Boost Control")]
     public Transform boostEndPoint;
-
-    private bool boostFinished = false;
+    [HideInInspector]
+    public bool boostFinished = false;
 
     private const string FINAL_BOOST = "FinalBoost";
     private void Awake()=> enableSpeed = normalSpeed;

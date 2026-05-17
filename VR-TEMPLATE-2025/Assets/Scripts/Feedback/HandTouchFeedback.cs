@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.XR.Interaction.Toolkit.Feedback;
 
 public class HandTouchFeedback : MonoBehaviour
 {
@@ -38,6 +39,14 @@ public class HandTouchFeedback : MonoBehaviour
     public float waitTime = 0.2f;
 
     private static readonly int EmissionColorProperty = Shader.PropertyToID("_EmissionColor");
+
+    private const float SUCCESS_HAPTIC_INTENSITY = 0.7f;
+    private const float SUCCESS_HAPTIC_DURATION = 0.15f;
+    private const float SUCCESS_HAPTIC_FREQUENCY = 0.5f;
+
+    private const float FAIL_HAPTIC_INTENSITY = 0.4f;
+    private const float FAIL_HAPTIC_DURATION = 0.25f;
+    private const float FAIL_HAPTIC_FREQUENCY = 0.5f;
 
     void Awake()
     {
@@ -90,6 +99,23 @@ public class HandTouchFeedback : MonoBehaviour
         else if (handObj == rightController.handObject) StartCoroutine(ApplyFeedbackRoutine(rightController, success));
         else if (handObj == leftController.handObject) StartCoroutine(ApplyFeedbackRoutine(leftController, success));
         else if (handObj == testHand.handObject) StartCoroutine(ApplyFeedbackRoutine(testHand, success));
+
+        if (handObj != null && handObj.TryGetComponent<SimpleHapticFeedback>(out SimpleHapticFeedback simpleHaptic))
+        {
+            simpleHaptic.enabled = true;
+
+            if (simpleHaptic.hapticImpulsePlayer != null)
+            {
+                if (success)
+                {
+                    simpleHaptic.hapticImpulsePlayer.SendHapticImpulse(SUCCESS_HAPTIC_INTENSITY, SUCCESS_HAPTIC_DURATION, SUCCESS_HAPTIC_FREQUENCY);
+                }
+                else
+                {
+                    simpleHaptic.hapticImpulsePlayer.SendHapticImpulse(FAIL_HAPTIC_INTENSITY, FAIL_HAPTIC_DURATION, FAIL_HAPTIC_FREQUENCY);
+                }
+            }
+        }
     }
 
     private IEnumerator ApplyFeedbackRoutine(Hand hand, bool success)

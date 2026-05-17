@@ -1,7 +1,8 @@
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using DG.Tweening;
+using static UnityEngine.Rendering.DebugUI;
 public class UIResult : MonoBehaviour
 {
     public static UIResult Instance;
@@ -67,7 +68,13 @@ public class UIResult : MonoBehaviour
     [SerializeField] private float dropDuration = 0.5f;
     [SerializeField] private float scaleDuration = 0.3f;
     [SerializeField] private float startYOffset = 1000f;
-
+    [Header("Pause Animation")]
+    [SerializeField]
+    private GameObject PausePanel;
+    [SerializeField]
+    private GameObject PauseText;
+    [SerializeField]
+    private GameObject ResumeButton;
     private Vector3 _resultTextInitialScale,
         _errorTextInitialScale,
         _consecutiveTextInitialScale,
@@ -87,6 +94,37 @@ public class UIResult : MonoBehaviour
     {
         Instance = this;
         CacheInitialScale();
+    }
+    [ContextMenu("Testar Pause")]
+    public void AnimatePausePanel()
+    {
+        PausePanel.SetActive(true);
+        Sequence resultSequence = DOTween.Sequence();
+        ResumeButton.transform.localScale = Vector3.zero;
+        MenuButton.transform.localScale = Vector3.zero;
+        RestartButton.transform.localScale = Vector3.zero;
+        PauseText.transform.localScale = Vector3.zero;
+        AppendScaleAnim(resultSequence, PauseText);
+        AppendScaleAnim(resultSequence, ResumeButton);
+        AppendScaleAnim(resultSequence, MenuButton);
+        AppendScaleAnim(resultSequence, RestartButton);
+    }
+    [ContextMenu("Testar Pause")]
+    public void AnimateDePausePanel()
+    {
+        Sequence resultSequence = DOTween.Sequence();
+        resultSequence.Append(PauseText.transform.DOScale(Vector3.zero, scaleDuration)
+            .SetEase(Ease.OutBack));
+        resultSequence.Append(ResumeButton.transform.DOScale(Vector3.zero, scaleDuration)
+    .SetEase(Ease.OutBack));
+        resultSequence.Append(MenuButton.transform.DOScale(Vector3.zero, scaleDuration)
+    .SetEase(Ease.OutBack));
+        resultSequence.Append(RestartButton.transform.DOScale(Vector3.zero, scaleDuration)
+    .SetEase(Ease.OutBack));
+        resultSequence.OnComplete(() =>
+        {
+            PausePanel.SetActive(false);
+        });
     }
     [ContextMenu("Testar Animacao")]
     public void AnimateResultPanel()
@@ -154,6 +192,8 @@ public class UIResult : MonoBehaviour
             RestartButton.SetActive(true);
         if(panel==MenuButton) 
             MenuButton.SetActive(true);
+        if(panel==ResumeButton)
+            ResumeButton.SetActive(true);
         seq.Append(panel.transform.DOScale(Vector3.one, scaleDuration)
             .SetEase(Ease.OutBack));
     }

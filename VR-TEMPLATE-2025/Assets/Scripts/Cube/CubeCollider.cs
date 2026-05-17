@@ -59,7 +59,13 @@ public class CubeCollider : MonoBehaviour
     }
     public void StopRun()
     {
-        GameObject parent = transform.parent.gameObject;
+        Transform parent = transform.parent;
+        if (parent != null)
+        {
+            CubeMovemment move = parent.GetComponent<CubeMovemment>();
+            if (move.boostFinished)
+                gameObject.SetActive(false);
+        }
         parent.GetComponent<CubeMovemment>().normalSpeed = 0;
     }
     public void FinishRun()

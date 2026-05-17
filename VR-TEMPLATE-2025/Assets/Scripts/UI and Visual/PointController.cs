@@ -95,6 +95,7 @@ public class PointController : MonoBehaviour
     }
     private void OnEnable()
     {
+        OnError += TouchEffect.Instance.ResetAllColumns;
         OnConsecutiveInt += CheckConsecutiveEvents;
         OnConsecutiveInt += CheckBestSceneConsecutive;
         OnConsecutive += CheckBestConsecutive;
@@ -102,6 +103,7 @@ public class PointController : MonoBehaviour
     }
     private void OnDisable()
     {
+        OnError -= TouchEffect.Instance.ResetAllColumns;
         OnConsecutiveInt -= CheckConsecutiveEvents;
         OnConsecutiveInt -= CheckBestSceneConsecutive;
         OnConsecutive -= CheckBestConsecutive;
