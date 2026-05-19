@@ -31,3 +31,15 @@ MonoBehaviour:
     volume: 0.04
     pitch: 1
     mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Flame1
+    clip: {fileID: 8300000, guid: 69a421dff3a0b9043b11f7b987c9b026, type: 3}
+    loop: 1
+    volume: 0.04
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Flame2
+    clip: {fileID: 8300000, guid: f472b1995656f4c44a2c2e785f6ccc31, type: 3}
+    loop: 0
+    volume: 0.5
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}

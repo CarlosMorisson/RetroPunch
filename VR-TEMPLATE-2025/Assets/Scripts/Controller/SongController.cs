@@ -15,27 +15,37 @@ public class SongController : MonoBehaviour
     public int spectrumSize = 512;
 
     [Header("Impact FX")]
-    [Range(0f, 1f)] public float maxVolumeBoostPercent = 0.25f; // +25%
-    [Range(-0.2f, 0.2f)] public float maxPitchBoost = 0.05f;       // pitch leve
+    [Range(0f, 1f)] public float maxVolumeBoostPercent = 0.25f; 
+    [Range(-0.2f, 0.2f)] public float maxPitchBoost = 0.05f;      
 
     [Space(15)]
     [Header("Touch Effect")]
     public List<AudioClip> touchAudio;
     public AudioSource TouchAudioSource;
+    [Header("Fail Effect")]
     [Space(15)]
     public List<AudioClip> failAudio;
     public AudioSource FailAudioSource;
+    [Header("Sequence Effect")]
+    public List<AudioClip> sequenceAudio;
+    public AudioSource SequenceAudioSource;
+    [Range(1f, 3f)] public float maxSequencePitch = 2.0f; // Limite máximo do pitch
+    [Range(0f, 0.5f)] public float pitchIncreaseStep = 0.05f;
 
     private List<AudioClip> playedTouchAudios = new List<AudioClip>();
     private List<AudioClip> playedFailAudio = new List<AudioClip>();
 
-    public AudioSource audioSource { get;  set; }
+    private List<AudioClip> shuffledSequence = new List<AudioClip>();
+    private int currentSequenceIndex = 0;
+
+    public AudioSource audioSource { get; set; }
 
     private float[] spectrumData;
     private Coroutine impactRoutine;
 
     private float baseVolume;
     private float basePitch;
+    private float initialSequencePitch;
 
     private void Awake()
     {
@@ -47,7 +57,7 @@ public class SongController : MonoBehaviour
         if (audioSource != null)
         {
             UIResult.Instance.UpdateSlider(audioSource.time);
-            if (!audioSource.isPlaying && audioSource.time ==0)
+            if (!audioSource.isPlaying && audioSource.time == 0)
             {
                 FinishSong();
             }
@@ -55,7 +65,7 @@ public class SongController : MonoBehaviour
     }
 
     /// <summary>
-    /// Carrega o AudioClip, atualiza nome/duração e toca.
+    /// Carrega o AudioClip, atualiza nome/duração e toca. Atua como o Start Game.
     /// </summary>
     public void LoadSong(AudioClip clip)
     {
@@ -75,6 +85,34 @@ public class SongController : MonoBehaviour
 
         baseVolume = audioSource.volume;
         basePitch = audioSource.pitch;
+
+        if (SequenceAudioSource != null)
+        {
+            initialSequencePitch = SequenceAudioSource.pitch;
+        }
+
+        InitializeSequenceOrder();
+    }
+
+    /// <summary>
+    /// Clona a lista original de sequenceAudio e a embaralha aleatoriamente.
+    /// </summary>
+    private void InitializeSequenceOrder()
+    {
+        shuffledSequence.Clear();
+        currentSequenceIndex = 0;
+
+        if (sequenceAudio == null || sequenceAudio.Count == 0) return;
+
+        shuffledSequence.AddRange(sequenceAudio);
+
+        for (int i = shuffledSequence.Count - 1; i > 0; i--)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, i + 1);
+            AudioClip temp = shuffledSequence[i];
+            shuffledSequence[i] = shuffledSequence[randomIndex];
+            shuffledSequence[randomIndex] = temp;
+        }
     }
 
     public void PauseSong()
@@ -109,11 +147,14 @@ public class SongController : MonoBehaviour
         intensity = Mathf.Clamp01(intensity);
 
         PlayTouchEffect();
+        PlaySequenceSuccessEffect(); 
+
         if (impactRoutine != null)
             StopCoroutine(impactRoutine);
 
         impactRoutine = StartCoroutine(ImpactRoutine(intensity, duration));
     }
+
     private void PlayTouchEffect()
     {
         if (touchAudio == null || touchAudio.Count == 0 || TouchAudioSource == null) return;
@@ -139,12 +180,40 @@ public class SongController : MonoBehaviour
             TouchAudioSource.PlayOneShot(selectedClip);
         }
     }
+
+    /// <summary>
+    /// Toca a próxima nota na sequência sorteada aumentando o Pitch de forma linear até o limite.
+    /// </summary>
+    private void PlaySequenceSuccessEffect()
+    {
+        if (shuffledSequence == null || shuffledSequence.Count == 0 || SequenceAudioSource == null) return;
+
+        AudioClip clipToPlay = shuffledSequence[currentSequenceIndex];
+        SequenceAudioSource.PlayOneShot(clipToPlay);
+
+        currentSequenceIndex++;
+        SequenceAudioSource.pitch = Mathf.Min(SequenceAudioSource.pitch + pitchIncreaseStep, maxSequencePitch);
+
+        if (currentSequenceIndex >= shuffledSequence.Count)
+        {
+            currentSequenceIndex = 0;
+        }
+    }
+
     public void PlayFailEffect()
     {
+        currentSequenceIndex = 0;
+
+        if (SequenceAudioSource != null)
+        {
+            SequenceAudioSource.pitch = initialSequencePitch;
+        }
+
         if (failAudio == null || failAudio.Count == 0 || FailAudioSource == null) return;
+
         if (playedFailAudio.Count >= failAudio.Count)
         {
-            playedTouchAudios.Clear();
+            playedFailAudio.Clear();
         }
 
         List<AudioClip> availableAudios = new List<AudioClip>();
@@ -204,6 +273,7 @@ public class SongController : MonoBehaviour
 
         impactRoutine = null;
     }
+
     public float GetGlobalFrequency()
     {
         var sources = AudioController.Instance.GetPlayingSources();
@@ -223,7 +293,6 @@ public class SongController : MonoBehaviour
             for (int i = 0; i < spectrumData.Length; i++)
                 sum += spectrumData[i];
 
-            // pondera pelo volume do som
             totalEnergy += sum * source.volume;
         }
 
@@ -288,7 +357,7 @@ public class SongController : MonoBehaviour
 
     public float GetPeakFrequency()
     {
-        if(audioSource == null)
+        if (audioSource == null)
             return 0f;
         audioSource.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
 

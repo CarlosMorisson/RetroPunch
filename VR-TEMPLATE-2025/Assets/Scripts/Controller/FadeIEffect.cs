@@ -16,8 +16,8 @@ public class FadeIEffect : MonoBehaviour
 
     private Material _instancedMaterial;
 
-    private const string GAME_SCENE= "BasicScene";
-    private const string MENU_SCENE = "BasicScene";
+    private const string GAME_SCENE= "GameScene";
+    private const string MENU_SCENE = "MenuScene";
     private void Awake()
     {
         if (SourceMaterial != null)

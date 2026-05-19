@@ -6,6 +6,7 @@ public class TouchEffect : MonoBehaviour
 {
     public List<ColummTouch> FlameCollum = new();
     public static TouchEffect Instance;
+    private const string FLAME_THROWER_NAME = "Flame2";
     private void Awake()
     {
         Instance = this;
@@ -20,6 +21,7 @@ public class TouchEffect : MonoBehaviour
 
         ColummTouch targetColumn = null;
 
+        print("Chamou aq");
         foreach (var column in FlameCollum)
         {
             if (!column.Burned)
@@ -28,7 +30,7 @@ public class TouchEffect : MonoBehaviour
                 break;
             }
         }
-
+        AudioController.Instance.Play(FLAME_THROWER_NAME);
         if (targetColumn == null)
         {
            
