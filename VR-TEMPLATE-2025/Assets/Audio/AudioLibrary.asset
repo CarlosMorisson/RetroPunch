@@ -43,3 +43,9 @@ MonoBehaviour:
     volume: 0.5
     pitch: 1
     mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: TransitionEffect
+    clip: {fileID: 8300000, guid: 6647c9f75c5b6c64c88a37593151e021, type: 3}
+    loop: 0
+    volume: 0.5
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
