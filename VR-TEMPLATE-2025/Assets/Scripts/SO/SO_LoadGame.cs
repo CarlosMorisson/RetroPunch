@@ -3,8 +3,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SO_LoadGame", menuName = "Scriptable Objects/SO_LoadGame")]
 public class SO_LoadGame : ScriptableObject
 {
-    [Header("Game Type")]
-    public GameType GameMode;
     [Space(10)]
     [Header("Game Music")]
     public AudioClip GameMusic;
@@ -67,9 +65,3 @@ public class BuildSettings
     [Header("Configuracoes De Cena Power")]
     public SceneSettings PowerSceneSettings;
 }
-public enum GameType
-{
-    Punch,
-    Push,
-    Put
-};

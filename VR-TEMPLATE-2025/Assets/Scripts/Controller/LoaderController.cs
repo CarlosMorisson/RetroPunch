@@ -19,7 +19,8 @@ public class LoaderController : MonoBehaviour
     {
         Instance = this;
 
-        GameMode = LoadGame.GameMode;
+        GameMode = StageLoadController.Instance.gameType;
+        LoadGame=StageLoadController.Instance.CurrentColor;
 
         SceneLoad();
 
@@ -28,7 +29,7 @@ public class LoaderController : MonoBehaviour
 
     public void LoadSong()
     {
-        SongGame.LoadSong(LoadGame.GameMusic);
+        SongGame.LoadSong(StageLoadController.Instance.ChooseMusic);
     }
 
     private void SceneLoad()

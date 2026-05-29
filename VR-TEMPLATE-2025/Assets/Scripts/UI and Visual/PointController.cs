@@ -92,6 +92,11 @@ public class PointController : MonoBehaviour
     private void Start()
     {
         _bestConsecutives = PlayerPrefs.GetInt(CONSECUTIVES_SAVE_NAME, 0);
+        EventOnConsecutives eventConsecutive = new EventOnConsecutives
+        {
+            PointTrigger = StageLoadController.Instance.CurrentDifficulty.ErrorTolerance
+        };
+        eventConsecutive.EventTrigger.AddListener(GameState.Instance.GameStateEnd);
     }
     private void OnEnable()
     {

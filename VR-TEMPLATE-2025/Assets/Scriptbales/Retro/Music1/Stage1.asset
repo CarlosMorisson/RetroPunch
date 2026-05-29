@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40c40296d663c884a82611dbd501f0cf, type: 3}
   m_Name: Stage1
   m_EditorClassIdentifier: 
-  GameMode: 0
   GameMusic: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
   BuildSettings:
     PrimaryColorLight: {r: 0.9122374, g: 0.2320754, b: 1, a: 1}

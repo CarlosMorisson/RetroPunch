@@ -42,6 +42,11 @@ public class InstancerController : MonoBehaviour
     private const float MAX_RATE = 10;
     private const float MIN_RATE = 0.05f;
 
+    private void Start()
+    {
+        baseSpawnRate = StageLoadController.Instance.CurrentDifficulty.BaseSpawnRate;
+        spawnRateMultiplier = StageLoadController.Instance.CurrentDifficulty.SpawnRateMultiplier;
+    }
     void Update()
     {
         if (prefabs == null || prefabs.Count == 0 || songController == null || spawnParent == null || stop)

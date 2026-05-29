@@ -12,33 +12,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40c40296d663c884a82611dbd501f0cf, type: 3}
   m_Name: Stage3
   m_EditorClassIdentifier: 
-  GameMode: 0
   GameMusic: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
   BuildSettings:
-    PrimaryColorLight: {r: 0, g: 0, b: 0, a: 0}
-    PrimaryColorDark: {r: 0, g: 0, b: 0, a: 0}
-    SecondaryColorLight: {r: 0, g: 0, b: 0, a: 0}
-    SecondaryColorDark: {r: 0, g: 0, b: 0, a: 0}
+    PrimaryColorLight: {r: 1.9766744, g: 1.0079472, b: 0, a: 1}
+    PrimaryColorDark: {r: 3.482202, g: 3.482202, b: 0, a: 1}
+    SecondaryColorLight: {r: 0, g: 0, b: 0, a: 1}
+    SecondaryColorDark: {r: 0, g: 0, b: 0, a: 1}
     BaseSceneSettings:
-      SkyboxMaterial: {fileID: 0}
-      GroundMaterial: {fileID: 0}
-      PlataformMaterial: {fileID: 0}
-      WallMaterial: {fileID: 0}
+      SkyboxMaterial: {fileID: 2100000, guid: bc956c2a94277984ab315b9e44015434, type: 2}
+      GroundMaterial: {fileID: 2100000, guid: d9d66429d76d45e4588709a0f48707ed, type: 2}
+      PlataformMaterial: {fileID: 2100000, guid: d9d66429d76d45e4588709a0f48707ed, type: 2}
+      WallMaterial: {fileID: 2100000, guid: 2da34fab77e314448b4ef40d570d1669, type: 2}
     PrimaryColorFreezeLight: {r: 0, g: 0.27607727, b: 0.6075471, a: 1}
     PrimaryColorFreezeDark: {r: 0, g: 0.6882615, b: 1, a: 1}
     SecondaryColorFreezeLight: {r: 1, g: 1, b: 1, a: 1}
     SecondaryColorFreezeDark: {r: 0.82641506, g: 0.80302596, b: 0.80302596, a: 1}
     FreezeSceneSettings:
-      SkyboxMaterial: {fileID: 0}
-      GroundMaterial: {fileID: 0}
-      PlataformMaterial: {fileID: 0}
-      WallMaterial: {fileID: 0}
+      SkyboxMaterial: {fileID: 2100000, guid: 3d57089665287cb499069c09d990af16, type: 2}
+      GroundMaterial: {fileID: 2100000, guid: 71143569593237840adb157ab69f7919, type: 2}
+      PlataformMaterial: {fileID: 2100000, guid: 71143569593237840adb157ab69f7919, type: 2}
+      WallMaterial: {fileID: 2100000, guid: 444fa3341639ad041bc6de89554d8ee5, type: 2}
     PrimaryColorPowerLight: {r: 0.90021396, g: 1, b: 0.27735847, a: 1}
     PrimaryColorPowerDark: {r: 0.32935095, g: 0.3660378, b: 0, a: 1}
     SecondaryColorPowerLight: {r: 1, g: 0.41826248, b: 0.2396226, a: 1}
     SecondaryColorPowerDark: {r: 1, g: 0.1741546, b: 0.118867874, a: 1}
     PowerSceneSettings:
-      SkyboxMaterial: {fileID: 0}
-      GroundMaterial: {fileID: 0}
-      PlataformMaterial: {fileID: 0}
-      WallMaterial: {fileID: 0}
+      SkyboxMaterial: {fileID: 2100000, guid: daadad2f907da7e4a9b9ac511b8fa361, type: 2}
+      GroundMaterial: {fileID: 2100000, guid: 75ed59a0d73662d4ca45c4b354ba97fe, type: 2}
+      PlataformMaterial: {fileID: 2100000, guid: 75ed59a0d73662d4ca45c4b354ba97fe, type: 2}
+      WallMaterial: {fileID: 2100000, guid: 7000f5599057dc64ba2d3139f157d8e3, type: 2}

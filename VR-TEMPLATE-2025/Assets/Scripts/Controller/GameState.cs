@@ -10,6 +10,12 @@ public enum State
     Tutorial,
     End
 };
+public enum Difficulty
+{
+    Easy,
+    Normal,
+    Hard
+};
 public class GameState : MonoBehaviour
 {
     public static GameState Instance;
@@ -32,11 +38,7 @@ public class GameState : MonoBehaviour
         }
     }
     public bool _gameStarted { private get; set; }
-    public enum Difficulty
-    {
-        Easy,
-        Hard
-    };
+
     public Difficulty difficulty;
     [Space(10f)]
     public UnityEvent OnMenuEvent;

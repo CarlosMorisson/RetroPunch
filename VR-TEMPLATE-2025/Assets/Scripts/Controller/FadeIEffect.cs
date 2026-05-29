@@ -57,7 +57,7 @@ public class FadeIEffect : MonoBehaviour
         });
     }
 
-    [ContextMenu("FadeIn")]
+    [ContextMenu("FadeInGame")]
     public void FadeIn()
     {
         Sequence seq = DOTween.Sequence();
@@ -76,6 +76,26 @@ public class FadeIEffect : MonoBehaviour
             RestartScene();
         });
     }
+    [ContextMenu("FadeInMenu")]
+    public void FadeInMenu()
+    {
+        Sequence seq = DOTween.Sequence();
+
+        seq.Append(_instancedMaterial.DOFade(1f, fadeDuration));
+
+        RetroCanvas.transform.localScale = Vector3.zero;
+
+        seq.Append(
+            RetroCanvas.transform
+                .DOScale(Vector3.one, scaleDuration)
+                .SetEase(Ease.OutBack)
+        );
+        seq.OnComplete(() =>
+        {
+            SceneManager.LoadScene(MENU_SCENE);
+        });
+    }
+
 
     private void SetAlpha(float value)
     {
