@@ -21,6 +21,8 @@ public class VRCalorieEstimator : MonoBehaviour
     private Vector3 lastHeadPos;
     private Vector3 lastLeftHandPos;
     private Vector3 lastRightHandPos;
+
+    private const string MAIN_TOTAL_CALORIES = "MainTotalCalories";
     public bool Stop { private get; set; }
     void Start()
     {
@@ -60,6 +62,9 @@ public class VRCalorieEstimator : MonoBehaviour
     public float GetTotalCalories()
     {
         Stop = true;
+        float calories = PlayerPrefs.GetFloat(MAIN_TOTAL_CALORIES)+ totalCaloriesBurned;
+        PlayerPrefs.SetFloat(MAIN_TOTAL_CALORIES, calories);
+        PlayerPrefs.Save();
         return totalCaloriesBurned;
     }
 }

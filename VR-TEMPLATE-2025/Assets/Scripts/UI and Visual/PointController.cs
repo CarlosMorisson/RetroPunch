@@ -45,7 +45,7 @@ public class PointController : MonoBehaviour
     }
     public event Action OnConsecutive;
     public event Action<int> OnConsecutiveInt;
-    private const string CONSECUTIVES_SAVE_NAME = "BestConsecutive";
+
     #endregion
 
     #region TotalCube
@@ -86,12 +86,17 @@ public class PointController : MonoBehaviour
     public event Action OnError;
     #endregion
 
+    private const string MAIN_TOTAL_SCORE = "MainTotalScore";
+    private const string MAIN_TOTAL_ERRORS = "MainTotalErrors";
+    private const string MAIN_BEST_CONSECUTIVE = "BestConsecutive";
+    private const string MAIN_TOTAL_ACCURACY = "MainTotalAccuracy";
+
     public List<EventOnConsecutives> EventsTrigger = new();
 
     private void Awake() => Instance = this;
     private void Start()
     {
-        _bestConsecutives = PlayerPrefs.GetInt(CONSECUTIVES_SAVE_NAME, 0);
+        _bestConsecutives = PlayerPrefs.GetInt(MAIN_BEST_CONSECUTIVE, 0);
         EventOnConsecutives eventConsecutive = new EventOnConsecutives
         {
             PointTrigger = StageLoadController.Instance.CurrentDifficulty.ErrorTolerance
@@ -138,7 +143,7 @@ public class PointController : MonoBehaviour
 
         float percentage = (float)Accept * 100 / TotalCube;
         _percentageInt = (int)percentage;
-        _sucessPercentage = percentage.ToString("F2") + "%";
+        _sucessPercentage = percentage.ToString("F1") + "%";
 
     }
     public float GetPercentageSucessInt() => _percentageInt;
@@ -148,8 +153,22 @@ public class PointController : MonoBehaviour
         if (_bestConsecutiveInScene >= _bestConsecutives)
         {
             _bestConsecutives= _bestConsecutiveInScene;
-            PlayerPrefs.SetInt(CONSECUTIVES_SAVE_NAME, _bestConsecutives);
+            PlayerPrefs.SetInt(MAIN_BEST_CONSECUTIVE, _bestConsecutives);
         }
+    }
+    public void UpdateMainValues()
+    {
+        int score = PlayerPrefs.GetInt(MAIN_TOTAL_SCORE)+ Accept;
+        int error = PlayerPrefs.GetInt(MAIN_TOTAL_ERRORS)+Errors;
+        float accuracy = PlayerPrefs.GetFloat(MAIN_TOTAL_ACCURACY);
+        if (accuracy==0)
+            accuracy=_percentageInt;
+        else
+            accuracy=(_percentageInt+ accuracy)/2;
+        PlayerPrefs.SetInt(MAIN_TOTAL_SCORE, score);
+        PlayerPrefs.SetInt(MAIN_TOTAL_ERRORS, error);
+        PlayerPrefs.SetFloat(MAIN_TOTAL_ACCURACY, accuracy);
+        PlayerPrefs.Save();
     }
     #region Events
     public void OnErrorEvent()

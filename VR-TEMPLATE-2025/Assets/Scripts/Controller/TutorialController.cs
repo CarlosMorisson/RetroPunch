@@ -1,13 +1,15 @@
+using DG.Tweening;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Video;
-using DG.Tweening;
+using static UnityEngine.Rendering.DebugUI;
 
 public class TutorialController : MonoBehaviour
 {
     [Header("Configurações de Tutorial")]
-    public List<TutorialStep> TutorialSteps = new();
+    public List<TutorialList> TutorialSteps = new();
     private int _currentIndex = -1;
+    private int tutorialType;
 
     private const float ANIM_DURATION = 0.5f;
     private const float PUNCH_ELASTICITY = 0.5f;
@@ -17,7 +19,7 @@ public class TutorialController : MonoBehaviour
     public void StartTutorial()
     {
         if (TutorialSteps.Count == 0) return;
-
+        tutorialType = (int)StageLoadController.Instance.gameType;
         _currentIndex = 0;
         PlayStepAnimation(_currentIndex);
     }
@@ -26,7 +28,7 @@ public class TutorialController : MonoBehaviour
     {
         if (_currentIndex >= 0 && _currentIndex < TutorialSteps.Count)
         {
-            TutorialSteps[_currentIndex].StepGameObject.SetActive(false);
+            TutorialSteps[_currentIndex].steps[tutorialType].StepGameObject.SetActive(false);
         }
 
         _currentIndex++;
@@ -46,37 +48,42 @@ public class TutorialController : MonoBehaviour
     {
         var step = TutorialSteps[index];
 
-        Vector3 panelScale = step.Panel.localScale;
-        Vector3 videoScale = step.VideoPanel.transform.localScale;
-        Vector3 textScale = step.TextPanel.transform.localScale;
-        Vector3 buttonScale = step.Button.transform.localScale;
+        Vector3 panelScale = step.steps[tutorialType].Panel.localScale;
+        Vector3 videoScale = step.steps[tutorialType].VideoPanel.transform.localScale;
+        Vector3 textScale = step.steps[tutorialType].TextPanel.transform.localScale;
+        Vector3 buttonScale = step.steps[tutorialType].Button.transform.localScale;
 
-        step.Panel.localScale = Vector3.zero;
-        step.VideoPanel.transform.localScale = Vector3.zero;
-        step.TextPanel.transform.localScale = Vector3.zero;
-        step.Button.transform.localScale = Vector3.zero;
+        step.steps[tutorialType].Panel.localScale = Vector3.zero;
+        step.steps[tutorialType].VideoPanel.transform.localScale = Vector3.zero;
+        step.steps[tutorialType].TextPanel.transform.localScale = Vector3.zero;
+        step.steps[tutorialType].Button.transform.localScale = Vector3.zero;
 
-        step.StepGameObject.SetActive(true);
+        step.steps[tutorialType].StepGameObject.SetActive(true);
 
         Sequence seq = DOTween.Sequence();
 
-        seq.Append(step.Panel.DOScale(panelScale, ANIM_DURATION).SetEase(DEFAULT_EASE));
+        seq.Append(step.steps[tutorialType].Panel.DOScale(panelScale, ANIM_DURATION).SetEase(DEFAULT_EASE));
 
-        seq.Append(step.VideoPanel.transform.DOScale(videoScale, ANIM_DURATION).SetEase(DEFAULT_EASE)
+        seq.Append(step.steps[tutorialType].VideoPanel.transform.DOScale(videoScale, ANIM_DURATION).SetEase(DEFAULT_EASE)
             .OnComplete(() => {
-                if (step.Clip != null) step.Clip.Play();
+                if (step.steps[tutorialType].Clip != null) step.steps[tutorialType].Clip.Play();
             }));
 
-        seq.Join(step.TextPanel.transform.DOScale(textScale, ANIM_DURATION).SetEase(DEFAULT_EASE));
+        seq.Join(step.steps[tutorialType].TextPanel.transform.DOScale(textScale, ANIM_DURATION).SetEase(DEFAULT_EASE));
 
-        seq.Append(step.Button.transform.DOScale(buttonScale, ANIM_DURATION).SetEase(DEFAULT_EASE)
+        seq.Append(step.steps[tutorialType].Button.transform.DOScale(buttonScale, ANIM_DURATION).SetEase(DEFAULT_EASE)
             .OnComplete(() => {
-                step.Button.transform.DOShakeScale(0.3f, SHAKE_STRENGTH)
-                .OnComplete(() => step.Button.transform.localScale = buttonScale);
+                step.steps[tutorialType].Button.transform.DOShakeScale(0.3f, SHAKE_STRENGTH)
+                .OnComplete(() => step.steps[tutorialType].Button.transform.localScale = buttonScale);
             }));
     }
 }
-
+[System.Serializable]
+public class TutorialList
+{
+    public string GameType;
+    public List<TutorialStep> steps = new List<TutorialStep>();
+}
 [System.Serializable]
 public class TutorialStep
 {

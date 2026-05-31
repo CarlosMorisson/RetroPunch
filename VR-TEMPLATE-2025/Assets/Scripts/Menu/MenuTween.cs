@@ -25,6 +25,11 @@ public class MenuTween : MonoBehaviour
     private Dictionary<GameObject, Vector3> initialScales = new Dictionary<GameObject, Vector3>();
     private List<GameObject> subElements = new List<GameObject>();
 
+    private bool chooseMusic,
+        chooseDifficulty,
+        chooseTutorial;
+    private Vector3 initialStartScale;
+
     private Sequence menuSequence;
 
     void Start()
@@ -38,8 +43,8 @@ public class MenuTween : MonoBehaviour
         subElements.Add(MusicSelection);
         subElements.Add(DifficultySelection);
         subElements.Add(TutorialSelection);
-        subElements.Add(GameSelection);
-
+        initialStartScale= GameSelection.transform.localScale;
+        GameSelection.transform.localScale= Vector3.zero;
         foreach (GameObject obj in subElements)
         {
             if (obj != null)
@@ -57,7 +62,26 @@ public class MenuTween : MonoBehaviour
         MenuMainButton.OnMainButtonChanged -= AnimateLeftCanva;
         menuSequence?.Kill();
     }
-
+    public void ChooseMusic() 
+    {
+        chooseMusic = true;
+        CheckStartButton();
+    }
+    public void ChooseDifficulty() 
+    {
+        chooseDifficulty = true;
+        CheckStartButton();
+    }
+    public void ChooseTutorial() 
+    {
+        chooseTutorial = true;
+        CheckStartButton();
+    }
+    public void CheckStartButton()
+    {
+        if (chooseTutorial && chooseMusic && chooseDifficulty)
+            GameSelection.transform.DOScale(initialStartScale, animDuration);
+    }
     private void AnimateLeftCanva(MainButton currentMainButton)
     {
         menuSequence?.Kill();

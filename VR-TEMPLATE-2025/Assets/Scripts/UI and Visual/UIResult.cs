@@ -132,6 +132,7 @@ public class UIResult : MonoBehaviour
         PreparePanelsForAnimation();
 
         PointController.Instance.CheckBestConsecutive();
+        PointController.Instance.UpdateMainValues();
 
         finalResultText.text = PointController.Instance.Accept.ToString();
         finalConsecutiveText.text = PointController.Instance.GetBestConsecutiveInScene().ToString();

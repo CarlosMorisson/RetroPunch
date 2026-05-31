@@ -35054,7 +35054,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameType: 0
-  ChooseMusic: {fileID: 8300000, guid: 1600e160e0ac6444bbe9cab779a03cd2, type: 3}
+  ChooseMusic: {fileID: 8300000, guid: 90685a146ec1c47caa952e9d908d23c0, type: 3}
   difficulty: 0
   IsTutorial: 0
   CurrentColor: {fileID: 11400000, guid: e7a65fe4be90e2e48a70abf763e90ad7, type: 2}
@@ -103526,24 +103526,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TutorialSteps:
-  - StepGameObject: {fileID: 1680851792}
-    Panel: {fileID: 1963922187}
-    Clip: {fileID: 1712728997}
-    VideoPanel: {fileID: 1648843318}
-    TextPanel: {fileID: 2024062056}
-    Button: {fileID: 723697030}
-  - StepGameObject: {fileID: 670639703}
-    Panel: {fileID: 319864406}
-    Clip: {fileID: 2075046891}
-    VideoPanel: {fileID: 498038770}
-    TextPanel: {fileID: 1168772399}
-    Button: {fileID: 1672475318}
-  - StepGameObject: {fileID: 942104035}
-    Panel: {fileID: 1533350619}
-    Clip: {fileID: 1414828995}
-    VideoPanel: {fileID: 736057083}
-    TextPanel: {fileID: 402775688}
-    Button: {fileID: 944946070}
+  - GameType: Puncher
+    steps:
+    - StepGameObject: {fileID: 1680851792}
+      Panel: {fileID: 1963922187}
+      Clip: {fileID: 1712728997}
+      VideoPanel: {fileID: 1648843318}
+      TextPanel: {fileID: 2024062056}
+      Button: {fileID: 723697030}
+    - StepGameObject: {fileID: 670639703}
+      Panel: {fileID: 319864406}
+      Clip: {fileID: 2075046891}
+      VideoPanel: {fileID: 498038770}
+      TextPanel: {fileID: 1168772399}
+      Button: {fileID: 1672475318}
+    - StepGameObject: {fileID: 942104035}
+      Panel: {fileID: 1533350619}
+      Clip: {fileID: 1414828995}
+      VideoPanel: {fileID: 736057083}
+      TextPanel: {fileID: 402775688}
+      Button: {fileID: 944946070}
+  - GameType: Pusher
+    steps: []
+  - GameType: Shooter
+    steps: []
 --- !u!1 &1448270197 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6227163508338399079, guid: c718b590b15303e4e983abdec500a2dc, type: 3}

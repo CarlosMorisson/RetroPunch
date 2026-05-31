@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f63a9c0dc27d9b439ed8e642f1e8591, type: 3}
   m_Name: Normal
   m_EditorClassIdentifier: 
-  BaseSpawnRate: 3
+  BaseSpawnRate: 5
   SpawnRateMultiplier: 3
   ErrorTolerance: 10
