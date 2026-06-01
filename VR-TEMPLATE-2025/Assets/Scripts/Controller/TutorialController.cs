@@ -19,6 +19,12 @@ public class TutorialController : MonoBehaviour
     public void StartTutorial()
     {
         if (TutorialSteps.Count == 0) return;
+        if (!StageLoadController.Instance.IsTutorial)
+        {
+            GameState.Instance.GameStateGame();
+            return;
+        }
+
         tutorialType = (int)StageLoadController.Instance.gameType;
         _currentIndex = 0;
         PlayStepAnimation(_currentIndex);
@@ -28,7 +34,7 @@ public class TutorialController : MonoBehaviour
     {
         if (_currentIndex >= 0 && _currentIndex < TutorialSteps.Count)
         {
-            TutorialSteps[_currentIndex].steps[tutorialType].StepGameObject.SetActive(false);
+            TutorialSteps[tutorialType].steps[_currentIndex].StepGameObject.SetActive(false);
         }
 
         _currentIndex++;
@@ -46,35 +52,35 @@ public class TutorialController : MonoBehaviour
 
     private void PlayStepAnimation(int index)
     {
-        var step = TutorialSteps[index];
+        var step = TutorialSteps[tutorialType];
 
-        Vector3 panelScale = step.steps[tutorialType].Panel.localScale;
-        Vector3 videoScale = step.steps[tutorialType].VideoPanel.transform.localScale;
-        Vector3 textScale = step.steps[tutorialType].TextPanel.transform.localScale;
-        Vector3 buttonScale = step.steps[tutorialType].Button.transform.localScale;
+        Vector3 panelScale = step.steps[_currentIndex].Panel.localScale;
+        Vector3 videoScale = step.steps[_currentIndex].VideoPanel.transform.localScale;
+        Vector3 textScale = step.steps[_currentIndex].TextPanel.transform.localScale;
+        Vector3 buttonScale = step.steps[_currentIndex].Button.transform.localScale;
 
-        step.steps[tutorialType].Panel.localScale = Vector3.zero;
-        step.steps[tutorialType].VideoPanel.transform.localScale = Vector3.zero;
-        step.steps[tutorialType].TextPanel.transform.localScale = Vector3.zero;
-        step.steps[tutorialType].Button.transform.localScale = Vector3.zero;
+        step.steps[_currentIndex].Panel.localScale = Vector3.zero;
+        step.steps[_currentIndex].VideoPanel.transform.localScale = Vector3.zero;
+        step.steps[_currentIndex].TextPanel.transform.localScale = Vector3.zero;
+        step.steps[_currentIndex].Button.transform.localScale = Vector3.zero;
 
-        step.steps[tutorialType].StepGameObject.SetActive(true);
+        step.steps[_currentIndex].StepGameObject.SetActive(true);
 
         Sequence seq = DOTween.Sequence();
 
-        seq.Append(step.steps[tutorialType].Panel.DOScale(panelScale, ANIM_DURATION).SetEase(DEFAULT_EASE));
+        seq.Append(step.steps[_currentIndex].Panel.DOScale(panelScale, ANIM_DURATION).SetEase(DEFAULT_EASE));
 
-        seq.Append(step.steps[tutorialType].VideoPanel.transform.DOScale(videoScale, ANIM_DURATION).SetEase(DEFAULT_EASE)
+        seq.Append(step.steps[_currentIndex].VideoPanel.transform.DOScale(videoScale, ANIM_DURATION).SetEase(DEFAULT_EASE)
             .OnComplete(() => {
-                if (step.steps[tutorialType].Clip != null) step.steps[tutorialType].Clip.Play();
+                if (step.steps[_currentIndex].Clip != null) step.steps[_currentIndex].Clip.Play();
             }));
 
-        seq.Join(step.steps[tutorialType].TextPanel.transform.DOScale(textScale, ANIM_DURATION).SetEase(DEFAULT_EASE));
+        seq.Join(step.steps[_currentIndex].TextPanel.transform.DOScale(textScale, ANIM_DURATION).SetEase(DEFAULT_EASE));
 
-        seq.Append(step.steps[tutorialType].Button.transform.DOScale(buttonScale, ANIM_DURATION).SetEase(DEFAULT_EASE)
+        seq.Append(step.steps[_currentIndex].Button.transform.DOScale(buttonScale, ANIM_DURATION).SetEase(DEFAULT_EASE)
             .OnComplete(() => {
-                step.steps[tutorialType].Button.transform.DOShakeScale(0.3f, SHAKE_STRENGTH)
-                .OnComplete(() => step.steps[tutorialType].Button.transform.localScale = buttonScale);
+                step.steps[_currentIndex].Button.transform.DOShakeScale(0.3f, SHAKE_STRENGTH)
+                .OnComplete(() => step.steps[_currentIndex].Button.transform.localScale = buttonScale);
             }));
     }
 }
