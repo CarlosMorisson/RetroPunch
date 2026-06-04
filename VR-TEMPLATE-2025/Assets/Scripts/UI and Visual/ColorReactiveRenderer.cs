@@ -39,7 +39,10 @@ public class ColorReactiveRenderer : MonoBehaviour
                 targetColor = ColorController.Instance.CurrentPrimary;
                 break;
             case ColorType.Secondary:
-                targetColor = ColorController.Instance.CurrentSecondary;
+                if (PowerEffect.Instance.isPowered)
+                    targetColor = ColorController.Instance.CurrentPrimary;
+                else
+                    targetColor = ColorController.Instance.CurrentSecondary;
                 break;
             case ColorType.PrimaryFreeze:
                 targetColor = ColorController.Instance.PrimaryFreezeColor;

@@ -90,18 +90,23 @@ public class PointController : MonoBehaviour
     private const string MAIN_TOTAL_ERRORS = "MainTotalErrors";
     private const string MAIN_BEST_CONSECUTIVE = "BestConsecutive";
     private const string MAIN_TOTAL_ACCURACY = "MainTotalAccuracy";
-
-    public List<EventOnConsecutives> EventsTrigger = new();
-
+    [Header("Eventos ao acertar")]
+    public List<EventOnConsecutives> PointsEventsTrigger = new();
+    [Header("Eventos ao errar")]
+    public List<EventOnConsecutives> ErrorEventsTrigger = new();
     private void Awake() => Instance = this;
     private void Start()
     {
         _bestConsecutives = PlayerPrefs.GetInt(MAIN_BEST_CONSECUTIVE, 0);
         EventOnConsecutives eventConsecutive = new EventOnConsecutives
         {
-            PointTrigger = StageLoadController.Instance.CurrentDifficulty.ErrorTolerance
+            PointTrigger = StageLoadController.Instance.CurrentDifficulty.ErrorTolerance,
+            EventTrigger = new UnityEvent()
         };
+
         eventConsecutive.EventTrigger.AddListener(GameState.Instance.GameStateEnd);
+
+        ErrorEventsTrigger.Add(eventConsecutive);
     }
     private void OnEnable()
     {
@@ -109,6 +114,7 @@ public class PointController : MonoBehaviour
         OnConsecutiveInt += CheckBestSceneConsecutive;
         OnConsecutive += CheckBestConsecutive;
         OnTotalCube += CalculateSucessPercentage;
+        OnErrorInt += CheckConsecutiveErrorEvents;
     }
     private void OnDisable()
     {
@@ -116,6 +122,7 @@ public class PointController : MonoBehaviour
         OnConsecutiveInt -= CheckBestSceneConsecutive;
         OnConsecutive -= CheckBestConsecutive;
         OnTotalCube -= CalculateSucessPercentage;
+        OnErrorInt -= CheckConsecutiveErrorEvents;
     }
     public void IncreasePoint()
     {
@@ -195,12 +202,31 @@ public class PointController : MonoBehaviour
 
     public void CheckConsecutiveEvents(int consecutives)
     {
-        if (consecutives <= 0 || EventsTrigger == null || EventsTrigger.Count == 0)
+        if (consecutives <= 0 || PointsEventsTrigger == null || PointsEventsTrigger.Count == 0)
             return;
 
-        for (int i = 0; i < EventsTrigger.Count; i++)
+        for (int i = 0; i < PointsEventsTrigger.Count; i++)
         {
-            var evt = EventsTrigger[i];
+            var evt = PointsEventsTrigger[i];
+
+            if (evt == null || evt.PointTrigger <= 0)
+                continue;
+
+            if (consecutives >= evt.PointTrigger &&
+                consecutives % evt.PointTrigger == 0)
+            {
+                evt.EventTrigger?.Invoke();
+            }
+        }
+    }
+    public void CheckConsecutiveErrorEvents(int consecutives)
+    {
+        if (consecutives <= 0 || ErrorEventsTrigger == null || ErrorEventsTrigger.Count == 0)
+            return;
+
+        for (int i = 0; i < ErrorEventsTrigger.Count; i++)
+        {
+            var evt = ErrorEventsTrigger[i];
 
             if (evt == null || evt.PointTrigger <= 0)
                 continue;

@@ -29,6 +29,7 @@ TagManager:
   - Ground
   - PrimaryColor
   - SecondaryColor
+  - Portal
   layers:
   - Default
   - TransparentFX
