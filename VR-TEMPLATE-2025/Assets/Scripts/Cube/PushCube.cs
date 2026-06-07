@@ -8,7 +8,9 @@ public enum PushType
     Down,
     Up,
     Left,
-    Right
+    Right,
+    Freeze,
+    Power
 }
 
 public class PushCube : CubeCollider
@@ -98,6 +100,9 @@ public class PushCube : CubeCollider
 
         OnSuccess += OnSucessLocal.Invoke;
 
+        PowerEffect.OnPowerStarted += CheckExplosionSucess;
+
+
         StartCoroutine(LifeTime());
     }
 
@@ -113,6 +118,8 @@ public class PushCube : CubeCollider
         OnFail -= ProgressEffectVisual.Instance.Error;
 
         OnSuccess -= OnSucessLocal.Invoke;
+
+        PowerEffect.OnPowerStarted -= CheckExplosionSucess;
 
         visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
 
@@ -153,19 +160,13 @@ public class PushCube : CubeCollider
         {
             collisionLocation = collision.contacts[0].point;
 
-            if (PowerEffect.Instance.isPowered)
-            {
-                ApplyBounceForce(collision);
-                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
-                return;
-            }
             ApplyBounceForce(collision);
             HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
         }
         if (collision.gameObject.CompareTag(PORTAL_NAME))
         {
             PortalFeedback portalGame = collision.gameObject.GetComponent<PortalFeedback>();
-            if (portalGame.PushType == pushDirection)
+            if (portalGame.PushType == pushDirection || portalGame.PushType==PushType.Freeze || portalGame.PushType==PushType.Power)
             {
                 HandleSuccess();
                 portalGame.HandleSuccess();
@@ -199,16 +200,30 @@ public class PushCube : CubeCollider
 
         rb.linearVelocity = Vector3.zero;
         rb.AddForce(bounceDirection * finalSpeed, ForceMode.VelocityChange);
+        GetComponent<PushCubeFeedback>().HandlePushFeedback(transform.position, bounceDirection); ;
     }
 
     #endregion
 
     #region Feedback
 
+    public void CheckExplosionSucess()
+    {
+        Transform parent = transform.parent;
+        if (parent != null)
+        {
+            CubeMovemment move = parent.GetComponent<CubeMovemment>();
+            if (move.boostFinished)
+            {
+                HandleSuccess();
+                print("chamou------------");
+            }
+        }
+    }
     public void SucessFeedback()
     {
         feedbackRotate.gameObject.SetActive(true);
-        feedbackRotate.GetComponent<BreakCube>().TriggerExplosion(collisionLocation);
+        feedbackRotate.GetComponent<BreakCube>().TriggerExplosion(collisionLocation, transform);
         gameObject.SetActive(false);
     }
 

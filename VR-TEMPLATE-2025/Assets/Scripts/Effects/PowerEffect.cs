@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using DG.Tweening;
+using System;
 
 public class PowerEffect : MonoBehaviour
 {
@@ -27,6 +28,8 @@ public class PowerEffect : MonoBehaviour
     private Tween clockFillTween;
 
     private const string TRANSITION_AUDIO = "TransitionEffect";
+
+    public static event Action OnPowerStarted;
 
     private void Awake()
     {
@@ -63,7 +66,11 @@ public class PowerEffect : MonoBehaviour
 
         powerRoutine = StartCoroutine(FreezeRoutine());
     }
-
+    [ContextMenu("Teste Explosion")]
+    public void Explosion()
+    {
+        OnPowerStarted?.Invoke();
+    }
     private IEnumerator FreezeRoutine()
     {
         isPowered = true;

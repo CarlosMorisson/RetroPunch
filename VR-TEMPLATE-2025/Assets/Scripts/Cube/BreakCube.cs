@@ -28,17 +28,14 @@ public class BreakCube : MonoBehaviour
 
     private static readonly int EmissionColorProperty = Shader.PropertyToID("_EmissionColor");
 
-    [ContextMenu("Trigger")]
-    public void TestExplosion()
-    {
-        TriggerExplosion(explosionCenter.position);
-    }
 
     /// <summary>
     /// Dispara a explosão reposicionando o centro
     /// </summary>
-    public void TriggerExplosion(Vector3 position)
+    public void TriggerExplosion(Vector3 position, Transform objectTransform)
     {
+        transform.position = objectTransform.position;  
+        transform.localRotation=objectTransform.localRotation;
         if (explosionCenter != null)
             explosionCenter.position = position;
         GetTargets();

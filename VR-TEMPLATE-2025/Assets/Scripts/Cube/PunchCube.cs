@@ -171,7 +171,7 @@ public class PunchCube : CubeCollider
     public void SucessFeedback()
     {
         feedbackRotate.gameObject.SetActive(true);
-        feedbackRotate.GetComponent<BreakCube>().TriggerExplosion(collisionLocation);
+        feedbackRotate.GetComponent<BreakCube>().TriggerExplosion(collisionLocation, transform);
         gameObject.SetActive(false);
     }
 

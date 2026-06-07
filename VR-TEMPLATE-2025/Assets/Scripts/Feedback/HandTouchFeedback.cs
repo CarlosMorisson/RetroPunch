@@ -117,7 +117,7 @@ public class HandTouchFeedback : MonoBehaviour
             }
         }
     }
-
+   
     private IEnumerator ApplyFeedbackRoutine(Hand hand, bool success)
     {
         if (hand.instantiatedMaterial == null) yield break;

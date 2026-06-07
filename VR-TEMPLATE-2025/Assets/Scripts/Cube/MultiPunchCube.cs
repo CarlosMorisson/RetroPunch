@@ -186,7 +186,7 @@ public class MultiPunchCube : CubeCollider
         if (point.feedback != null)
         {
             point.feedback.gameObject.SetActive(true);
-            point.feedback.gameObject.GetComponent<BreakCube>().TriggerExplosion(collisionLocation);
+            point.feedback.gameObject.GetComponent<BreakCube>().TriggerExplosion(collisionLocation, transform);
         }
             
         point.sphere.transform.DOScale(Vector3.zero, 0.5f);
@@ -245,7 +245,7 @@ public class MultiPunchCube : CubeCollider
         if (mainFeedback != null)
         {
             mainFeedback.gameObject.SetActive(true);
-            mainFeedback.GetComponent<BreakCube>().TriggerExplosion(collisionLocation);
+            mainFeedback.GetComponent<BreakCube>().TriggerExplosion(collisionLocation, transform);
         }
 
         gameObject.SetActive(false);
