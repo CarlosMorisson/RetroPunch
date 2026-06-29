@@ -56,30 +56,47 @@ public class PunchCube : CubeCollider
         hasMisstaken = false;
         transform.localRotation = initialRotation;
         transform.localScale = initialScale;
-        feedbackRotate.localRotation = initialRotation;
-        visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
 
-        foreach (var booster in visualBoosters)
+        if (feedbackRotate != null)
+            feedbackRotate.localRotation = initialRotation;
+
+        if (!eventsRegistered)
         {
-            if (booster == null) continue;
+            visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
-            OnSuccess +=booster.TriggerBoost;
-            OnFail += booster.TriggerDeBoost;
+            foreach (var booster in visualBoosters)
+            {
+                if (booster == null) continue;
+                OnSuccess += booster.TriggerBoost;
+                OnFail += booster.TriggerDeBoost;
+            }
+
+            OnSuccess += SucessFeedback;
+            OnFail += FailFeedback;
+
+            if (PointController.Instance != null)
+            {
+                OnSuccess += PointController.Instance.IncreasePoint;
+                OnFail += PointController.Instance.IncreaseError;
+            }
+
+            if (ProgressEffectVisual.Instance != null)
+            {
+                OnSuccess += ProgressEffectVisual.Instance.Success;
+                OnFail += ProgressEffectVisual.Instance.Error;
+            }
+
+            if (ColorController.Instance != null)
+            {
+                OnSuccess += ColorController.Instance.TriggerSuccessFlash;
+                OnFail += ColorController.Instance.TriggerFailDim;
+            }
+
+            if (OnSucessLocal != null)
+                OnSuccess += OnSucessLocal.Invoke;
+
+            eventsRegistered = true;
         }
-
-        OnSuccess += SucessFeedback;
-        OnFail += FailFeedback;
-
-        OnSuccess += PointController.Instance.IncreasePoint;
-        OnFail += PointController.Instance.IncreaseError;
-
-        OnSuccess += ProgressEffectVisual.Instance.Success;
-        OnFail += ProgressEffectVisual.Instance.Error;
-
-        OnSuccess += ColorController.Instance.TriggerSuccessFlash;
-        OnFail += ColorController.Instance.TriggerFailDim;
-
-        OnSuccess += OnSucessLocal.Invoke;
 
         RandomRotation();
         StartCoroutine(LifeTime());
@@ -87,30 +104,43 @@ public class PunchCube : CubeCollider
 
     protected override void OnDisable()
     {
-        OnSuccess -= SucessFeedback;
-        OnFail -= FailFeedback;
-
-        OnSuccess -= PointController.Instance.IncreasePoint;
-        OnFail -= PointController.Instance.IncreaseError;
-
-        OnSuccess -= ProgressEffectVisual.Instance.Success;
-        OnFail -= ProgressEffectVisual.Instance.Error;
-
-        OnSuccess -= OnSucessLocal.Invoke;
-
-        visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
-
-        foreach (var booster in visualBoosters)
+        if (eventsRegistered)
         {
-            if (booster == null) continue;
+            OnSuccess -= SucessFeedback;
+            OnFail -= FailFeedback;
 
-            OnSuccess -= booster.TriggerBoost;
-            OnFail -= booster.TriggerDeBoost;
+            if (PointController.Instance != null)
+            {
+                OnSuccess -= PointController.Instance.IncreasePoint;
+                OnFail -= PointController.Instance.IncreaseError;
+            }
+
+            if (ProgressEffectVisual.Instance != null)
+            {
+                OnSuccess -= ProgressEffectVisual.Instance.Success;
+                OnFail -= ProgressEffectVisual.Instance.Error;
+            }
+
+            if (OnSucessLocal != null)
+                OnSuccess -= OnSucessLocal.Invoke;
+            if (visualBoosters != null)
+            {
+                foreach (var booster in visualBoosters)
+                {
+                    if (booster == null) continue;
+                    OnSuccess -= booster.TriggerBoost;
+                    OnFail -= booster.TriggerDeBoost;
+                }
+            }
+
+            if (ColorController.Instance != null)
+            {
+                OnSuccess -= ColorController.Instance.TriggerSuccessFlash;
+                OnFail -= ColorController.Instance.TriggerFailDim;
+            }
+
+            eventsRegistered = false;
         }
-
-        OnSuccess -= ColorController.Instance.TriggerSuccessFlash;
-        OnFail -= ColorController.Instance.TriggerFailDim;
-
     }
 
 
@@ -200,8 +230,7 @@ public class PunchCube : CubeCollider
             .SetEase(Ease.InBack)
             .OnComplete(() =>
             {
-                GameObject parent = transform.parent.gameObject;
-                ObjectPooler.Instance.ReturnToPool(PrefabTag, parent);
+                ReturnToPool(PrefabTag);
             });
     }
 

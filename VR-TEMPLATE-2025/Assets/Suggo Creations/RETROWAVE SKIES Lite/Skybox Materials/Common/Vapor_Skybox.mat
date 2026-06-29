@@ -109,8 +109,8 @@ Material:
     - _EnableBlendModePreserveSpecularLighting: 0
     - _EnableFogOnTransparent: 1
     - _FogContrast: 30
-    - _FogHeight: 1
-    - _FogPower: 1
+    - _FogHeight: -10
+    - _FogPower: 0
     - _HorizonHeight: -0.03
     - _HorizonStrength: 1
     - _LinesMaskPower: 22.8

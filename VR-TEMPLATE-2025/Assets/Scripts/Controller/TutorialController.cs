@@ -19,11 +19,6 @@ public class TutorialController : MonoBehaviour
     public void StartTutorial()
     {
         if (TutorialSteps.Count == 0) return;
-        if (!StageLoadController.Instance.IsTutorial)
-        {
-            GameState.Instance.GameStateGame();
-            return;
-        }
 
         tutorialType = (int)StageLoadController.Instance.gameType;
         _currentIndex = 0;

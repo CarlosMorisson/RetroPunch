@@ -40,6 +40,8 @@ public class SongController : MonoBehaviour
 
     public AudioSource audioSource { get; set; }
 
+    public bool LoadMusic=false;
+
     private float[] spectrumData;
     private Coroutine impactRoutine;
 
@@ -92,6 +94,7 @@ public class SongController : MonoBehaviour
         }
 
         InitializeSequenceOrder();
+        LoadMusic = true;
     }
 
     /// <summary>
@@ -147,12 +150,66 @@ public class SongController : MonoBehaviour
         intensity = Mathf.Clamp01(intensity);
 
         PlayTouchEffect();
-        PlaySequenceSuccessEffect(); 
+        PlaySequenceSuccessEffect();
 
         if (impactRoutine != null)
             StopCoroutine(impactRoutine);
 
         impactRoutine = StartCoroutine(ImpactRoutine(intensity, duration));
+    }
+
+    private IEnumerator ImpactRoutine(float intensity, float duration)
+    {
+        // Queda brusca de volume e pitch — sensação de "peso"
+        float duckVolume = baseVolume * Mathf.Lerp(0.4f, 0.2f, intensity);
+        float duckPitch = basePitch - Mathf.Lerp(0.08f, 0.2f, intensity);
+
+        // Overshoot de pitch no retorno — sensação de "ressalto"
+        float boostPitch = basePitch + Mathf.Lerp(0.03f, 0.08f, intensity);
+        float boostVolume = baseVolume * Mathf.Lerp(1.1f, 1.25f, intensity);
+
+        float punchDown = 0.04f; 
+        float hold = duration * 0.1f; 
+        float punchUp = 0.06f; 
+        float settle = 0.12f; 
+
+        float t = 0f;
+
+        while (t < punchDown)
+        {
+            t += Time.deltaTime;
+            float lerp = t / punchDown;
+            audioSource.volume = Mathf.Lerp(baseVolume, duckVolume, lerp);
+            audioSource.pitch = Mathf.Lerp(basePitch, duckPitch, lerp);
+            yield return null;
+        }
+
+        // 2. Hold no fundo
+        yield return new WaitForSeconds(hold);
+
+        t = 0f;
+        while (t < punchUp)
+        {
+            t += Time.deltaTime;
+            float lerp = t / punchUp;
+            audioSource.volume = Mathf.Lerp(duckVolume, boostVolume, lerp);
+            audioSource.pitch = Mathf.Lerp(duckPitch, boostPitch, lerp);
+            yield return null;
+        }
+
+        t = 0f;
+        while (t < settle)
+        {
+            t += Time.deltaTime;
+            float lerp = t / settle;
+            audioSource.volume = Mathf.Lerp(boostVolume, baseVolume, lerp);
+            audioSource.pitch = Mathf.Lerp(boostPitch, basePitch, lerp);
+            yield return null;
+        }
+
+        audioSource.volume = baseVolume;
+        audioSource.pitch = basePitch;
+        impactRoutine = null;
     }
 
     private void PlayTouchEffect()
@@ -233,46 +290,7 @@ public class SongController : MonoBehaviour
             FailAudioSource.PlayOneShot(selectedClip);
         }
     }
-    private IEnumerator ImpactRoutine(float intensity, float duration)
-    {
-        float targetVolume = baseVolume * (1f + maxVolumeBoostPercent * intensity);
-        float targetPitch = basePitch + maxPitchBoost * intensity;
-
-        float attackTime = 0.03f;
-        float releaseTime = 0.08f;
-
-        float t = 0f;
-        while (t < attackTime)
-        {
-            t += Time.deltaTime;
-            float lerp = t / attackTime;
-
-            audioSource.volume = Mathf.Lerp(baseVolume, targetVolume, lerp);
-            audioSource.pitch = Mathf.Lerp(basePitch, targetPitch, lerp);
-
-            yield return null;
-        }
-
-        yield return new WaitForSeconds(duration);
-
-        t = 0f;
-
-        while (t < releaseTime)
-        {
-            t += Time.deltaTime;
-            float lerp = t / releaseTime;
-
-            audioSource.volume = Mathf.Lerp(targetVolume, baseVolume, lerp);
-            audioSource.pitch = Mathf.Lerp(targetPitch, basePitch, lerp);
-
-            yield return null;
-        }
-
-        audioSource.volume = baseVolume;
-        audioSource.pitch = basePitch;
-
-        impactRoutine = null;
-    }
+   
 
     public float GetGlobalFrequency()
     {
@@ -354,7 +372,37 @@ public class SongController : MonoBehaviour
 
         return spectrumData;
     }
+    public MusicAnalysis GetAnalysis()
+    {
+        float[] spectrum = GetGlobalSpectrum();
 
+        if (spectrum == null)
+            return null;
+
+        float bass = 0;
+        float mid = 0;
+        float treble = 0;
+
+        int bassEnd = spectrum.Length / 8;
+        int midEnd = spectrum.Length / 2;
+
+        for (int i = 0; i < bassEnd; i++)
+            bass += spectrum[i];
+
+        for (int i = bassEnd; i < midEnd; i++)
+            mid += spectrum[i];
+
+        for (int i = midEnd; i < spectrum.Length; i++)
+            treble += spectrum[i];
+
+        return new MusicAnalysis
+        {
+            Bass = bass,
+            Mid = mid,
+            Treble = treble,
+            Intensity = bass + mid + treble
+        };
+    }
     public float GetPeakFrequency()
     {
         if (audioSource == null)
@@ -367,4 +415,12 @@ public class SongController : MonoBehaviour
 
         return maxValue;
     }
+}
+
+public class MusicAnalysis
+{
+    public float Bass;
+    public float Mid;
+    public float Treble;
+    public float Intensity;
 }

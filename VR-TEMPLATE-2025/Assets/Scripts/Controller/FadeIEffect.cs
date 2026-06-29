@@ -1,6 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 public class FadeIEffect : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class FadeIEffect : MonoBehaviour
 
     private const string GAME_SCENE= "GameScene";
     private const string MENU_SCENE = "MenuScene";
+    public UnityEvent OnGameStart;
     private void Awake()
     {
         if (SourceMaterial != null)
@@ -53,7 +55,10 @@ public class FadeIEffect : MonoBehaviour
 
         seq.OnComplete(() =>
         {
-            _instancedMaterial.DOFade(0f, fadeDuration);
+            _instancedMaterial.DOFade(0f, fadeDuration).OnComplete(() =>
+            {
+                OnGameStart.Invoke();
+            });
         });
     }
 

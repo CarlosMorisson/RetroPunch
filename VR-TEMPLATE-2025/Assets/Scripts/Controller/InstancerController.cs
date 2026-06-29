@@ -1,153 +1,435 @@
-using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class InstancerController : MonoBehaviour
 {
-    [System.Serializable]
-    public class PrefabSpawnChance
-    {
-        [Header("PrefabToInstance")]
-        public string prefabTag;
+    [Header("Prefabs")]
+    public List<PrefabSpawnData> prefabs = new();
 
-        [Header("ChanceToSpawn")]
-        [Range(0f, 100f)]
-        public float spawnChance;
-    }
+    [Header("Grid")]
+    public int columns = 3;
+    public int rows = 3;
 
-    [Header("References")]
-    public SongController songController;
+    public float horizontalSpacing = 2f;
+    public float verticalSpacing = 2f;
 
-    [Header("Prefabs With Chance")]
-    public List<PrefabSpawnChance> prefabs = new();
-
-    [Header("Spawn Settings")]
-    public Transform spawnParent;
-
-    [Tooltip("Variação SOMENTE em X e Y")]
-    public Vector2 randomX = new Vector2(-5f, 5f);
-    public Vector2 randomY = new Vector2(-2f, 2f);
-
-    [Tooltip("Direção fixa do spawn (lado único)")]
     public float fixedZOffset = 0f;
 
-    public float baseSpawnRate = 0.5f;
-    public float spawnRateMultiplier = 1f;
+    [Header("Spawn")]
+    public Transform spawnParent;
 
-    public float baseScale = 1f;
-    public float scaleMultiplier = 2f;
+    [Header("Intensity Thresholds")]
+    [Range(0f, 1f)]
+    public float mediumIntensityThreshold = 0.35f;
+
+    [Range(0f, 1f)]
+    public float highIntensityThreshold = 0.65f;
+
+    [Header("Spawn Count")]
+    public int lowIntensitySpawnCount = 1;
+    public int mediumIntensitySpawnCount = 2;
+    public int highIntensitySpawnCount = 3;
+
+    [Header("Timing Calculation")]
+    public Transform playerPosition;      // posição Z onde o cubo deve chegar
+    public float cubeBoostSpeed = 10f;    // mesmo valor do CubeMovement
+    public float cubeNormalSpeed = 2f;    // mesmo valor do CubeMovement
+    public Transform boostEndPoint;       // mesmo ponto do CubeMovement
+    public float timingOffset = 0f;
 
     private bool stop;
-    private float spawnTimer;
 
-    private const float MAX_RATE = 10;
-    private const float MIN_RATE = 0.05f;
+    private readonly List<Vector3> gridPositions = new();
+
+    private readonly Dictionary<GameObject, int> objectCellMap = new();
+    private readonly HashSet<int> usedCells = new();
+
+    private string lastPrefabTag = "";
+
+    private int lastCell = -1;
 
     private void Start()
     {
-        baseSpawnRate = StageLoadController.Instance.CurrentDifficulty.BaseSpawnRate;
-        spawnRateMultiplier = StageLoadController.Instance.CurrentDifficulty.SpawnRateMultiplier;
+        GenerateGrid();
+        if(StageLoadController.Instance != null)
+            ApplyFromStage();
+        else
+            Debug.LogWarning("StageLoadController não encontrado no Awake do InstancerController.");
     }
-    void Update()
+    private void ApplyFromStage()
     {
-        if (prefabs == null || prefabs.Count == 0 || songController == null || spawnParent == null || stop)
-            return;
+        ApplyPrefabs();
+    }
 
-        float freq = Mathf.Clamp01(songController.GetGlobalFrequencyMultiplicative());
+    private void ApplyPrefabs()
+    {
+        var stage = StageLoadController.Instance;
 
-        float dynamicRate = baseSpawnRate - (freq * spawnRateMultiplier);
-        dynamicRate = Mathf.Clamp(dynamicRate, MIN_RATE, MAX_RATE);
-
-        spawnTimer += Time.deltaTime;
-
-        if (spawnTimer >= dynamicRate)
+        if (stage.CurrentBeatMap == null)
         {
-            spawnTimer = 0f;
-            SpawnObject(freq);
+            Debug.LogWarning("CurrentBeatMap é nulo — prefabs não foram aplicados.");
+            return;
         }
-    }
-    public void SetStop(bool value)=>stop = value;
-    void SpawnObject(float freq)
-    {
-        string prefabId = GetRandomPrefabByChance();
 
-        if (string.IsNullOrEmpty(prefabId))
+        // Busca o GameModeBeatMap correspondente ao gameType atual
+        GameModeBeatMap gameModeBeatMap = stage.stageList.stages
+            .FirstOrDefault(s => s.musicClip == stage.ChooseMusic)
+            ?.difficulties
+            .FirstOrDefault(d => d.difficulty == stage.difficulty)
+            ?.gameModeBeatMaps
+            .FirstOrDefault(g => g.gameType == stage.gameType);
+
+        if (gameModeBeatMap == null)
+        {
+            Debug.LogWarning("GameModeBeatMap não encontrado para os parâmetros atuais.");
+            return;
+        }
+
+        if (gameModeBeatMap.prefabSpawnData == null || gameModeBeatMap.prefabSpawnData.Count == 0)
+        {
+            Debug.LogWarning("PrefabSpawnData vazio para o GameModeBeatMap atual.");
+            return;
+        }
+
+        prefabs = gameModeBeatMap.prefabSpawnData;
+
+        foreach (var prefab in prefabs)
+            prefab.ApplyRarity();
+
+        Debug.Log($"[InstancerController] {prefabs.Count} prefab(s) carregado(s) do StageLoadController.");
+    }
+
+    private void OnEnable()
+    {
+        ObjectPooler.OnObjectReturned += HandleObjectReturned;
+    }
+
+    private void OnDisable()
+    {
+        ObjectPooler.OnObjectReturned -= HandleObjectReturned;
+    }
+
+    private void HandleObjectReturned(GameObject obj)
+    {
+        if (!objectCellMap.TryGetValue(obj, out int cell))
             return;
 
-        Vector3 pos = spawnParent.position;
+        objectCellMap.Remove(obj);
+    }
 
-        pos.x += Random.Range(randomX.x, randomX.y);
-        pos.y += Random.Range(randomY.x, randomY.y);
-        pos.z += fixedZOffset;
+    public void SetStop(bool value)
+    {
+        stop = value;
+    }
+    public float CalculateSpawnOffset()
+    {
+        if (playerPosition == null || boostEndPoint == null || spawnParent == null)
+            return 0f;
 
-        GameObject obj = ObjectPooler.Instance.SpawnFromPool(
-            prefabId,
-            pos,
-            spawnParent.rotation
+        float spawnZ = spawnParent.position.z;
+        float boostEndZ = boostEndPoint.position.z;
+        float playerZ = playerPosition.position.z;
+
+        // Distância percorrida em boost
+        float boostDist = Mathf.Abs(boostEndZ - spawnZ);
+
+        // Distância percorrida em velocidade normal após o boost
+        float normalDist = Mathf.Abs(playerZ - boostEndZ);
+
+        // Tempo total de viagem
+        float boostTime = boostDist / cubeBoostSpeed;
+        float normalTime = normalDist / cubeNormalSpeed;
+
+        float totalTime = boostTime + normalTime + timingOffset;
+
+        return totalTime;
+    }
+
+    public void SpawnBeat(BeatPoint beat)
+    {
+        if (stop) return;
+
+        int spawnCount = GetSpawnCount(beat.intensity);
+
+        spawnCount = Mathf.Min(
+            spawnCount,
+            StageLoadController.Instance.CurrentDifficulty.MaxSpawnPerBeat
         );
 
-        obj.transform.SetParent(spawnParent, true);
+        if (usedCells.Count + spawnCount > gridPositions.Count)
+            usedCells.Clear();
 
-        // opcional
-        // float scale = baseScale + freq * scaleMultiplier;
-        // obj.transform.localScale = Vector3.one * scale;
+        for (int i = 0; i < spawnCount; i++)
+            SpawnObject(beat);
     }
 
-
-    string GetRandomPrefabByChance()
+    private void SpawnObject(BeatPoint beat)
     {
-        float random = Random.Range(0f, 100f);
-        float cumulative = 0f;
+        PrefabSpawnData prefab =
+            GetRandomPrefab(beat.affinity);
+        if (prefab == null)
+            return;
 
-        foreach (var p in prefabs)
+        int cell = GetFreeCell();
+
+        if (cell == -1)
+            return;
+
+        Vector3 spawnPosition =
+            gridPositions[cell];
+
+        GameObject obj =
+            ObjectPooler.Instance.SpawnFromPool(
+                prefab.prefabTag,
+                spawnPosition,
+                spawnParent.rotation
+            );
+
+        if (obj == null)
+            return;
+
+
+        objectCellMap[obj] = cell;
+
+        obj.transform.SetParent(
+            spawnParent,
+            true
+        );
+        if (obj.TryGetComponent<ShootCube>(out var shootCube))
+            shootCube.beat = beat;
+    }
+
+    private int GetFreeCell()
+    {
+        List<int> freeCells = new();
+
+        for (int i = 0; i < gridPositions.Count; i++)
         {
-            cumulative += p.spawnChance;
-
-            if (random <= cumulative)
-                return p.prefabTag;
+            if (!usedCells.Contains(i))
+                freeCells.Add(i);
         }
 
-        return prefabs[0].prefabTag; 
+        Debug.Log($"FreeCells: {freeCells.Count} | UsedCells: {usedCells.Count} | Grid: {gridPositions.Count}");
+
+        if (freeCells.Count == 0) return -1;
+
+        int chosen = freeCells[Random.Range(0, freeCells.Count)];
+        usedCells.Add(chosen);
+        return chosen;
     }
 
-    private void OnValidate()
+    private PrefabSpawnData GetRandomPrefab(
+        MusicAffinity affinity
+    )
     {
-        if (prefabs == null || prefabs.Count == 0)
-            return;
+        List<PrefabSpawnData> valid =
+            GetValidPrefabs(affinity);
 
-        float total = 0f;
+        if (valid.Count == 0)
+            return null;
 
-        foreach (var p in prefabs)
-            total += p.spawnChance;
+        List<PrefabSpawnData> filtered =
+            new();
 
-        if (total == 0f)
-            return;
-
-        if (Mathf.Abs(total - 100f) > 0.01f)
+        foreach (var prefab in valid)
         {
-            for (int i = 0; i < prefabs.Count; i++)
+            if (
+                !prefab.allowConsecutiveSpawns &&
+                prefab.prefabTag == lastPrefabTag
+            )
             {
-                prefabs[i].spawnChance = (prefabs[i].spawnChance / total) * 100f;
+                continue;
             }
 
-#if UNITY_EDITOR
-            UnityEditor.EditorUtility.SetDirty(this);
-#endif
+            filtered.Add(prefab);
+        }
+
+        if (filtered.Count == 0)
+            filtered = valid;
+
+        int totalWeight = 0;
+
+        foreach (var prefab in filtered)
+        {
+            totalWeight += prefab.weight;
+        }
+
+        int random =
+            Random.Range(0, totalWeight);
+
+        int cumulative = 0;
+
+        foreach (var prefab in filtered)
+        {
+            cumulative += prefab.weight;
+
+            if (random < cumulative)
+            {
+                lastPrefabTag =
+                    prefab.prefabTag;
+
+                return prefab;
+            }
+        }
+
+        return filtered[0];
+    }
+
+    private List<PrefabSpawnData> GetValidPrefabs(
+        MusicAffinity affinity
+    )
+    {
+        List<PrefabSpawnData> result =
+            new();
+
+        int maxDifficulty =
+            StageLoadController.Instance
+            .CurrentDifficulty
+            .MaxPrefabDifficulty;
+
+        foreach (var prefab in prefabs)
+        {
+            if (prefab.prefabDifficulty >
+                maxDifficulty)
+                continue;
+
+            bool affinityMatch =
+                prefab.affinity ==
+                MusicAffinity.Any
+                ||
+                prefab.affinity ==
+                affinity;
+
+            if (!affinityMatch)
+                continue;
+
+            result.Add(prefab);
+        }
+
+        return result;
+    }
+
+    private int GetSpawnCount(
+        float intensity
+    )
+    {
+        if (intensity >= highIntensityThreshold)
+            return highIntensitySpawnCount;
+
+        if (intensity >= mediumIntensityThreshold)
+            return mediumIntensitySpawnCount;
+
+        return lowIntensitySpawnCount;
+    }
+
+    private void GenerateGrid()
+    {
+        gridPositions.Clear();
+
+        float startX =
+            -((columns - 1)
+            * horizontalSpacing)
+            * 0.5f;
+
+        float startY =
+            -((rows - 1)
+            * verticalSpacing)
+            * 0.5f;
+
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                Vector3 pos =
+                    spawnParent.position +
+                    new Vector3(
+                        startX +
+                        x * horizontalSpacing,
+                        startY +
+                        y * verticalSpacing,
+                        fixedZOffset
+                    );
+
+                gridPositions.Add(pos);
+            }
         }
     }
 
-    void OnDrawGizmosSelected()
+    private void OnDrawGizmosSelected()
     {
-        if (!spawnParent) return;
+        if (spawnParent == null)
+            return;
 
         Gizmos.color = Color.cyan;
 
-        Vector3 center = spawnParent.position + new Vector3(0, 0, fixedZOffset);
-        Vector3 size = new Vector3(
-            randomX.y - randomX.x,
-            randomY.y - randomY.x,
-            0.1f
-        );
+        float startX =
+            -((columns - 1)
+            * horizontalSpacing)
+            * 0.5f;
 
-        Gizmos.DrawWireCube(center, size);
+        float startY =
+            -((rows - 1)
+            * verticalSpacing)
+            * 0.5f;
+
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                Vector3 pos =
+                    spawnParent.position +
+                    new Vector3(
+                        startX +
+                        x * horizontalSpacing,
+                        startY +
+                        y * verticalSpacing,
+                        fixedZOffset
+                    );
+
+                Gizmos.DrawWireCube(
+                    pos,
+                    Vector3.one * 0.4f
+                );
+            }
+        }
     }
+}
+
+[System.Serializable]
+public class PrefabSpawnData
+{
+    public string prefabTag;
+
+    public MusicAffinity affinity =
+        MusicAffinity.Any;
+
+    [Range(1, 10)]
+    public int prefabDifficulty = 1;
+
+    public SpawnRarity rarity = SpawnRarity.Common;
+
+    [HideInInspector]
+    public int weight = 60;
+
+    public bool allowConsecutiveSpawns = true;
+
+    public void ApplyRarity()
+    {
+        weight = rarity switch
+        {
+            SpawnRarity.Common => 80,
+            SpawnRarity.Uncommon => 5,
+            SpawnRarity.Rare => 4,
+            SpawnRarity.Epic => 1,
+            _ => 60
+        };
+    }
+}
+public enum SpawnRarity
+{
+    Common,    // weight: 60
+    Uncommon,  // weight: 30
+    Rare,      // weight: 8
+    Epic       // weight: 2
 }

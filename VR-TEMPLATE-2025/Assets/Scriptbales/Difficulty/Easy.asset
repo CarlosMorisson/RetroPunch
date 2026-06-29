@@ -12,6 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f63a9c0dc27d9b439ed8e642f1e8591, type: 3}
   m_Name: Easy
   m_EditorClassIdentifier: 
-  BaseSpawnRate: 5
-  SpawnRateMultiplier: 3
+  BaseSpawnRate: 1.2
+  SpawnRateMultiplier: 0.5
   ErrorTolerance: 100
+  MaxPrefabDifficulty: 1
+  MaxSimultaneousObjects: 2
+  MusicIntensityMultiplier: 1
+  ChanceToSpawnMultipleObjects: 2
+  ShootSpeedMultiplier: 0.8
+  PushDistanceMultiplier: 0.8
+  RotationSpeedMultiplier: 0.5
+  MaxSpawnPerBeat: 3

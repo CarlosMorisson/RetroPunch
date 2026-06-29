@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f63a9c0dc27d9b439ed8e642f1e8591, type: 3}
   m_Name: Normal
   m_EditorClassIdentifier: 
-  BaseSpawnRate: 5
-  SpawnRateMultiplier: 3
-  ErrorTolerance: 10
+  BaseSpawnRate: 0.8
+  SpawnRateMultiplier: 1
+  ErrorTolerance: 20
+  MaxPrefabDifficulty: 2
+  MaxSimultaneousObjects: 2
+  MusicIntensityMultiplier: 1
+  ChanceToSpawnMultipleObjects: 0.25
+  ShootSpeedMultiplier: 1
+  PushDistanceMultiplier: 1
+  RotationSpeedMultiplier: 1

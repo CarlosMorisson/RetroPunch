@@ -52,9 +52,18 @@ public class GameState : MonoBehaviour
         Instance = this;
         
     }
-    private void Start()
+   
+    public void CheckInitialState()
     {
-        GameStateTutorial();
+        if (StageLoadController.Instance.IsTutorial)
+        {
+            GameStateTutorial();
+        }
+        else
+        {
+            GameStateGame();
+            print("chamou aqui");
+        }
     }
     void OnEnable()
     {

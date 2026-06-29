@@ -41,6 +41,8 @@ public class MultiPunchCube : CubeCollider
 
     private bool hasMisstaken = false;
 
+    private bool eventsRegistered = false; 
+
     #region LIFECYCLE
 
     protected virtual void Awake()
@@ -60,62 +62,94 @@ public class MultiPunchCube : CubeCollider
         base.OnEnable();
 
         hasMisstaken = false;
-
         ResetPoints();
 
-        OnSuccess += FinalSuccess;
-        OnFail += FailFeedback;
-
-        visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
-
-        foreach (var booster in visualBoosters)
+        if (!eventsRegistered)
         {
-            if (booster == null) continue;
+            visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
-            OnSuccess += booster.TriggerBoost;
-            OnFail += booster.TriggerDeBoost;
+            foreach (var booster in visualBoosters)
+            {
+                if (booster == null) continue;
+                OnSuccess += booster.TriggerBoost;
+                OnFail += booster.TriggerDeBoost;
+            }
+
+            OnSuccess += FinalSuccess;
+            OnFail += FailFeedback;
+
+            if (PointController.Instance != null)
+            {
+                OnSuccess += PointController.Instance.IncreasePoint;
+                OnFail += PointController.Instance.IncreaseError;
+            }
+
+            if (ProgressEffectVisual.Instance != null)
+            {
+                OnSuccess += ProgressEffectVisual.Instance.Success;
+                OnFail += ProgressEffectVisual.Instance.Error;
+            }
+
+            if (ColorController.Instance != null)
+            {
+                OnSuccess += ColorController.Instance.TriggerSuccessFlash;
+                OnFail += ColorController.Instance.TriggerFailDim;
+            }
+
+            if (SkyboxVisual.Instance != null)
+            {
+                OnSuccess += SkyboxVisual.Instance.TriggerSuccessBoost;
+                OnFail += SkyboxVisual.Instance.TriggerFailDeboost;
+            }
+
+            eventsRegistered = true;
         }
-
-        OnSuccess += PointController.Instance.IncreasePoint;
-        OnFail += PointController.Instance.IncreaseError;
-
-        OnSuccess += ProgressEffectVisual.Instance.Success;
-        OnFail += ProgressEffectVisual.Instance.Error;
-
-        OnSuccess += ColorController.Instance.TriggerSuccessFlash;
-        OnFail += ColorController.Instance.TriggerFailDim;
-
-        OnSuccess += SkyboxVisual.Instance.TriggerSuccessBoost;
-        OnFail += SkyboxVisual.Instance.TriggerFailDeboost;
 
         StartCoroutine(LifeTime());
     }
 
     protected override void OnDisable()
     {
-        OnSuccess -= FinalSuccess;
-        OnFail -= FailFeedback;
-
-        OnSuccess -= PointController.Instance.IncreasePoint;
-        OnFail -= PointController.Instance.IncreaseError;
-
-        OnSuccess -= ProgressEffectVisual.Instance.Success;
-        OnFail -= ProgressEffectVisual.Instance.Error;
-
-        OnSuccess -= ColorController.Instance.TriggerSuccessFlash;
-        OnFail -= ColorController.Instance.TriggerFailDim;
-
-        OnSuccess -= SkyboxVisual.Instance.TriggerSuccessBoost;
-        OnFail -= SkyboxVisual.Instance.TriggerFailDeboost;
-
-        visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
-
-        foreach (var booster in visualBoosters)
+        if (eventsRegistered)
         {
-            if (booster == null) continue;
+            OnSuccess -= FinalSuccess;
+            OnFail -= FailFeedback;
 
-            OnSuccess -= booster.TriggerBoost;
-            OnFail -= booster.TriggerDeBoost;
+            if (PointController.Instance != null)
+            {
+                OnSuccess -= PointController.Instance.IncreasePoint;
+                OnFail -= PointController.Instance.IncreaseError;
+            }
+
+            if (ProgressEffectVisual.Instance != null)
+            {
+                OnSuccess -= ProgressEffectVisual.Instance.Success;
+                OnFail -= ProgressEffectVisual.Instance.Error;
+            }
+
+            if (ColorController.Instance != null)
+            {
+                OnSuccess -= ColorController.Instance.TriggerSuccessFlash;
+                OnFail -= ColorController.Instance.TriggerFailDim;
+            }
+
+            if (SkyboxVisual.Instance != null)
+            {
+                OnSuccess -= SkyboxVisual.Instance.TriggerSuccessBoost;
+                OnFail -= SkyboxVisual.Instance.TriggerFailDeboost;
+            }
+
+            if (visualBoosters != null)
+            {
+                foreach (var booster in visualBoosters)
+                {
+                    if (booster == null) continue;
+                    OnSuccess -= booster.TriggerBoost;
+                    OnFail -= booster.TriggerDeBoost;
+                }
+            }
+
+            eventsRegistered = false;
         }
     }
 
@@ -276,8 +310,7 @@ public class MultiPunchCube : CubeCollider
             .SetEase(Ease.InBack)
             .OnComplete(() =>
             {
-                GameObject parent = transform.parent.gameObject;
-                ObjectPooler.Instance.ReturnToPool(PrefabTag, parent);
+                ReturnToPool(PrefabTag);
             });
     }
 

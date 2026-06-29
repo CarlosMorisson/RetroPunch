@@ -38,7 +38,13 @@ public class SkyboxVisual : MonoBehaviour
 
     [Header("Renderers")]
     public MeshRenderer plataformRenderer;
-    public MeshRenderer groundRenderer;
+
+    [Header("Ground Renderers")]
+    public MeshRenderer groundRenderer1; // Antigo groundRenderer
+    public MeshRenderer groundRenderer2; // Adicionado
+    public MeshRenderer groundRenderer3; // Adicionado
+
+    [Header("Other Renderers")]
     public MeshRenderer playerPlataformRenderer;
     public MeshRenderer wallRenderer;
 
@@ -47,7 +53,7 @@ public class SkyboxVisual : MonoBehaviour
     public float smoothSpeed = 5f;
 
     [Header("Impact Settings")]
-    public float successBoostIntensity = 0.5f; 
+    public float successBoostIntensity = 0.5f;
     public float failDeboostIntensity = -0.3f;
     public float impactReturnSpeed = 8f;
     private float currentImpactBoost = 0f;
@@ -62,7 +68,7 @@ public class SkyboxVisual : MonoBehaviour
     private SceneSettings powerScene;
 
     private Material skyboxInstance;
-    private Material groundInstance;
+    private Material groundInstance; 
     private Material plataformInstance;
     private Material wallInstance;
 
@@ -76,6 +82,7 @@ public class SkyboxVisual : MonoBehaviour
     {
         Instance = this;
     }
+
     public void TriggerSuccessBoost()
     {
         if (isTransitioning) return;
@@ -109,10 +116,13 @@ public class SkyboxVisual : MonoBehaviour
 
         RenderSettings.skybox = skyboxInstance;
 
-        groundRenderer.material = groundInstance;
-        plataformRenderer.material = plataformInstance;
-        playerPlataformRenderer.material = plataformInstance;
-        wallRenderer.material = wallInstance;
+        if (groundRenderer1 != null) groundRenderer1.material = groundInstance;
+        if (groundRenderer2 != null) groundRenderer2.material = groundInstance;
+        if (groundRenderer3 != null) groundRenderer3.material = groundInstance;
+
+        if (plataformRenderer != null) plataformRenderer.material = plataformInstance;
+        if (playerPlataformRenderer != null) playerPlataformRenderer.material = plataformInstance;
+        if (wallRenderer != null) wallRenderer.material = wallInstance;
 
         baseSkyColor = skyboxInstance.GetColor(COLOR_NAME);
     }
@@ -120,7 +130,6 @@ public class SkyboxVisual : MonoBehaviour
     public void SetBaseSkybox() => SmoothTransition(baseScene);
     public void SetFreezeSkybox() => SmoothTransition(freezeScene);
     public void SetPowerSkybox() => SmoothTransition(powerScene);
-
 
     void SmoothTransition(SceneSettings target, float duration = 0.2f)
     {
@@ -255,7 +264,14 @@ public class SkyboxVisual : MonoBehaviour
             finalReaction * SkyboxSettings.MultiplierGround
         );
 
-        groundInstance.SetVector("_GridSpeed", gridSpeed);
-        plataformInstance.SetVector("_GridSpeed", gridSpeed);
+        if (groundInstance != null)
+        {
+            groundInstance.SetVector("_GridSpeed", gridSpeed);
+        }
+
+        if (plataformInstance != null)
+        {
+            plataformInstance.SetVector("_GridSpeed", gridSpeed);
+        }
     }
 }

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 public class ObjectPooler : MonoBehaviour
 {
-    public static ObjectPooler Instance; 
+    public static ObjectPooler Instance;
+    public static System.Action<GameObject> OnObjectReturned;
 
     [System.Serializable]
     public class Pool
@@ -81,6 +82,7 @@ public class ObjectPooler : MonoBehaviour
             Debug.LogWarning("Pool with tag " + tag + " doesn't exist.");
             return;
         }
+        OnObjectReturned?.Invoke(obj);
         ResetAllRigidbodies(obj);
         obj.SetActive(false);
     }

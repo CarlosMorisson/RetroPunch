@@ -76,7 +76,6 @@ public class CubeCollider : MonoBehaviour
     }
     void GameStateChanged(State newState)
     {
-        Debug.Log("Novo estado do jogo: " + newState);
         switch (newState)
         {
             case State.Game:
@@ -90,6 +89,13 @@ public class CubeCollider : MonoBehaviour
                 print("chamou");
                 break;
         }
+    }
+    protected void ReturnToPool(string poolTag)
+    {
+        ObjectPooler.Instance.ReturnToPool(
+            poolTag,
+            transform.parent.gameObject
+        );
     }
     protected virtual void OnDisable()
     {

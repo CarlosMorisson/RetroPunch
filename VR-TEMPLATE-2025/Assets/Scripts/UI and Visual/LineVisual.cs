@@ -64,6 +64,16 @@ public class LineEffectWaveform : MonoBehaviour
         if (!audioSource.isPlaying) return;
 
         audioSource.GetOutputData(audioBuffer, channel);
+        Color startColor = ColorController.Instance.CurrentPrimary;
+        Color endColor = ColorController.Instance.CurrentSecondary;
+
+        // Força o Alpha a ser 1f (100% opaco)
+        startColor.a = 1f;
+        endColor.a = 1f;
+
+        // Aplica no Line Renderer
+        lr.startColor = startColor;
+        lr.endColor = endColor;
 
         int bufferLen = audioBuffer.Length;
 

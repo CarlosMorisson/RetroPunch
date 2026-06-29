@@ -15,6 +15,7 @@ public class HandTouchFeedback : MonoBehaviour
         public Material handMaterial;
         public ParticleSystem successParticle;
         public ParticleSystem failParticle;
+        public ParticleSystem touchParticle;
 
         [HideInInspector]
         public Material instantiatedMaterial;
@@ -100,6 +101,7 @@ public class HandTouchFeedback : MonoBehaviour
         else if (handObj == leftController.handObject) StartCoroutine(ApplyFeedbackRoutine(leftController, success));
         else if (handObj == testHand.handObject) StartCoroutine(ApplyFeedbackRoutine(testHand, success));
 
+
         if (handObj != null && handObj.TryGetComponent<SimpleHapticFeedback>(out SimpleHapticFeedback simpleHaptic))
         {
             simpleHaptic.enabled = true;
@@ -122,9 +124,9 @@ public class HandTouchFeedback : MonoBehaviour
     {
         if (hand.instantiatedMaterial == null) yield break;
 
+        hand.touchParticle.Play();
         Color targetColor = success ? successColor : failColor;
         ParticleSystem targetParticle = success ? hand.successParticle : hand.failParticle;
-
         if (hand.successParticle != null) hand.successParticle.startColor = successColor;
         if (hand.failParticle != null) hand.failParticle.startColor = failColor;
 

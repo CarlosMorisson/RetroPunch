@@ -53,6 +53,8 @@ public class PushCube : CubeCollider
 
     private const string PORTAL_NAME = "Portal";
 
+    private const float DESTROY_AFTER_TOUCH = 4f;
+
     #region Lifecycle
 
     protected virtual void Awake()
@@ -162,11 +164,12 @@ public class PushCube : CubeCollider
 
             ApplyBounceForce(collision);
             HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
+            StartCoroutine(WaitToDestroy());
         }
         if (collision.gameObject.CompareTag(PORTAL_NAME))
         {
             PortalFeedback portalGame = collision.gameObject.GetComponent<PortalFeedback>();
-            if (portalGame.PushType == pushDirection || portalGame.PushType==PushType.Freeze || portalGame.PushType==PushType.Power)
+            if (portalGame.PushType == pushDirection || pushDirection == PushType.Freeze || pushDirection == PushType.Power)
             {
                 HandleSuccess();
                 portalGame.HandleSuccess();
@@ -178,7 +181,11 @@ public class PushCube : CubeCollider
             }
         }
     }
-
+    private IEnumerator WaitToDestroy()
+    {
+        yield return new WaitForSeconds(DESTROY_AFTER_TOUCH);
+        HandleFail();   
+    }
     private void ApplyBounceForce(Collision collision)
     {
         if (rb == null) return;
@@ -252,8 +259,7 @@ public class PushCube : CubeCollider
             .SetEase(Ease.InBack)
             .OnComplete(() =>
             {
-                GameObject parent = transform.parent.gameObject;
-                ObjectPooler.Instance.ReturnToPool(PrefabTag, parent);
+                ReturnToPool(PrefabTag);
             });
     }
 
