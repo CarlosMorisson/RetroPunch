@@ -119,14 +119,18 @@ public class HandTouchFeedback : MonoBehaviour
             }
         }
     }
-   
+
     private IEnumerator ApplyFeedbackRoutine(Hand hand, bool success)
     {
         if (hand.instantiatedMaterial == null) yield break;
 
-        hand.touchParticle.Play();
+        // proteção: touchParticle pode já ter sido destruído
+        if (hand.touchParticle != null)
+            hand.touchParticle.Play();
+
         Color targetColor = success ? successColor : failColor;
         ParticleSystem targetParticle = success ? hand.successParticle : hand.failParticle;
+
         if (hand.successParticle != null) hand.successParticle.startColor = successColor;
         if (hand.failParticle != null) hand.failParticle.startColor = failColor;
 
@@ -134,11 +138,15 @@ public class HandTouchFeedback : MonoBehaviour
         {
             targetParticle.Play();
         }
+
         float t = 0;
         Color currentMatColor = hand.instantiatedMaterial.GetColor(EmissionColorProperty);
 
         while (t < 1)
         {
+            // se o material foi destruído no meio da transição, aborta a coroutine
+            if (hand.instantiatedMaterial == null) yield break;
+
             t += Time.deltaTime * transitionSpeed;
             Color blendedColor = Color.Lerp(currentMatColor, targetColor, t);
             hand.instantiatedMaterial.SetColor(EmissionColorProperty, blendedColor);
@@ -146,11 +154,16 @@ public class HandTouchFeedback : MonoBehaviour
         }
 
         yield return new WaitForSeconds(waitTime);
+
+        if (hand.instantiatedMaterial == null) yield break;
+
         t = 0;
         currentMatColor = hand.instantiatedMaterial.GetColor(EmissionColorProperty);
 
         while (t < 1)
         {
+            if (hand.instantiatedMaterial == null) yield break;
+
             t += Time.deltaTime * returnSpeed;
             Color blendedColor = Color.Lerp(currentMatColor, hand.originalEmissionColor, t);
             hand.instantiatedMaterial.SetColor(EmissionColorProperty, blendedColor);

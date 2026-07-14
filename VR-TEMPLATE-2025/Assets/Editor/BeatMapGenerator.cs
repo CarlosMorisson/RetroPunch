@@ -26,6 +26,7 @@ public class BeatMapGenerator : EditorWindow
     private bool hasPreview = false;
     private float warmupThresholdMultiplier = 2.0f;
     private float warmupDuration = 5f;
+    private float warmupMinDistanceMultiplier = 3f;
 
     private static readonly float[] ThresholdByDifficulty =
     {
@@ -67,6 +68,9 @@ public class BeatMapGenerator : EditorWindow
     {
         warmupDuration = EditorGUILayout.Slider(
     "Warmup Duration (s)", warmupDuration, 1f, 10f);
+
+        warmupMinDistanceMultiplier = EditorGUILayout.Slider(
+    "Warmup Min Distance Mult", warmupMinDistanceMultiplier, 1f, 15f);
 
         warmupThresholdMultiplier = EditorGUILayout.Slider(
             "Warmup Threshold Mult", warmupThresholdMultiplier, 1.2f, 4f);
@@ -178,51 +182,59 @@ public class BeatMapGenerator : EditorWindow
         clip.GetData(samples, 0);
 
         List<float> energyHistory = new();
-        int warmupSamples = Mathf.FloorToInt(warmupDuration * clip.frequency * clip.channels);
-        int warmupWindows = warmupSamples / sampleWindow;
+        int totalWindows = samples.Length / sampleWindow;
+        int midStart = totalWindows / 4;      
+        int midEnd = totalWindows / 2;      
 
-        for (int w = 0; w < warmupWindows; w++)
+        for (int w = midStart; w < midEnd && energyHistory.Count < historySize; w++)
         {
-            int start = w * sampleWindow;
-            if (start + sampleWindow >= samples.Length) break;
-            energyHistory.Add(ComputeEnergy(samples, start, sampleWindow));
-            if (energyHistory.Count > historySize)
-                energyHistory.RemoveAt(0);
+            int s = w * sampleWindow;
+            if (s + sampleWindow >= samples.Length) break;
+            energyHistory.Add(ComputeEnergy(samples, s, sampleWindow));
         }
+
         List<BeatPoint> beats = new();
-        float lastBeatTime = -999f;
+        float lastBeatTime = -minDistance * warmupMinDistanceMultiplier;
         float maxEnergy = 0f;
+        int windowIndex = 0;
 
-        int startIndex = warmupWindows * sampleWindow;
-
-        for (int i = startIndex; i < samples.Length - sampleWindow; i += sampleWindow)
+        for (int i = 0; i < samples.Length - sampleWindow; i += sampleWindow)
         {
             float energy = ComputeEnergy(samples, i, sampleWindow);
             maxEnergy = Mathf.Max(maxEnergy, energy);
+
+            float avgEnergy = Average(energyHistory);
+            float stdDev = StdDev(energyHistory, avgEnergy);
+
+            float time = (float)i / (clip.frequency * clip.channels);
+            bool isWarmup = time < warmupDuration;
+            float activeThreshold = isWarmup
+                ? threshold * warmupThresholdMultiplier
+                : threshold;
+
+            float dynamicThreshold = avgEnergy + stdDev * activeThreshold;
 
             energyHistory.Add(energy);
             if (energyHistory.Count > historySize)
                 energyHistory.RemoveAt(0);
 
-            float avgEnergy = Average(energyHistory);
             if (avgEnergy <= 0f) continue;
-
-            float stdDev = StdDev(energyHistory, avgEnergy);
-            float dynamicThreshold = avgEnergy + stdDev * threshold;
-
             if (energy <= dynamicThreshold) continue;
+            float activeMinDistance = time < warmupDuration
+                ? Mathf.Lerp(minDistance * warmupMinDistanceMultiplier, minDistance, time / warmupDuration)
+                : minDistance;
 
-            float time = (float)i / (clip.frequency * clip.channels);
-            if (time - lastBeatTime < minDistance) continue;
+            if (time - lastBeatTime < activeMinDistance) continue;
 
             lastBeatTime = time;
-
             beats.Add(new BeatPoint
             {
                 time = time,
                 intensity = energy,
                 affinity = GuessAffinity(samples, i, sampleWindow)
             });
+
+            windowIndex++;
         }
 
         NormalizeIntensity(beats, maxEnergy);

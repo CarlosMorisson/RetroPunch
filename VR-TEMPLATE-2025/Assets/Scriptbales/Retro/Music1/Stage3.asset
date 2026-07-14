@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameMusic: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
   BuildSettings:
-    PrimaryColorLight: {r: 1.9766744, g: 1.0079472, b: 0, a: 1}
-    PrimaryColorDark: {r: 3.482202, g: 3.482202, b: 0, a: 1}
-    SecondaryColorLight: {r: 0, g: 0, b: 0, a: 1}
+    PrimaryColorLight: {r: 2.4438024, g: 2.6390157, b: 0.45311397, a: 1}
+    PrimaryColorDark: {r: 1.5964533, g: 1.5964533, b: 0, a: 1}
+    SecondaryColorLight: {r: 0.15471691, g: 0.15471691, b: 0.15471691, a: 1}
     SecondaryColorDark: {r: 0, g: 0, b: 0, a: 1}
     BaseSceneSettings:
       SkyboxMaterial: {fileID: 2100000, guid: bc956c2a94277984ab315b9e44015434, type: 2}

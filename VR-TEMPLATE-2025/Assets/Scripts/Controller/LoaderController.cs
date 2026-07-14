@@ -29,6 +29,7 @@ public class LoaderController : MonoBehaviour
 
     public void LoadSong()
     {
+        
         SongGame.LoadSong(StageLoadController.Instance.ChooseMusic);
     }
 

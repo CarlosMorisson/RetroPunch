@@ -36,6 +36,7 @@ public class CubeCollider : MonoBehaviour
 
     protected const string WALL_TAG="Wall";
     protected const string PLAYER_TAG = "Player";
+    private const float WAIT_TIME=2f;
 
     #region Unity Lifecycle
 
@@ -92,10 +93,16 @@ public class CubeCollider : MonoBehaviour
     }
     protected void ReturnToPool(string poolTag)
     {
+        StartCoroutine(WaitReturnToPool(poolTag));  
+    }
+    private IEnumerator WaitReturnToPool(string poolTag)
+    {
+        yield return new WaitForSeconds(WAIT_TIME);
         ObjectPooler.Instance.ReturnToPool(
             poolTag,
             transform.parent.gameObject
         );
+        transform.parent.gameObject.SetActive(false);
     }
     protected virtual void OnDisable()
     {
@@ -166,9 +173,18 @@ public class CubeCollider : MonoBehaviour
 
     }
 
+    // CubeCollider — HandleFail reseta física imediatamente, não espera o pool
     protected virtual void HandleFail()
     {
-        gameObject.GetComponent<Rigidbody>().useGravity = true;
+        Rigidbody rb = GetComponentInParent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.useGravity = false;     
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.Sleep();
+        }
+
         OnFail?.Invoke();
     }
 

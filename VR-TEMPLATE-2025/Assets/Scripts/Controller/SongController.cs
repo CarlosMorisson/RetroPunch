@@ -71,6 +71,8 @@ public class SongController : MonoBehaviour
     /// </summary>
     public void LoadSong(AudioClip clip)
     {
+        if (audioSource != null)
+            return;
         spectrumData = new float[spectrumSize];
 
         songClip = clip;
@@ -117,7 +119,7 @@ public class SongController : MonoBehaviour
             shuffledSequence[randomIndex] = temp;
         }
     }
-
+    [ContextMenu("Pause")]
     public void PauseSong()
     {
         if (audioSource != null && audioSource.isPlaying)
@@ -127,6 +129,7 @@ public class SongController : MonoBehaviour
             Debug.Log("Música Pausada");
         }
     }
+    [ContextMenu("Despause")]
     public void ResumeSong()
     {
         if (audioSource != null && isPaused)

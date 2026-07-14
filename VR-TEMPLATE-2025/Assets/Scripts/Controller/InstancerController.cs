@@ -110,12 +110,25 @@ public class InstancerController : MonoBehaviour
         ObjectPooler.OnObjectReturned -= HandleObjectReturned;
     }
 
+    // InstancerController
     private void HandleObjectReturned(GameObject obj)
     {
         if (!objectCellMap.TryGetValue(obj, out int cell))
+        {
+            foreach (Transform child in obj.GetComponentsInChildren<Transform>(true))
+            {
+                if (objectCellMap.TryGetValue(child.gameObject, out cell))
+                {
+                    objectCellMap.Remove(child.gameObject);
+                    usedCells.Remove(cell);
+                    return;
+                }
+            }
             return;
+        }
 
         objectCellMap.Remove(obj);
+        usedCells.Remove(cell);   
     }
 
     public void SetStop(bool value)
@@ -166,36 +179,23 @@ public class InstancerController : MonoBehaviour
 
     private void SpawnObject(BeatPoint beat)
     {
-        PrefabSpawnData prefab =
-            GetRandomPrefab(beat.affinity);
-        if (prefab == null)
-            return;
+        PrefabSpawnData prefab = GetRandomPrefab(beat.affinity);
+        if (prefab == null) return;
 
         int cell = GetFreeCell();
+        if (cell == -1) return;
 
-        if (cell == -1)
-            return;
+        GameObject obj = ObjectPooler.Instance.SpawnFromPool(
+            prefab.prefabTag,
+            gridPositions[cell],
+            spawnParent.rotation
+        );
 
-        Vector3 spawnPosition =
-            gridPositions[cell];
-
-        GameObject obj =
-            ObjectPooler.Instance.SpawnFromPool(
-                prefab.prefabTag,
-                spawnPosition,
-                spawnParent.rotation
-            );
-
-        if (obj == null)
-            return;
-
-
+        if (obj == null) return;
         objectCellMap[obj] = cell;
 
-        obj.transform.SetParent(
-            spawnParent,
-            true
-        );
+        obj.transform.SetParent(spawnParent, true);
+
         if (obj.TryGetComponent<ShootCube>(out var shootCube))
             shootCube.beat = beat;
     }

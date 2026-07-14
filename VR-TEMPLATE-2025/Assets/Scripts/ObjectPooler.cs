@@ -1,5 +1,7 @@
-using UnityEngine;
+using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class ObjectPooler : MonoBehaviour
 {
@@ -31,15 +33,23 @@ public class ObjectPooler : MonoBehaviour
         }
     }
 
+    // ObjectPooler — inicializa o pool em chunks por frame
     void Start()
     {
         poolDictionary = new Dictionary<string, Queue<GameObject>>();
+        StartCoroutine(InitializePoolsAsync());
+    }
 
+    private IEnumerator InitializePoolsAsync()
+    {
         foreach (Pool pool in pools)
         {
             Queue<GameObject> objectPool = new Queue<GameObject>();
 
-            for (int i = 0; i < pool.size; i++)
+            // Instancia só 20% do tamanho configurado no início
+            int initialSize = Mathf.Max(1, pool.size / 5);
+
+            for (int i = 0; i < initialSize; i++)
             {
                 if (pool.prefab != null)
                 {
@@ -47,10 +57,13 @@ public class ObjectPooler : MonoBehaviour
                     obj.SetActive(false);
                     objectPool.Enqueue(obj);
                 }
-                
+
+                yield return null; // 1 objeto por frame
             }
+
             poolDictionary.Add(pool.tag, objectPool);
         }
+
     }
 
     public GameObject SpawnFromPool(string tag, Vector3 position, Quaternion rotation)
@@ -61,30 +74,62 @@ public class ObjectPooler : MonoBehaviour
             return null;
         }
 
-        GameObject objectToSpawn = poolDictionary[tag].Dequeue();
+        Queue<GameObject> pool = poolDictionary[tag];
 
-        if (objectToSpawn.activeInHierarchy)
+        int count = pool.Count;
+        for (int i = 0; i < count; i++)
         {
-            Debug.LogWarning($"Pool '{tag}' is exhausted. Reusing oldest object. Consider increasing pool size.");
+            GameObject obj = pool.Dequeue();
+
+            if (!obj.activeInHierarchy)
+            {
+                obj.SetActive(true);
+                obj.transform.position = position;
+                obj.transform.rotation = rotation;
+                pool.Enqueue(obj);
+                return obj;
+            }
+
+            pool.Enqueue(obj);
         }
-        objectToSpawn.SetActive(true);
-        objectToSpawn.transform.position = position;
-        objectToSpawn.transform.rotation = rotation;
 
-        poolDictionary[tag].Enqueue(objectToSpawn);
+        Pool poolData = pools.Find(p => p.tag == tag);
+        if (poolData != null && poolData.prefab != null)
+        {
+            GameObject newObj = Instantiate(poolData.prefab, poolData.Parent);
+            newObj.SetActive(true);
+            newObj.transform.position = position;
+            newObj.transform.rotation = rotation;
+            pool.Enqueue(newObj);
+            Debug.Log($"Pool '{tag}' expandido dinamicamente.");
+            return newObj;
+        }
 
-        return objectToSpawn;
+        return null;
     }
     public void ReturnToPool(string tag, GameObject obj)
     {
         if (!poolDictionary.ContainsKey(tag))
         {
-            Debug.LogWarning("Pool with tag " + tag + " doesn't exist.");
+            Debug.LogWarning($"Pool '{tag}' não existe.");
             return;
         }
-        OnObjectReturned?.Invoke(obj);
+
+        DOTween.Kill(obj.transform);
+        foreach (Transform child in obj.GetComponentsInChildren<Transform>())
+            DOTween.Kill(child);
+
         ResetAllRigidbodies(obj);
+        ResetScale(obj);  
+
         obj.SetActive(false);
+
+        OnObjectReturned?.Invoke(obj);
+    }
+
+    private void ResetScale(GameObject obj)
+    {
+        obj.transform.localScale = Vector3.one;
     }
     public void ResetAllRigidbodies(GameObject obj)
     {

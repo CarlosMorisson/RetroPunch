@@ -17,11 +17,245 @@ MonoBehaviour:
     musicClip: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
     difficulties:
     - difficulty: 0
-      gameModeBeatMaps: []
+      gameModeBeatMaps:
+      - gameType: 0
+        beatMap: {fileID: 11400000, guid: a42fa697545bd8f468b1a10b4ed99a34, type: 2}
+        prefabSpawnData:
+        - prefabTag: Cube1
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube2
+          affinity: 1
+          prefabDifficulty: 1
+          rarity: 1
+          weight: 5
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube3
+          affinity: 1
+          prefabDifficulty: 1
+          rarity: 1
+          weight: 5
+          allowConsecutiveSpawns: 0
+        - prefabTag: Cube4
+          affinity: 0
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 0
+        - prefabTag: CubeFreeze
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
+        - prefabTag: CubePower
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
+      - gameType: 1
+        beatMap: {fileID: 11400000, guid: e8b2e5f3dd37b674a822ca73a5c57e02, type: 2}
+        prefabSpawnData:
+        - prefabTag: Cube1
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube2
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube3
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube4
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: CubeFreeze
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
+        - prefabTag: CubePower
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
     - difficulty: 1
-      gameModeBeatMaps: []
+      gameModeBeatMaps:
+      - gameType: 0
+        beatMap: {fileID: 11400000, guid: cd48b121c684dd043b18c9cfc943b6b2, type: 2}
+        prefabSpawnData:
+        - prefabTag: Cube1
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube2
+          affinity: 1
+          prefabDifficulty: 1
+          rarity: 1
+          weight: 5
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube3
+          affinity: 1
+          prefabDifficulty: 1
+          rarity: 1
+          weight: 5
+          allowConsecutiveSpawns: 0
+        - prefabTag: Cube4
+          affinity: 0
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 0
+        - prefabTag: CubeFreeze
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
+        - prefabTag: CubePower
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
+      - gameType: 1
+        beatMap: {fileID: 11400000, guid: 3eceff7006283fb4ca4d02413b9d7286, type: 2}
+        prefabSpawnData:
+        - prefabTag: Cube1
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube2
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube3
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube4
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: CubeFreeze
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
+        - prefabTag: CubePower
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
     - difficulty: 2
-      gameModeBeatMaps: []
+      gameModeBeatMaps:
+      - gameType: 0
+        beatMap: {fileID: 11400000, guid: 2e64d9c1827956e42a3047092845a293, type: 2}
+        prefabSpawnData:
+        - prefabTag: Cube1
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube2
+          affinity: 1
+          prefabDifficulty: 1
+          rarity: 1
+          weight: 5
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube3
+          affinity: 1
+          prefabDifficulty: 1
+          rarity: 1
+          weight: 5
+          allowConsecutiveSpawns: 0
+        - prefabTag: Cube4
+          affinity: 0
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 0
+        - prefabTag: CubeFreeze
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
+        - prefabTag: CubePower
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
+      - gameType: 1
+        beatMap: {fileID: 11400000, guid: 7d800bfde13611f418461bf364da469c, type: 2}
+        prefabSpawnData:
+        - prefabTag: Cube1
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube2
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube3
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: Cube4
+          affinity: 3
+          prefabDifficulty: 1
+          rarity: 0
+          weight: 80
+          allowConsecutiveSpawns: 1
+        - prefabTag: CubeFreeze
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
+        - prefabTag: CubePower
+          affinity: 2
+          prefabDifficulty: 1
+          rarity: 3
+          weight: 1
+          allowConsecutiveSpawns: 0
   - stageName: EvolutionImpasse
     musicClip: {fileID: 8300000, guid: 90685a146ec1c47caa952e9d908d23c0, type: 3}
     difficulties:
@@ -67,43 +301,43 @@ MonoBehaviour:
           weight: 1
           allowConsecutiveSpawns: 0
       - gameType: 1
-        beatMap: {fileID: 11400000, guid: c5218be59078162468a995b052311284, type: 2}
+        beatMap: {fileID: 11400000, guid: 679b01180f9e3ec4fb98a3e6ab5fdd38, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
           prefabDifficulty: 1
           rarity: 0
-          weight: 61
+          weight: 80
           allowConsecutiveSpawns: 1
         - prefabTag: Cube2
           affinity: 3
           prefabDifficulty: 1
           rarity: 0
-          weight: 10
+          weight: 80
           allowConsecutiveSpawns: 1
         - prefabTag: Cube3
           affinity: 3
           prefabDifficulty: 1
           rarity: 0
-          weight: 10
+          weight: 80
           allowConsecutiveSpawns: 1
         - prefabTag: Cube4
           affinity: 3
           prefabDifficulty: 1
           rarity: 0
-          weight: 10
+          weight: 80
           allowConsecutiveSpawns: 1
         - prefabTag: CubeFreeze
           affinity: 2
           prefabDifficulty: 1
           rarity: 3
-          weight: 10
+          weight: 1
           allowConsecutiveSpawns: 0
         - prefabTag: CubePower
           affinity: 2
           prefabDifficulty: 1
           rarity: 3
-          weight: 10
+          weight: 1
           allowConsecutiveSpawns: 0
       - gameType: 2
         beatMap: {fileID: 11400000, guid: c5218be59078162468a995b052311284, type: 2}
@@ -147,7 +381,7 @@ MonoBehaviour:
     - difficulty: 1
       gameModeBeatMaps:
       - gameType: 0
-        beatMap: {fileID: 11400000, guid: c5218be59078162468a995b052311284, type: 2}
+        beatMap: {fileID: 11400000, guid: 70326c56b7c642047ab3eabf0d213560, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -186,7 +420,7 @@ MonoBehaviour:
           weight: 1
           allowConsecutiveSpawns: 0
       - gameType: 1
-        beatMap: {fileID: 11400000, guid: c5218be59078162468a995b052311284, type: 2}
+        beatMap: {fileID: 11400000, guid: 29c9ff6e65329df43b48db4b679fd4be, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -266,7 +500,7 @@ MonoBehaviour:
     - difficulty: 2
       gameModeBeatMaps:
       - gameType: 0
-        beatMap: {fileID: 11400000, guid: c5218be59078162468a995b052311284, type: 2}
+        beatMap: {fileID: 11400000, guid: 55be7d895a9699946a8cd0ccb96f6fde, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -305,7 +539,7 @@ MonoBehaviour:
           weight: 10
           allowConsecutiveSpawns: 0
       - gameType: 1
-        beatMap: {fileID: 11400000, guid: c5218be59078162468a995b052311284, type: 2}
+        beatMap: {fileID: 11400000, guid: 472e5382db17468458ae222d040dc677, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3

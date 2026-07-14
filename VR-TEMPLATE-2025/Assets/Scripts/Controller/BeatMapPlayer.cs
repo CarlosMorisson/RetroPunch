@@ -4,45 +4,67 @@ public class BeatMapPlayer : MonoBehaviour
 {
     public SongController songController;
     public SongBeatMap beatMap;
-
     public InstancerController instancer;
 
-    public float spawnOffset = 1.5f;
-
     private int currentBeat;
+    private bool skipDone;
 
     private void Start()
     {
-        beatMap=StageLoadController.Instance.CurrentBeatMap;
+        currentBeat = 0;
+        skipDone = false;
+        beatMap = StageLoadController.Instance.CurrentBeatMap;
     }
-    void Update()
+
+    private void Update()
     {
         if (songController == null) return;
         if (songController.audioSource == null) return;
-        if (!songController.LoadMusic) return;
-
-        float currentTime = songController.audioSource.time;
-
+        if (beatMap == null) return;
         if (currentBeat >= beatMap.beats.Count) return;
 
-        // Se ainda não inicializou, pula todos os beats passados
-        if (currentBeat == 0 && currentTime > 0f)
+        if (!skipDone)
         {
+            if (songController.audioSource.clip == null) return;
+
+            skipDone = true;
+            float offset = instancer.CalculateSpawnOffset();
+
+            int skipped = 0;
             while (
                 currentBeat < beatMap.beats.Count &&
-                beatMap.beats[currentBeat].time < currentTime
+                beatMap.beats[currentBeat].time - offset <= 0f
             )
             {
                 currentBeat++;
+                skipped++;
             }
+
+            if (skipped > 0)
+                Debug.Log($"[BeatMapPlayer] {skipped} beat(s) ignorados (time - offset <= 0).");
+
+            return;
         }
+
+        if (!songController.LoadMusic) return;
+
+        float currentTime = songController.audioSource.time;
+        float spawnOffset = instancer.CalculateSpawnOffset();
 
         BeatPoint next = beatMap.beats[currentBeat];
 
-        if (currentTime >= next.time - instancer.CalculateSpawnOffset())
+        if (currentTime >= next.time - spawnOffset)
         {
+            Debug.Log($"[SPAWN] frame={Time.frameCount} | currentTime={currentTime:F3} | beatTime={next.time:F3} | offset={spawnOffset:F3} | beat={currentBeat}");
             instancer.SpawnBeat(next);
             currentBeat++;
         }
+    }
+
+    public void Restart()
+    {
+        currentBeat = 0;
+        skipDone = false;
+        beatMap = StageLoadController.Instance.CurrentBeatMap;
     }
 }

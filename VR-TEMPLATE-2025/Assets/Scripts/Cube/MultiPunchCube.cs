@@ -282,6 +282,7 @@ public class MultiPunchCube : CubeCollider
             mainFeedback.GetComponent<BreakCube>().TriggerExplosion(collisionLocation, transform);
         }
 
+        ReturnToPool(PrefabTag);
         gameObject.SetActive(false);
     }
 
