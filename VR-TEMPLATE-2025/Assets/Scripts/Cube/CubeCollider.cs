@@ -169,21 +169,29 @@ public class CubeCollider : MonoBehaviour
 
     protected virtual void HandleSuccess()
     {
+        StopParentMovement();
         OnSuccess?.Invoke();
 
     }
-
-    // CubeCollider — HandleFail reseta física imediatamente, não espera o pool
-    protected virtual void HandleFail()
+    private void StopParentMovement()
     {
-        Rigidbody rb = GetComponentInParent<Rigidbody>();
-        if (rb != null)
+        Transform parent = transform.parent;
+        if (parent == null) return;
+
+        if (parent.TryGetComponent<CubeMovemment>(out var move))
+            move.normalSpeed = 0f;
+
+        if (parent.TryGetComponent<Rigidbody>(out var rb))
         {
-            rb.useGravity = false;     
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             rb.Sleep();
         }
+    }
+    // CubeCollider — HandleFail reseta física imediatamente, não espera o pool
+    protected virtual void HandleFail()
+    {
+        StopParentMovement();
 
         OnFail?.Invoke();
     }

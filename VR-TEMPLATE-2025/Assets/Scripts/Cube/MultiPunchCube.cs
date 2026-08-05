@@ -36,6 +36,7 @@ public class MultiPunchCube : CubeCollider
     private Renderer cachedRenderer;
     private Material originalMaterial;
     private Vector3 collisionLocation;
+    private Vector3 originalLocalScale;
 
     private BuildMovemmentVisual[] visualBoosters;
 
@@ -47,7 +48,7 @@ public class MultiPunchCube : CubeCollider
 
     protected virtual void Awake()
     {
-
+        originalLocalScale=transform.localScale;
         cachedRenderer = GetComponentInChildren<Renderer>();
         if (cachedRenderer != null)
             originalMaterial = cachedRenderer.material;
@@ -61,6 +62,7 @@ public class MultiPunchCube : CubeCollider
     {
         base.OnEnable();
 
+        transform.localScale = originalLocalScale;
         hasMisstaken = false;
         ResetPoints();
 
@@ -283,7 +285,6 @@ public class MultiPunchCube : CubeCollider
         }
 
         ReturnToPool(PrefabTag);
-        gameObject.SetActive(false);
     }
 
     public void FailFeedback()

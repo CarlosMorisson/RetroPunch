@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.XR.Interaction.Toolkit.Feedback;
 
 public class HandTouchFeedback : MonoBehaviour
@@ -11,11 +12,20 @@ public class HandTouchFeedback : MonoBehaviour
     {
         public string name;
         public GameObject handObject;
-        public GameObject targetRenderer;
+
+        [Tooltip("Lista de objetos com Renderer que recebem o material instanciado.")]
+        public List<GameObject> targetRenderer;
+
         public Material handMaterial;
         public ParticleSystem successParticle;
         public ParticleSystem failParticle;
         public ParticleSystem touchParticle;
+
+        [Header("Identificação")]
+        [Tooltip("true = Controller, false = Hand (mão rastreada).")]
+        public bool isController;
+        [Tooltip("true = Right, false = Left.")]
+        public bool isRight;
 
         [HideInInspector]
         public Material instantiatedMaterial;
@@ -52,6 +62,12 @@ public class HandTouchFeedback : MonoBehaviour
     void Awake()
     {
         Instance = this;
+
+        if (rightHand != null) { rightHand.isController = false; rightHand.isRight = true; }
+        if (leftHand != null) { leftHand.isController = false; leftHand.isRight = false; }
+        if (rightController != null) { rightController.isController = true; rightController.isRight = true; }
+        if (leftController != null) { leftController.isController = true; leftController.isRight = false; }
+
         InitializeHand(rightHand);
         InitializeHand(leftHand);
         InitializeHand(rightController);
@@ -68,29 +84,100 @@ public class HandTouchFeedback : MonoBehaviour
 
     private void InitializeHand(Hand hand)
     {
-        if (hand.handObject != null && hand.handMaterial != null && hand.targetRenderer != null)
+        if (hand == null || hand.handObject == null || hand.handMaterial == null ||
+            hand.targetRenderer == null || hand.targetRenderer.Count == 0)
         {
-            if (hand.targetRenderer.TryGetComponent<Renderer>(out Renderer renderer))
+            return;
+        }
+
+        hand.instantiatedMaterial = new Material(hand.handMaterial);
+        hand.instantiatedMaterial.EnableKeyword("_EMISSION");
+
+        if (hand.instantiatedMaterial.HasProperty(EmissionColorProperty))
+        {
+            hand.originalEmissionColor = hand.instantiatedMaterial.GetColor(EmissionColorProperty);
+        }
+        else
+        {
+            hand.originalEmissionColor = Color.black;
+        }
+
+        foreach (GameObject targetObj in hand.targetRenderer)
+        {
+            if (targetObj == null) continue;
+
+            if (targetObj.TryGetComponent<Renderer>(out Renderer renderer))
             {
-                hand.instantiatedMaterial = new Material(hand.handMaterial);
                 renderer.material = hand.instantiatedMaterial;
-
-                hand.instantiatedMaterial.EnableKeyword("_EMISSION");
-
-                if (hand.instantiatedMaterial.HasProperty(EmissionColorProperty))
-                {
-                    hand.originalEmissionColor = hand.instantiatedMaterial.GetColor(EmissionColorProperty);
-                }
-                else
-                {
-                    hand.originalEmissionColor = Color.black;
-                }
             }
             else
             {
-                Debug.LogWarning($"Nenhum Renderer encontrado no objeto: {hand.targetRenderer.name}");
+                Debug.LogWarning($"Nenhum Renderer encontrado no objeto: {targetObj.name}");
             }
         }
+    }
+
+    /// <summary>
+    /// Retorna o slot (Hand) correspondente à combinação isController + isRight.
+    /// Não considera o testHand, que é um slot manual/avulso.
+    /// </summary>
+    public Hand GetHandSlot(bool isController, bool isRight)
+    {
+        List<Hand> allHands = new List<Hand> { rightHand, leftHand, rightController, leftController };
+
+        foreach (Hand h in allHands)
+        {
+            if (h != null && h.isController == isController && h.isRight == isRight)
+            {
+                return h;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Valida o tipo de um Hand (Controller ou Hand) e sua lateralidade.
+    /// Retorna false se o hand for nulo.
+    /// </summary>
+    public bool ValidateHandType(Hand hand, out bool isController, out bool isRight)
+    {
+        if (hand == null)
+        {
+            isController = false;
+            isRight = false;
+            return false;
+        }
+
+        isController = hand.isController;
+        isRight = hand.isRight;
+        return true;
+    }
+
+    /// <summary>
+    /// Recebe os dados de uma HandSwitch (vinda do SwitchHandsController) e aplica
+    /// no slot correto, com base em data.isController e na lateralidade informada (isRight).
+    /// </summary>
+    public void UpdateHandData(HandSwitch data, bool isRight)
+    {
+        if (data == null) return;
+
+        Hand target = GetHandSlot(data.isController, isRight);
+
+        if (target == null)
+        {
+            Debug.LogWarning($"[HandTouchFeedback] Nenhum slot encontrado para isController={data.isController}, isRight={isRight}");
+            return;
+        }
+
+        target.handObject = data.handObject;
+        target.targetRenderer = data.targetRenderer;
+        target.handMaterial = data.handMaterial;
+        target.successParticle = data.successParticle;
+        target.failParticle = data.failParticle;
+        target.touchParticle = data.touchParticle;
+
+        InitializeHand(target);
     }
 
     public void HandFeedback(GameObject handObj, bool success)
@@ -124,7 +211,6 @@ public class HandTouchFeedback : MonoBehaviour
     {
         if (hand.instantiatedMaterial == null) yield break;
 
-        // proteção: touchParticle pode já ter sido destruído
         if (hand.touchParticle != null)
             hand.touchParticle.Play();
 
@@ -144,7 +230,6 @@ public class HandTouchFeedback : MonoBehaviour
 
         while (t < 1)
         {
-            // se o material foi destruído no meio da transição, aborta a coroutine
             if (hand.instantiatedMaterial == null) yield break;
 
             t += Time.deltaTime * transitionSpeed;

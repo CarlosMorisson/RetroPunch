@@ -232,7 +232,6 @@ public class PushCube : CubeCollider
         feedbackRotate.gameObject.SetActive(true);
         feedbackRotate.GetComponent<BreakCube>().TriggerExplosion(collisionLocation, transform);
         ReturnToPool(PrefabTag);
-        gameObject.SetActive(false);
     }
 
     public void FailFeedback()
