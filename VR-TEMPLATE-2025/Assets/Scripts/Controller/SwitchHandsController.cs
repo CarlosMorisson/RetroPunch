@@ -2,17 +2,17 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// Representa uma opção de mão (mão nua, controle, luva, etc).
-/// isController define se essa opção representa um Controller (true) ou uma Hand/mão rastreada (false).
-/// A lateralidade (Left/Right) é definida pela posição dela dentro de um BothHands (LeftHand ou RightHand),
-/// não por um campo aqui.
+/// Representa uma opï¿½ï¿½o de mï¿½o (mï¿½o nua, controle, luva, etc).
+/// isController define se essa opï¿½ï¿½o representa um Controller (true) ou uma Hand/mï¿½o rastreada (false).
+/// A lateralidade (Left/Right) ï¿½ definida pela posiï¿½ï¿½o dela dentro de um BothHands (LeftHand ou RightHand),
+/// nï¿½o por um campo aqui.
 /// </summary>
 [System.Serializable]
 public class HandSwitch
 {
     public string name;
 
-    [Tooltip("GameObject 'pai' dessa opção. É ativado quando essa opção se torna a atual, e desativado quando não é.")]
+    [Tooltip("GameObject 'pai' dessa opï¿½ï¿½o. ï¿½ ativado quando essa opï¿½ï¿½o se torna a atual, e desativado quando nï¿½o ï¿½.")]
     public GameObject parentObject;
 
     public GameObject handObject;
@@ -25,8 +25,8 @@ public class HandSwitch
     public ParticleSystem failParticle;
     public ParticleSystem touchParticle;
 
-    [Header("Identificação")]
-    [Tooltip("Marque true se essa opção representa um Controller. Deixe false se representa uma Hand (mão rastreada).")]
+    [Header("Identificaï¿½ï¿½o")]
+    [Tooltip("Marque true se essa opï¿½ï¿½o representa um Controller. Deixe false se representa uma Hand (mï¿½o rastreada).")]
     public bool isController;
 
     [HideInInspector]
@@ -36,8 +36,8 @@ public class HandSwitch
 }
 
 /// <summary>
-/// Par de opções (esquerda e direita) que representam um mesmo "conjunto" de mãos
-/// (ex: "Mãos Nuas", "Controles", "Mãos com Luva").
+/// Par de opï¿½ï¿½es (esquerda e direita) que representam um mesmo "conjunto" de mï¿½os
+/// (ex: "Mï¿½os Nuas", "Controles", "Mï¿½os com Luva").
 /// </summary>
 [System.Serializable]
 public class BothHands
@@ -48,25 +48,26 @@ public class BothHands
 }
 
 /// <summary>
-/// Controla qual BothHands está ativo no momento.
-/// - Mantém uma lista de todas as opções disponíveis (bothHandsList).
-/// - Randomiza a opção atual sem repetir até esgotar todas (usedBothHands),
-///   resetando o ciclo quando todas já foram usadas.
+/// Controla qual BothHands estï¿½ ativo no momento.
+/// - Mantï¿½m uma lista de todas as opï¿½ï¿½es disponï¿½veis (bothHandsList).
+/// - Randomiza a opï¿½ï¿½o atual sem repetir atï¿½ esgotar todas (usedBothHands),
+///   resetando o ciclo quando todas jï¿½ foram usadas.
 /// - Ao definir o BothHands atual, ativa o parentObject do Left/Right escolhidos
-///   e desativa o parentObject de todas as outras opções da lista.
-/// - Propaga os dados da opção atual para o HandTouchFeedback, atualizando
+///   e desativa o parentObject de todas as outras opï¿½ï¿½es da lista.
+/// - Propaga os dados da opï¿½ï¿½o atual para o HandTouchFeedback, atualizando
 ///   o slot correto (rightHand / leftHand / rightController / leftController)
 ///   com base no isController da HandSwitch e na lateralidade (Left/Right do BothHands).
 /// </summary>
+
 public class SwitchHandsController : MonoBehaviour
 {
-    [Header("Opções Disponíveis")]
+    [Header("Opï¿½ï¿½es Disponï¿½veis")]
     public List<BothHands> bothHandsList = new List<BothHands>();
 
-    [Header("Opção Atual")]
+    [Header("Opï¿½ï¿½o Atual")]
     public BothHands currentBothHands;
 
-    [Header("Controle de Randomização (somente leitura)")]
+    [Header("Controle de Randomizaï¿½ï¿½o (somente leitura)")]
     [SerializeField]
     private List<BothHands> usedBothHands = new List<BothHands>();
 
@@ -76,14 +77,17 @@ public class SwitchHandsController : MonoBehaviour
     }
 
     /// <summary>
-    /// Escolhe aleatoriamente um BothHands da lista que ainda não foi usado no ciclo atual.
-    /// Quando todos já tiverem sido usados, libera todos novamente (reseta o ciclo).
+    /// Escolhe aleatoriamente um BothHands da lista que ainda nï¿½o foi usado no ciclo atual.
+    /// Quando todos jï¿½ tiverem sido usados, libera todos novamente (reseta o ciclo).
     /// </summary>
+    [ContextMenu("Teste Randomiza")]
     public void RandomizeCurrentBothHands()
     {
+        if(StageLoadController.Instance.gameType != GameType.Shoot)
+            return;
         if (bothHandsList == null || bothHandsList.Count == 0)
         {
-            Debug.LogWarning("[SwitchHandsController] bothHandsList está vazia.");
+            Debug.LogWarning("[SwitchHandsController] bothHandsList estï¿½ vazia.");
             return;
         }
 
@@ -110,7 +114,7 @@ public class SwitchHandsController : MonoBehaviour
     }
 
     /// <summary>
-    /// Define o BothHands atual: ativa seus parentObjects, desativa os das outras opções
+    /// Define o BothHands atual: ativa seus parentObjects, desativa os das outras opï¿½ï¿½es
     /// e propaga os dados para o HandTouchFeedback.
     /// </summary>
     public void SetCurrentBothHands(BothHands newHands)
@@ -163,7 +167,7 @@ public class SwitchHandsController : MonoBehaviour
     {
         if (HandTouchFeedback.Instance == null)
         {
-            Debug.LogWarning("[SwitchHandsController] HandTouchFeedback.Instance não encontrado na cena.");
+            Debug.LogWarning("[SwitchHandsController] HandTouchFeedback.Instance nï¿½o encontrado na cena.");
             return;
         }
 

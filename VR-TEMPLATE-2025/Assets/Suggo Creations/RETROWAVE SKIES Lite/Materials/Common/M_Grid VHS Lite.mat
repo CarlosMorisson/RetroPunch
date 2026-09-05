@@ -63,6 +63,7 @@ Material:
     - _Cull: 2
     - _DstBlend: 0
     - _ENABLE_PARALLAX_EFFECT: 1
+    - _Emission_Intensity: 79.82
     - _GridRotation: 0
     - _Grid_Line_X_Width: 0.9
     - _Grid_Line_Y_Width: 0.9
@@ -81,7 +82,7 @@ Material:
     - _ZWrite: 1
     - _ZWriteControl: 0
     m_Colors:
-    - _GridColor: {r: 0.36895007, g: 1.0914494, b: 1.4022043, a: 1}
+    - _GridColor: {r: 40.980797, g: 121.23175, b: 155.74858, a: 1}
     - _GridSpeed: {r: 0, g: -0.1, b: 0, a: 0}
     - _GroundColor: {r: 0.5457309, g: 0, b: 0.5471698, a: 1}
     - _Parallax_Color: {r: 0, g: 2.101961, b: 2.9960785, a: 1}
