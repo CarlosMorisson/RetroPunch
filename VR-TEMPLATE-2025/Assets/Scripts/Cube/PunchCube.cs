@@ -58,7 +58,10 @@ public class PunchCube : CubeCollider
         transform.localScale = initialScale;
 
         if (feedbackRotate != null)
+        {
             feedbackRotate.localRotation = initialRotation;
+            feedbackRotate.gameObject.SetActive(false);
+        }
 
         if (!eventsRegistered)
         {
@@ -104,6 +107,8 @@ public class PunchCube : CubeCollider
 
     protected override void OnDisable()
     {
+        base.OnDisable();
+
         if (eventsRegistered)
         {
             OnSuccess -= SucessFeedback;
@@ -200,9 +205,18 @@ public class PunchCube : CubeCollider
 
     public void SucessFeedback()
     {
-        feedbackRotate.gameObject.SetActive(true);
-        feedbackRotate.GetComponent<BreakCube>().TriggerExplosion(collisionLocation, transform);
+        // Inicia o retorno ao pool antes de desativar, pois a coroutine roda no ObjectPooler.
         ReturnToPool(PrefabTag);
+
+        gameObject.SetActive(false);
+
+        if (feedbackRotate != null)
+        {
+            feedbackRotate.gameObject.SetActive(true);
+
+            if (feedbackRotate.TryGetComponent<BreakCube>(out var breakCube))
+                breakCube.TriggerExplosion(collisionLocation, transform);
+        }
     }
 
     public void FailFeedback()

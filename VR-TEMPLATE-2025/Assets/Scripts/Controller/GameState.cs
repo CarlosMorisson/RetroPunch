@@ -55,14 +55,13 @@ public class GameState : MonoBehaviour
    
     public void CheckInitialState()
     {
-        if (StageLoadController.Instance.IsTutorial)
+        if (StageLoadController.Instance != null && StageLoadController.Instance.IsTutorial)
         {
             GameStateTutorial();
         }
         else
         {
             GameStateGame();
-            print("chamou aqui");
         }
     }
     void OnEnable()
@@ -74,8 +73,8 @@ public class GameState : MonoBehaviour
     {
         OnGameStateChanged -= GameStateChanged;
     }
-    //Metodo de seleção de dificuldade
-    #region Seleção de dificuldade
+    //Metodo de seleï¿½ï¿½o de dificuldade
+    #region Seleï¿½ï¿½o de dificuldade
     public void SetEasy() => difficulty = Difficulty.Easy;
     public void SetHard() => difficulty = Difficulty.Hard;
     #endregion

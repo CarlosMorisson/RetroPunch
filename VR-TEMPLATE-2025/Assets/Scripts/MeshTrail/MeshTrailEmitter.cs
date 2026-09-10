@@ -70,13 +70,22 @@ public class MeshTrailEmitter : MonoBehaviour
         else if (meshRenderer != null)
         {
             var sourceMF = meshRenderer.GetComponent<MeshFilter>();
-            if (!sourceMF) return;
+            if (!sourceMF)
+            {
+                Destroy(ghost);
+                return;
+            }
 
             var mf = ghost.AddComponent<MeshFilter>();
             mf.mesh = sourceMF.mesh;
 
             var mr = ghost.AddComponent<MeshRenderer>();
             mr.material = meshRenderer.material;
+        }
+        else
+        {
+            Destroy(ghost);
+            return;
         }
 
         ghost.AddComponent<MeshTrailGhost>()

@@ -9,6 +9,16 @@ public class BreakCube : MonoBehaviour
     public Transform targetParents;
     private List<Rigidbody> targets = new();
 
+    private struct FragmentState
+    {
+        public Transform transform;
+        public Vector3 position;
+        public Quaternion rotation;
+        public Vector3 scale;
+    }
+
+    private List<FragmentState> fragmentInitialStates;
+
     [Header("Explosion Settings")]
     public float explosionForce = 10f;
     public float explosionRadius = 5f;
@@ -30,22 +40,28 @@ public class BreakCube : MonoBehaviour
 
 
     /// <summary>
-    /// Dispara a explosão reposicionando o centro
+    /// Dispara a explosï¿½o reposicionando o centro
     /// </summary>
     public void TriggerExplosion(Vector3 position, Transform objectTransform)
     {
-        transform.position = objectTransform.position;  
+        transform.position = objectTransform.position;
         transform.localRotation=objectTransform.localRotation;
         if (explosionCenter != null)
             explosionCenter.position = position;
+        ResetFragments();
         GetTargets();
-        Color primaryColor = ColorController.Instance.CurrentPrimary;
-        SetupParticleMaterial(primaryColor);
+        if (ColorController.Instance != null)
+        {
+            Color primaryColor = ColorController.Instance.CurrentPrimary;
+            SetupParticleMaterial(primaryColor);
+        }
+        if (FeedbackParticle != null)
+            FeedbackParticle.Play();
         Explode();
         StartCoroutine(WaitToActive());
     }
     /// <summary>
-    /// Instancia o material do ParticleSystemRenderer e muda a cor da emissão
+    /// Instancia o material do ParticleSystemRenderer e muda a cor da emissï¿½o
     /// </summary>
     private void SetupParticleMaterial(Color colorToApply)
     {
@@ -80,9 +96,50 @@ public class BreakCube : MonoBehaviour
         {
             child.gameObject.SetActive(false);
         }
+        gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Reativa os fragmentos e devolve cada um para sua posiï¿½ï¿½o, rotaï¿½ï¿½o e escala iniciais,
+    /// alem de zerar a velocidade dos rigidbodies, antes de uma nova explosao.
+    /// </summary>
+    private void ResetFragments()
+    {
+        if (targetParents == null) return;
+
+        if (fragmentInitialStates == null)
+        {
+            fragmentInitialStates = new List<FragmentState>();
+            foreach (Transform child in targetParents)
+            {
+                fragmentInitialStates.Add(new FragmentState
+                {
+                    transform = child,
+                    position = child.localPosition,
+                    rotation = child.localRotation,
+                    scale = child.localScale
+                });
+            }
+        }
+
+        foreach (var state in fragmentInitialStates)
+        {
+            if (state.transform == null) continue;
+
+            state.transform.gameObject.SetActive(true);
+            state.transform.localPosition = state.position;
+            state.transform.localRotation = state.rotation;
+            state.transform.localScale = state.scale;
+
+            if (state.transform.TryGetComponent<Rigidbody>(out var rb))
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
     }
     /// <summary>
-    /// Aplica força de explosão nos objetos da lista
+    /// Aplica forï¿½a de explosï¿½o nos objetos da lista
     /// </summary>
     private void Explode()
     {
@@ -116,6 +173,8 @@ public class BreakCube : MonoBehaviour
     /// </summary>
     private void GetTargets()
     {
+        targets.Clear();
+
         foreach(Transform child in targetParents)
         {
             if (child.gameObject.TryGetComponent<MeshTrailEmitter>(out MeshTrailEmitter trailEmitter))

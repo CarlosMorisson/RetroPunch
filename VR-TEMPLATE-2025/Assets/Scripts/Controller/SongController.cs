@@ -29,7 +29,7 @@ public class SongController : MonoBehaviour
     [Header("Sequence Effect")]
     public List<AudioClip> sequenceAudio;
     public AudioSource SequenceAudioSource;
-    [Range(1f, 3f)] public float maxSequencePitch = 2.0f; // Limite máximo do pitch
+    [Range(1f, 3f)] public float maxSequencePitch = 2.0f; // Limite mï¿½ximo do pitch
     [Range(0f, 0.5f)] public float pitchIncreaseStep = 0.05f;
 
     private List<AudioClip> playedTouchAudios = new List<AudioClip>();
@@ -67,7 +67,7 @@ public class SongController : MonoBehaviour
     }
 
     /// <summary>
-    /// Carrega o AudioClip, atualiza nome/duração e toca. Atua como o Start Game.
+    /// Carrega o AudioClip, atualiza nome/duraï¿½ï¿½o e toca. Atua como o Start Game.
     /// </summary>
     public void LoadSong(AudioClip clip)
     {
@@ -126,7 +126,7 @@ public class SongController : MonoBehaviour
         {
             audioSource.Pause();
             isPaused = true;
-            Debug.Log("Música Pausada");
+            Debug.Log("Mï¿½sica Pausada");
         }
     }
     [ContextMenu("Despause")]
@@ -136,7 +136,7 @@ public class SongController : MonoBehaviour
         {
             audioSource.UnPause();
             isPaused = false;
-            Debug.Log("Música Retomada");
+            Debug.Log("Mï¿½sica Retomada");
         }
     }
 
@@ -163,11 +163,11 @@ public class SongController : MonoBehaviour
 
     private IEnumerator ImpactRoutine(float intensity, float duration)
     {
-        // Queda brusca de volume e pitch — sensação de "peso"
+        // Queda brusca de volume e pitch ï¿½ sensaï¿½ï¿½o de "peso"
         float duckVolume = baseVolume * Mathf.Lerp(0.4f, 0.2f, intensity);
         float duckPitch = basePitch - Mathf.Lerp(0.08f, 0.2f, intensity);
 
-        // Overshoot de pitch no retorno — sensação de "ressalto"
+        // Overshoot de pitch no retorno ï¿½ sensaï¿½ï¿½o de "ressalto"
         float boostPitch = basePitch + Mathf.Lerp(0.03f, 0.08f, intensity);
         float boostVolume = baseVolume * Mathf.Lerp(1.1f, 1.25f, intensity);
 
@@ -242,7 +242,7 @@ public class SongController : MonoBehaviour
     }
 
     /// <summary>
-    /// Toca a próxima nota na sequência sorteada aumentando o Pitch de forma linear até o limite.
+    /// Toca a prï¿½xima nota na sequï¿½ncia sorteada aumentando o Pitch de forma linear atï¿½ o limite.
     /// </summary>
     private void PlaySequenceSuccessEffect()
     {
@@ -417,6 +417,44 @@ public class SongController : MonoBehaviour
             if (v > maxValue) maxValue = v;
 
         return maxValue;
+    }
+
+    /// <summary>
+    /// Analisa apenas a mÃºsica principal (audioSource) em bandas de grave/mÃ©dio/agudo,
+    /// normalizadas pela quantidade de bins de cada banda para terem escalas comparÃ¡veis.
+    /// </summary>
+    public MusicAnalysis GetSongAnalysis()
+    {
+        if (audioSource == null || !audioSource.isPlaying)
+            return null;
+
+        audioSource.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
+
+        int bassEnd = spectrumData.Length / 8;
+        int midEnd = spectrumData.Length / 2;
+
+        float bass = 0f, mid = 0f, treble = 0f;
+
+        for (int i = 0; i < bassEnd; i++)
+            bass += spectrumData[i];
+
+        for (int i = bassEnd; i < midEnd; i++)
+            mid += spectrumData[i];
+
+        for (int i = midEnd; i < spectrumData.Length; i++)
+            treble += spectrumData[i];
+
+        bass /= bassEnd;
+        mid /= (midEnd - bassEnd);
+        treble /= (spectrumData.Length - midEnd);
+
+        return new MusicAnalysis
+        {
+            Bass = bass,
+            Mid = mid,
+            Treble = treble,
+            Intensity = bass + mid + treble
+        };
     }
 }
 

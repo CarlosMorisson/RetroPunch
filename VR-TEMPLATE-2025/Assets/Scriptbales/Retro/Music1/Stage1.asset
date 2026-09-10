@@ -14,19 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameMusic: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
   BuildSettings:
-    PrimaryColorLight: {r: 0.9288352, g: 0.34528297, b: 1, a: 1}
-    PrimaryColorDark: {r: 0.84402275, g: 0, b: 1, a: 1}
-    SecondaryColorLight: {r: 0, g: 0.7209208, b: 1, a: 1}
-    SecondaryColorDark: {r: 0, g: 0.047751628, b: 0.7490196, a: 1}
+    PrimaryBaseColor: {r: 0.19753566, g: 0, b: 0.21509439, a: 1}
+    PrimaryColorLight: {r: 0.7490196, g: 0, b: 0.6862745, a: 1}
+    PrimaryColorDark: {r: 0.42941177, g: 0, b: 0.39411765, a: 1}
+    SecondaryColorLight: {r: 0, g: 0.53998375, b: 0.74901956, a: 1}
+    SecondaryColorDark: {r: 0, g: 0.27058825, b: 0.3745098, a: 1}
+    SecondaryBaseColor: {r: 0.017226206, g: 0, b: 0.13962269, a: 1}
     BaseSceneSettings:
       SkyboxMaterial: {fileID: 2100000, guid: 20fca97cf5b8e92459331b3cd74c4be1, type: 2}
       GroundMaterial: {fileID: 2100000, guid: a4115c037cd9c4f4c9b1b73355446825, type: 2}
       PlataformMaterial: {fileID: 2100000, guid: a4115c037cd9c4f4c9b1b73355446825, type: 2}
       WallMaterial: {fileID: 2100000, guid: 07d3f86d3ccea2a4cb9b80044174c061, type: 2}
-    PrimaryColorFreezeLight: {r: 0, g: 0.27607727, b: 0.6075471, a: 1}
+    PrimaryBaseFreezeColor: {r: 0, g: 0.56078434, b: 0.80392164, a: 1}
+    PrimaryColorFreezeLight: {r: 0, g: 1.8064518, b: 4, a: 1}
     PrimaryColorFreezeDark: {r: 0, g: 0.6882615, b: 1, a: 1}
     SecondaryColorFreezeLight: {r: 1, g: 1, b: 1, a: 1}
     SecondaryColorFreezeDark: {r: 0.82641506, g: 0.80302596, b: 0.80302596, a: 1}
+    SecondaryBaseFreezeColor: {r: 1, g: 1, b: 1, a: 1}
     FreezeSceneSettings:
       SkyboxMaterial: {fileID: 2100000, guid: 3d57089665287cb499069c09d990af16, type: 2}
       GroundMaterial: {fileID: 2100000, guid: 1c5362e6da8e57648a72257d61422d6a, type: 2}
@@ -34,8 +38,10 @@ MonoBehaviour:
       WallMaterial: {fileID: 2100000, guid: bc066615580b0c74ea6ab176b3c96d4a, type: 2}
     PrimaryColorPowerLight: {r: 1, g: 0.9182916, b: 0, a: 1}
     PrimaryColorPowerDark: {r: 0.3647059, g: 0.25963974, b: 0, a: 1}
+    PrimaryBasePowerColor: {r: 1, g: 0.96470594, b: 0, a: 1}
     SecondaryColorPowerLight: {r: 1, g: 0.09755004, b: 0, a: 1}
     SecondaryColorPowerDark: {r: 0.90943396, g: 0, b: 0.025736807, a: 1}
+    SecondaryBasePowerColor: {r: 1, g: 0.34509805, b: 0, a: 1}
     PowerSceneSettings:
       SkyboxMaterial: {fileID: 2100000, guid: 8af2f7fe1cff1c34a96fe0f1dbd1b0f5, type: 2}
       GroundMaterial: {fileID: 2100000, guid: 47d6cc12055c1fb4992224c98d9c0755, type: 2}

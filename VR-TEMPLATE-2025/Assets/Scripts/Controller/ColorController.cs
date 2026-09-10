@@ -5,6 +5,9 @@ public class ColorController : MonoBehaviour
 {
     public static ColorController Instance;
 
+    public const string SHADER_NAME_PROCEDURAL = "Custom/RetroWave Grid Procedural";
+    public const string SHADER_NAME_URP = "Custom/RetroWave Grid";
+
     [Header("Config")]
     [SerializeField] private float colorLerpSpeed = 6f;
     [SerializeField] private float frequencyMultiplier = 1.5f;
@@ -29,6 +32,16 @@ public class ColorController : MonoBehaviour
 
     public Color PrimaryPowerColor;
     public Color SecondaryPowerColor;
+
+    [Header("Base Color (nao reativa)")]
+    public Color PrimaryBaseColor;
+    public Color SecondaryBaseColor;
+
+    public Color PrimaryBaseFreezeColor;
+    public Color SecondaryBaseFreezeColor;
+
+    public Color PrimaryBasePowerColor;
+    public Color SecondaryBasePowerColor;
 
     private BuildSettings settings;
     private Color _currentPrimaryColorLight;
@@ -74,6 +87,15 @@ public class ColorController : MonoBehaviour
 
         PrimaryPowerColor   = settings.PrimaryColorPowerLight;
         SecondaryPowerColor = settings.SecondaryColorPowerLight;
+
+        PrimaryBaseColor = settings.PrimaryBaseColor;
+        SecondaryBaseColor = settings.SecondaryBaseColor;
+
+        PrimaryBaseFreezeColor = settings.PrimaryBaseFreezeColor;
+        SecondaryBaseFreezeColor = settings.SecondaryBaseFreezeColor;
+
+        PrimaryBasePowerColor = settings.PrimaryBasePowerColor;
+        SecondaryBasePowerColor = settings.SecondaryBasePowerColor;
     }
 
     private void Update()

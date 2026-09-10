@@ -52,6 +52,10 @@ public class SkyboxVisual : MonoBehaviour
     public float intensityMultiplier = 1f;
     public float smoothSpeed = 5f;
 
+    [Header("Reaction Limit")]
+    [Tooltip("Limita o quanto a reação da música (grave/agudo) pode empurrar todos os parâmetros do shader do skybox, evitando deformação excessiva em músicas muito intensas.")]
+    [Range(0f, 5f)] public float maxReactionIntensity = 2f;
+
     [Header("Impact Settings")]
     public float successBoostIntensity = 0.5f;
     public float failDeboostIntensity = -0.3f;
@@ -61,7 +65,9 @@ public class SkyboxVisual : MonoBehaviour
     [Header("Skybox Settings")]
     public SkyboxSettings SkyboxSettings;
 
-    private float smoothedFrequency;
+    private float smoothedBass;
+    private float smoothedMid;
+    private float smoothedTreble;
 
     private SceneSettings baseScene;
     private SceneSettings freezeScene;
@@ -218,34 +224,49 @@ public class SkyboxVisual : MonoBehaviour
         if (songController == null || skyboxInstance == null)
             return;
 
-        float freq = songController.GetPeakFrequency();
-        float target = freq * intensityMultiplier;
+        MusicAnalysis analysis = songController.GetSongAnalysis();
+        if (analysis == null)
+            return;
 
-        smoothedFrequency = Mathf.Lerp(
-            smoothedFrequency,
-            target,
+        smoothedBass = Mathf.Lerp(
+            smoothedBass,
+            analysis.Bass * intensityMultiplier,
             Time.deltaTime * smoothSpeed
         );
 
-        float finalReaction = smoothedFrequency + currentImpactBoost;
+        smoothedMid = Mathf.Lerp(
+            smoothedMid,
+            analysis.Mid * intensityMultiplier,
+            Time.deltaTime * smoothSpeed
+        );
+
+        smoothedTreble = Mathf.Lerp(
+            smoothedTreble,
+            analysis.Treble * intensityMultiplier,
+            Time.deltaTime * smoothSpeed
+        );
+
+        float bassReaction = Mathf.Clamp(smoothedBass + currentImpactBoost, -maxReactionIntensity, maxReactionIntensity);
+        float midReaction = Mathf.Clamp(smoothedMid + currentImpactBoost, -maxReactionIntensity, maxReactionIntensity);
+        float trebleReaction = Mathf.Clamp(smoothedTreble + currentImpactBoost, -maxReactionIntensity, maxReactionIntensity);
 
         skyboxInstance.SetFloat("_HorizonStrength",
             SkyboxSettings.StartHorizontalStrenght +
-            finalReaction * SkyboxSettings.MultiplierHorizontalStrenght);
+            bassReaction * SkyboxSettings.MultiplierHorizontalStrenght);
 
         skyboxInstance.SetFloat("_HorizonSkyHeight",
             SkyboxSettings.StartHorizontalSkyHeight +
-            finalReaction * SkyboxSettings.MultiplierHorizontalSkyHeight);
+            midReaction * SkyboxSettings.MultiplierHorizontalSkyHeight);
 
         skyboxInstance.SetFloat("_StarSize",
             SkyboxSettings.StartStarDensity +
-            finalReaction * SkyboxSettings.MultiplierStartDensity);
+            trebleReaction * SkyboxSettings.MultiplierStartDensity);
 
         skyboxInstance.SetFloat("_SunMaskSize",
             SkyboxSettings.StartDiscSize +
-            finalReaction * SkyboxSettings.MultiplierDiscSize);
+            trebleReaction * SkyboxSettings.MultiplierDiscSize);
 
-        float colorT = Mathf.Clamp01(finalReaction);
+        float colorT = Mathf.Clamp01(midReaction);
 
         float intensity = Mathf.Lerp(
             SkyboxSettings.MinColor,
@@ -261,7 +282,7 @@ public class SkyboxVisual : MonoBehaviour
         Vector2 gridSpeed = new Vector2(
             0,
             SkyboxSettings.StartGround +
-            finalReaction * SkyboxSettings.MultiplierGround
+            bassReaction * SkyboxSettings.MultiplierGround
         );
 
         if (groundInstance != null)

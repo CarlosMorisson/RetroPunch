@@ -64,7 +64,7 @@ public class CubeCollider : MonoBehaviour
         if (parent != null)
         {
             CubeMovemment move = parent.GetComponent<CubeMovemment>();
-            if (move.boostFinished && GameState.Instance.SceneState==State.Pause)
+            if (move.boostFinished && GameState.Instance.CurrentState==State.Pause)
                 gameObject.SetActive(false);
         }
         parent.GetComponent<CubeMovemment>().normalSpeed = 0;
@@ -93,7 +93,12 @@ public class CubeCollider : MonoBehaviour
     }
     protected void ReturnToPool(string poolTag)
     {
-        StartCoroutine(WaitReturnToPool(poolTag));  
+        // Hospedada no ObjectPooler (sempre ativo) para sobreviver caso este GameObject
+        // seja desativado imediatamente pelo feedback de sucesso/falha.
+        if (ObjectPooler.Instance != null)
+            ObjectPooler.Instance.StartCoroutine(WaitReturnToPool(poolTag));
+        else
+            StartCoroutine(WaitReturnToPool(poolTag));
     }
     private IEnumerator WaitReturnToPool(string poolTag)
     {
@@ -160,7 +165,7 @@ public class CubeCollider : MonoBehaviour
     #region Condition Logic
 
     /// <summary>
-    /// Condição para o sucesso da colisão (pode ser sobrescrita nas subclasses)
+    /// Condiï¿½ï¿½o para o sucesso da colisï¿½o (pode ser sobrescrita nas subclasses)
     /// </summary>
     protected virtual bool ConcludeCondition(GameObject other)
     {
@@ -188,7 +193,7 @@ public class CubeCollider : MonoBehaviour
             rb.Sleep();
         }
     }
-    // CubeCollider — HandleFail reseta física imediatamente, não espera o pool
+    // CubeCollider ï¿½ HandleFail reseta fï¿½sica imediatamente, nï¿½o espera o pool
     protected virtual void HandleFail()
     {
         StopParentMovement();

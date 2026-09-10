@@ -73,6 +73,8 @@ public class SwitchHandsController : MonoBehaviour
 
     void Awake()
     {
+        if(GameType.Shoot!=StageLoadController.Instance.gameType)
+            return;
         DeactivateAllParents();
     }
 

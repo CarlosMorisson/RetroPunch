@@ -13,7 +13,7 @@ public class BeatMapPlayer : MonoBehaviour
     {
         currentBeat = 0;
         skipDone = false;
-        beatMap = StageLoadController.Instance.CurrentBeatMap;
+        beatMap = StageLoadController.Instance != null ? StageLoadController.Instance.CurrentBeatMap : beatMap;
     }
 
     private void Update()
@@ -65,6 +65,6 @@ public class BeatMapPlayer : MonoBehaviour
     {
         currentBeat = 0;
         skipDone = false;
-        beatMap = StageLoadController.Instance.CurrentBeatMap;
+        beatMap = StageLoadController.Instance != null ? StageLoadController.Instance.CurrentBeatMap : beatMap;
     }
 }

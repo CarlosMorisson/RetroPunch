@@ -24,6 +24,7 @@ public class SceneSettings
 public class BuildSettings
 {
     [Header("Cores base da fase")]
+    public Color PrimaryBaseColor;
     [ColorUsage(true, true)]
     public Color PrimaryColorLight;
     [ColorUsage(true, true)]
@@ -33,11 +34,13 @@ public class BuildSettings
     public Color SecondaryColorLight;
     [ColorUsage(true, true)]
     public Color SecondaryColorDark;
+    public Color SecondaryBaseColor;
     [Space(20)]
     [Header("Configuracoes De Cena Base")]
     public SceneSettings BaseSceneSettings;
     [Space(10)]
     [Header("Cores do freeze time")]
+    public Color PrimaryBaseFreezeColor;
     [ColorUsage(true, true)]
     public Color PrimaryColorFreezeLight;
     [ColorUsage(true, true)]
@@ -47,6 +50,7 @@ public class BuildSettings
     public Color SecondaryColorFreezeLight;
     [ColorUsage(true, true)]
     public Color SecondaryColorFreezeDark;
+    public Color SecondaryBaseFreezeColor;
     [Space(20)]
     [Header("Configuracoes De Cena Freeze")]
     public SceneSettings FreezeSceneSettings;
@@ -56,11 +60,13 @@ public class BuildSettings
     public Color PrimaryColorPowerLight;
     [ColorUsage(true, true)]
     public Color PrimaryColorPowerDark;
+    public Color PrimaryBasePowerColor;
     [Space(10)]
     [ColorUsage(true, true)]
     public Color SecondaryColorPowerLight;
     [ColorUsage(true, true)]
     public Color SecondaryColorPowerDark;
+    public Color SecondaryBasePowerColor;
     [Space(20)]
     [Header("Configuracoes De Cena Power")]
     public SceneSettings PowerSceneSettings;

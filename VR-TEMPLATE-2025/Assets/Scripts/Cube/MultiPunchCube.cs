@@ -64,6 +64,10 @@ public class MultiPunchCube : CubeCollider
 
         transform.localScale = originalLocalScale;
         hasMisstaken = false;
+
+        if (mainFeedback != null)
+            mainFeedback.gameObject.SetActive(false);
+
         ResetPoints();
 
         if (!eventsRegistered)
@@ -112,6 +116,8 @@ public class MultiPunchCube : CubeCollider
 
     protected override void OnDisable()
     {
+        base.OnDisable();
+
         if (eventsRegistered)
         {
             OnSuccess -= FinalSuccess;
@@ -275,16 +281,21 @@ public class MultiPunchCube : CubeCollider
 
     void FinalSuccess()
     {
+        // Inicia o retorno ao pool antes de desativar, pois a coroutine roda no ObjectPooler.
+        ReturnToPool(PrefabTag);
+
+        gameObject.SetActive(false);
+
         if (mainParticle != null)
             mainParticle.Play();
 
         if (mainFeedback != null)
         {
             mainFeedback.gameObject.SetActive(true);
-            mainFeedback.GetComponent<BreakCube>().TriggerExplosion(collisionLocation, transform);
-        }
 
-        ReturnToPool(PrefabTag);
+            if (mainFeedback.TryGetComponent<BreakCube>(out var breakCube))
+                breakCube.TriggerExplosion(collisionLocation, transform);
+        }
     }
 
     public void FailFeedback()

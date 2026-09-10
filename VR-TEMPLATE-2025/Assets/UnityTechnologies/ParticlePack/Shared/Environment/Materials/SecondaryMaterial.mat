@@ -162,10 +162,10 @@ Material:
     - _GridEmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0, g: 1, b: 1, a: 1}
     - _OutlineEmissionColor: {r: 0, g: 1, b: 1, a: 1}
-    - _PrimaryColor: {r: 0.4641509, g: 0.076190785, b: 0.32427412, a: 1}
+    - _PrimaryColor: {r: 0.2528302, g: 0, b: 0.16344571, a: 1}
     - _PrimaryEmissionColor: {r: 0, g: 0.29631925, b: 1, a: 1}
     - _SecondaryColor: {r: 0.7509433, g: 0, b: 0.621698, a: 1}
-    - _SecondaryEmissionColor: {r: 2.0474796, g: 0, b: 1.479331, a: 1}
+    - _SecondaryEmissionColor: {r: 0.92215145, g: 0, b: 0.66626656, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

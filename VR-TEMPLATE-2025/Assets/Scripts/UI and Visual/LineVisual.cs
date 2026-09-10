@@ -4,11 +4,11 @@ using UnityEngine;
 public class LineEffectWaveform : MonoBehaviour
 {
     [Header("Audio")]
-    public AudioSource audioSource;         
+    public SongController audioSource;         
     public int channel = 0;               
 
     [Header("Line")]
-    [Tooltip("Número de pontos do line renderer")]
+    [Tooltip("Nï¿½mero de pontos do line renderer")]
     public int points = 256;             
     public float lineLength = 40f;          
     public float baseHeight = 0f;           
@@ -48,26 +48,25 @@ public class LineEffectWaveform : MonoBehaviour
             lr.SetPosition(i, useLocalSpace ? new Vector3(x, baseHeight, 0) : transform.TransformPoint(new Vector3(x, baseHeight, 0)));
         }
 
-        if (audioSource != null)
-            audioSource.spatialBlend = 0f; 
+        if (audioSource != null && audioSource.audioSource != null)
+            audioSource.audioSource.spatialBlend = 0f;
     }
 
     private void Start()
     {
-        audioSource = SongController.Instance.audioSource;
         amplitude = AMPLITUDE_VALUE;
         width = WIDTH_VALUE;
     }
     void Update()
     {
-        if (audioSource == null) return;
-        if (!audioSource.isPlaying) return;
+        if (audioSource == null || audioSource.audioSource == null) return;
+        if (!audioSource.audioSource.isPlaying) return;
 
-        audioSource.GetOutputData(audioBuffer, channel);
+        audioSource.audioSource.GetOutputData(audioBuffer, channel);
         Color startColor = ColorController.Instance.CurrentPrimary;
         Color endColor = ColorController.Instance.CurrentSecondary;
 
-        // Força o Alpha a ser 1f (100% opaco)
+        // Forï¿½a o Alpha a ser 1f (100% opaco)
         startColor.a = 1f;
         endColor.a = 1f;
 

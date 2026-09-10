@@ -19,7 +19,7 @@ public class PushCube : CubeCollider
     public PushType pushDirection;
     [Tooltip("Fator de perda de velocidade natural no rebote (ex: 0.8f = 80% da velocidade original)")]
     public float bounceRetainFactor = 0.8f;
-    [Tooltip("Multiplicador de impacto baseado na velocidade da mão do jogador")]
+    [Tooltip("Multiplicador de impacto baseado na velocidade da mï¿½o do jogador")]
     public float handVelocityMultiplier = 1.2f;
 
     public string PrefabTag;
@@ -78,6 +78,7 @@ public class PushCube : CubeCollider
         transform.localRotation = initialRotation;
         transform.localScale = initialScale;
         feedbackRotate.localRotation = initialRotation;
+        feedbackRotate.gameObject.SetActive(false);
         visualBoosters = Object.FindObjectsByType<BuildMovemmentVisual>(FindObjectsSortMode.None);
 
         foreach (var booster in visualBoosters)
@@ -91,14 +92,23 @@ public class PushCube : CubeCollider
         OnSuccess += SucessFeedback;
         OnFail += FailFeedback;
 
-        OnSuccess += PointController.Instance.IncreasePoint;
-        OnFail += PointController.Instance.IncreaseError;
+        if (PointController.Instance != null)
+        {
+            OnSuccess += PointController.Instance.IncreasePoint;
+            OnFail += PointController.Instance.IncreaseError;
+        }
 
-        OnSuccess += ProgressEffectVisual.Instance.Success;
-        OnFail += ProgressEffectVisual.Instance.Error;
+        if (ProgressEffectVisual.Instance != null)
+        {
+            OnSuccess += ProgressEffectVisual.Instance.Success;
+            OnFail += ProgressEffectVisual.Instance.Error;
+        }
 
-        OnSuccess += ColorController.Instance.TriggerSuccessFlash;
-        OnFail += ColorController.Instance.TriggerFailDim;
+        if (ColorController.Instance != null)
+        {
+            OnSuccess += ColorController.Instance.TriggerSuccessFlash;
+            OnFail += ColorController.Instance.TriggerFailDim;
+        }
 
         OnSuccess += OnSucessLocal.Invoke;
 
@@ -110,14 +120,22 @@ public class PushCube : CubeCollider
 
     protected override void OnDisable()
     {
+        base.OnDisable();
+
         OnSuccess -= SucessFeedback;
         OnFail -= FailFeedback;
 
-        OnSuccess -= PointController.Instance.IncreasePoint;
-        OnFail -= PointController.Instance.IncreaseError;
+        if (PointController.Instance != null)
+        {
+            OnSuccess -= PointController.Instance.IncreasePoint;
+            OnFail -= PointController.Instance.IncreaseError;
+        }
 
-        OnSuccess -= ProgressEffectVisual.Instance.Success;
-        OnFail -= ProgressEffectVisual.Instance.Error;
+        if (ProgressEffectVisual.Instance != null)
+        {
+            OnSuccess -= ProgressEffectVisual.Instance.Success;
+            OnFail -= ProgressEffectVisual.Instance.Error;
+        }
 
         OnSuccess -= OnSucessLocal.Invoke;
 
@@ -133,8 +151,11 @@ public class PushCube : CubeCollider
             OnFail -= booster.TriggerDeBoost;
         }
 
-        OnSuccess -= ColorController.Instance.TriggerSuccessFlash;
-        OnFail -= ColorController.Instance.TriggerFailDim;
+        if (ColorController.Instance != null)
+        {
+            OnSuccess -= ColorController.Instance.TriggerSuccessFlash;
+            OnFail -= ColorController.Instance.TriggerFailDim;
+        }
     }
 
     public IEnumerator LifeTime()
