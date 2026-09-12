@@ -64,7 +64,6 @@ Material:
     - _Cull: 2
     - _DstBlend: 0
     - _ENABLE_PARALLAX_EFFECT: 0
-    - _Emission_Intensity: 0
     - _GridRotation: 0
     - _Grid_Line_X_Width: 0.9
     - _Grid_Line_Y_Width: 0.9
@@ -79,12 +78,11 @@ Material:
     - _Surface: 0
     - _USETEXTUREBOOL: 1
     - _WorkflowMode: 1
-    - _XRMotionVectorsPass: 1
     - _ZTest: 4
     - _ZWrite: 1
     - _ZWriteControl: 0
     m_Colors:
-    - _GridColor: {r: 67.793526, g: 46.241802, b: 20.146189, a: 1}
+    - _GridColor: {r: 1, g: 0.6820976, b: 0.2971698, a: 1}
     - _GridSpeed: {r: 0, g: -0.1, b: 0, a: 0}
     - _GroundColor: {r: 0.16037738, g: 0.08143309, b: 0, a: 1}
     - _Parallax_Color: {r: 1.011765, g: 0, b: 1.011765, a: 1}

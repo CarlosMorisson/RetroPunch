@@ -76,6 +76,7 @@ public class SwitchHandsController : MonoBehaviour
         if(GameType.Shoot!=StageLoadController.Instance.gameType)
             return;
         DeactivateAllParents();
+        RandomizeCurrentBothHands();
     }
 
     /// <summary>

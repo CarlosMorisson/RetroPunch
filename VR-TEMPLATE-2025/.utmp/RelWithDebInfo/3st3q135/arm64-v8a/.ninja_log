@@ -1,0 +1,10 @@
+# ninja log v5
+39	1710	8109304824123352	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	a55eeb0816f5021
+27	1725	8109304824123352	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	4204aad70297d2f4
+0	1745	8109304824479204	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	309ad5256680de1f
+69	1765	8109304824680755	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	bbf6f04a3fad5a9d
+9	1809	8109304825122702	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	1d63edb3bf582ad8
+58	1969	8109304826742375	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	1731c2512b0f44aa
+48	2012	8109304827172035	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	95c06c9dfd523ae0
+18	2090	8109304827945945	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	52295e93c548ac4c
+2091	2195	8109304829018473	C:/Unity/Projects/RetroBeachPunch/UNITY6--VR-TEMPLATE/VR-TEMPLATE-2025/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/3st3q135/obj/arm64-v8a/libgame.so	38d0701804004f10

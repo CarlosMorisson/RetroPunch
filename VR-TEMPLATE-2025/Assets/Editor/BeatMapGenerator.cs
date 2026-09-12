@@ -1,6 +1,7 @@
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
 
 public enum BeatMapDifficulty
 {
@@ -15,19 +16,42 @@ public enum BeatMapDifficulty
 
 public class BeatMapGenerator : EditorWindow
 {
+    // ---------------------------------------------------------------
+    // Configuração básica
+    // ---------------------------------------------------------------
     private AudioClip clip;
-
     private BeatMapDifficulty difficulty = BeatMapDifficulty.Medium;
-
-    private int sampleWindow = 1024;
 
     private Vector2 scrollPos;
     private List<BeatPoint> previewBeats = new();
     private bool hasPreview = false;
+
+    // ---------------------------------------------------------------
+    // Warmup (igual ao original)
+    // ---------------------------------------------------------------
     private float warmupThresholdMultiplier = 2.0f;
     private float warmupDuration = 5f;
     private float warmupMinDistanceMultiplier = 3f;
 
+    // ---------------------------------------------------------------
+    // Análise espectral (novo)
+    // ---------------------------------------------------------------
+    private static readonly int[] FftSizes = { 512, 1024, 2048, 4096 };
+    private static readonly string[] FftSizeLabels = { "512", "1024", "2048", "4096" };
+    private int fftSizeIndex = 1; // 1024 por padrão
+
+    private static readonly int[] HopDivisors = { 1, 2, 4 };
+    private static readonly string[] HopLabels = { "1x (sem overlap)", "2x (50% overlap)", "4x (75% overlap)" };
+    private int hopDivisorIndex = 1; // 50% overlap por padrão
+
+    private bool showBands = false;
+    private float bassMaxHz = 150f;   // "tum" — grave / kick / linha de baixo
+    private float midMaxHz = 2000f;   // "bam" — médio / snare / vocal / corpo do instrumento
+    private float trebleMaxHz = 8000f; // agudo — hi-hat / prato / "tss"
+
+    // ---------------------------------------------------------------
+    // Curvas por dificuldade (mesmas do original)
+    // ---------------------------------------------------------------
     private static readonly float[] ThresholdByDifficulty =
     {
         4.0f, // Beginner
@@ -61,19 +85,18 @@ public class BeatMapGenerator : EditorWindow
         60
     };
 
+    // ---------------------------------------------------------------
+    // Geração em lote (novo)
+    // ---------------------------------------------------------------
+    private string batchFolderPath = "Assets/Audio";
+    private string batchOutputFolder = "Assets/BeatMaps";
+    private bool batchOverwriteExisting = false;
+
     [MenuItem("Tools/Generate Beat Map")]
     public static void Open() => GetWindow<BeatMapGenerator>("Beat Map Generator");
 
     private void OnGUI()
     {
-        warmupDuration = EditorGUILayout.Slider(
-    "Warmup Duration (s)", warmupDuration, 1f, 10f);
-
-        warmupMinDistanceMultiplier = EditorGUILayout.Slider(
-    "Warmup Min Distance Mult", warmupMinDistanceMultiplier, 1f, 15f);
-
-        warmupThresholdMultiplier = EditorGUILayout.Slider(
-            "Warmup Threshold Mult", warmupThresholdMultiplier, 1.2f, 4f);
         GUILayout.Label("Beat Map Generator", EditorStyles.boldLabel);
         GUILayout.Space(6);
 
@@ -93,8 +116,28 @@ public class BeatMapGenerator : EditorWindow
         EditorGUILayout.IntField("  History Size", HistorySizeByDifficulty[idx]);
         EditorGUI.EndDisabledGroup();
 
-        GUILayout.Space(4);
-        sampleWindow = EditorGUILayout.IntSlider("Sample Window", sampleWindow, 512, 4096);
+        GUILayout.Space(8);
+        GUILayout.Label("Análise Espectral (FFT)", EditorStyles.boldLabel);
+        fftSizeIndex = EditorGUILayout.Popup("Tamanho da Janela FFT", fftSizeIndex, FftSizeLabels);
+        hopDivisorIndex = EditorGUILayout.Popup("Overlap entre janelas", hopDivisorIndex, HopLabels);
+
+        showBands = EditorGUILayout.Foldout(showBands, "Bandas de Frequência (Hz)");
+        if (showBands)
+        {
+            EditorGUI.indentLevel++;
+            bassMaxHz = EditorGUILayout.Slider("Fim do Grave (tum)", bassMaxHz, 40f, 400f);
+            midMaxHz = EditorGUILayout.Slider("Fim do Médio (bam)", midMaxHz, bassMaxHz + 50f, 6000f);
+            trebleMaxHz = EditorGUILayout.Slider("Fim do Agudo", trebleMaxHz, midMaxHz + 200f, 16000f);
+            EditorGUI.indentLevel--;
+        }
+
+        GUILayout.Space(8);
+        GUILayout.Label("Warmup", EditorStyles.boldLabel);
+        warmupDuration = EditorGUILayout.Slider("Warmup Duration (s)", warmupDuration, 1f, 10f);
+        warmupMinDistanceMultiplier = EditorGUILayout.Slider(
+            "Warmup Min Distance Mult", warmupMinDistanceMultiplier, 1f, 15f);
+        warmupThresholdMultiplier = EditorGUILayout.Slider(
+            "Warmup Threshold Mult", warmupThresholdMultiplier, 1.2f, 4f);
 
         GUILayout.Space(10);
 
@@ -107,8 +150,6 @@ public class BeatMapGenerator : EditorWindow
         if (GUILayout.Button("Save Asset"))
             SaveAsset();
         EditorGUI.EndDisabledGroup();
-
-
 
         EditorGUILayout.EndHorizontal();
 
@@ -130,7 +171,38 @@ public class BeatMapGenerator : EditorWindow
 
             EditorGUILayout.EndScrollView();
         }
+
+        GUILayout.Space(16);
+        GUILayout.Label("Geração em Lote (pasta inteira)", EditorStyles.boldLabel);
+
+        EditorGUILayout.BeginHorizontal();
+        batchFolderPath = EditorGUILayout.TextField("Pasta de Áudio", batchFolderPath);
+        if (GUILayout.Button("...", GUILayout.Width(30)))
+        {
+            string picked = EditorUtility.OpenFolderPanel("Selecionar pasta com músicas", "Assets", "");
+            if (!string.IsNullOrEmpty(picked))
+            {
+                if (picked.StartsWith(Application.dataPath))
+                    batchFolderPath = "Assets" + picked.Substring(Application.dataPath.Length);
+                else
+                    Debug.LogWarning("Selecione uma pasta dentro do projeto (Assets/...).");
+            }
+        }
+        EditorGUILayout.EndHorizontal();
+
+        batchOutputFolder = EditorGUILayout.TextField("Pasta de Saída", batchOutputFolder);
+        batchOverwriteExisting = EditorGUILayout.Toggle("Sobrescrever existentes", batchOverwriteExisting);
+
+        GUILayout.Space(4);
+        EditorGUILayout.HelpBox(
+            "Gera um BeatMap para CADA música encontrada na pasta, usando a Dificuldade e os " +
+            "parâmetros acima. Ideal pra deixar rodando sozinho enquanto você faz outra coisa.",
+            MessageType.Info);
+
+        if (GUILayout.Button("Gerar Beat Maps da Pasta Inteira"))
+            RunBatch();
     }
+
     private void Preview()
     {
         if (clip == null)
@@ -139,7 +211,7 @@ public class BeatMapGenerator : EditorWindow
             return;
         }
 
-        previewBeats = DetectBeats();
+        previewBeats = DetectBeats(clip);
         hasPreview = true;
         Repaint();
     }
@@ -171,105 +243,321 @@ public class BeatMapGenerator : EditorWindow
         Debug.Log($"BeatMap salvo: {previewBeats.Count} beats em '{path}'.");
     }
 
-    private List<BeatPoint> DetectBeats()
+    // =================================================================
+    // GERAÇÃO EM LOTE
+    // =================================================================
+    private void RunBatch()
     {
+        if (!AssetDatabase.IsValidFolder(batchFolderPath))
+        {
+            Debug.LogError($"Pasta de áudio inválida: '{batchFolderPath}'. Precisa ser um caminho dentro de Assets/.");
+            return;
+        }
+
+        if (!AssetDatabase.IsValidFolder(batchOutputFolder))
+            CreateFolderRecursive(batchOutputFolder);
+
+        string[] guids = AssetDatabase.FindAssets("t:AudioClip", new[] { batchFolderPath });
+        int total = guids.Length;
+        int processed = 0, skipped = 0, failed = 0;
+
+        if (total == 0)
+        {
+            Debug.LogWarning($"Nenhum AudioClip encontrado em '{batchFolderPath}'.");
+            return;
+        }
+
+        try
+        {
+            for (int i = 0; i < total; i++)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guids[i]);
+
+                bool cancel = EditorUtility.DisplayCancelableProgressBar(
+                    "Gerando Beat Maps",
+                    $"({i + 1}/{total}) {Path.GetFileNameWithoutExtension(assetPath)}",
+                    (float)i / total);
+                if (cancel)
+                {
+                    Debug.LogWarning($"Geração em lote cancelada pelo usuário em {i}/{total}.");
+                    break;
+                }
+
+                AudioClip audioClip = AssetDatabase.LoadAssetAtPath<AudioClip>(assetPath);
+                if (audioClip == null)
+                {
+                    Debug.LogError($"Não foi possível carregar '{assetPath}'.");
+                    failed++;
+                    continue;
+                }
+
+                // AudioClips com Load Type = Streaming não expõem PCM via GetData()
+                // (retorna silêncio) — detectamos e pulamos em vez de gerar um beat map vazio.
+                if (IsStreamingClip(assetPath))
+                {
+                    Debug.LogWarning(
+                        $"'{assetPath}' está com Load Type = Streaming; GetData() não funciona nesse modo. " +
+                        "Selecione o clip e mude para 'Decompress On Load' ou 'Compressed In Memory'. Pulando.");
+                    skipped++;
+                    continue;
+                }
+
+                string outputAssetPath = $"{batchOutputFolder}/{audioClip.name}_{difficulty}_BeatMap.asset";
+
+                if (!batchOverwriteExisting &&
+                    AssetDatabase.LoadAssetAtPath<SongBeatMap>(outputAssetPath) != null)
+                {
+                    skipped++;
+                    continue;
+                }
+
+                try
+                {
+                    bool wasLoaded = audioClip.loadState == AudioDataLoadState.Loaded;
+                    audioClip.LoadAudioData();
+
+                    List<BeatPoint> beats = DetectBeats(audioClip);
+
+                    if (!wasLoaded)
+                        audioClip.UnloadAudioData();
+
+                    SongBeatMap beatMap = ScriptableObject.CreateInstance<SongBeatMap>();
+                    beatMap.audioClip = audioClip;
+                    beatMap.beats = beats;
+
+                    if (AssetDatabase.LoadAssetAtPath<SongBeatMap>(outputAssetPath) != null)
+                        AssetDatabase.DeleteAsset(outputAssetPath);
+
+                    AssetDatabase.CreateAsset(beatMap, outputAssetPath);
+                    processed++;
+                }
+                catch (System.Exception ex)
+                {
+                    // Uma música problemática não deve derrubar uma rodada de horas.
+                    Debug.LogError($"Falha ao processar '{assetPath}': {ex.Message}");
+                    failed++;
+                }
+            }
+        }
+        finally
+        {
+            EditorUtility.ClearProgressBar();
+            AssetDatabase.SaveAssets();
+        }
+
+        Debug.Log(
+            $"Lote concluído: {processed} gerados, {skipped} pulados, {failed} falharam (de {total} músicas). " +
+            $"Saída em '{batchOutputFolder}'.");
+    }
+
+    private static bool IsStreamingClip(string assetPath)
+    {
+        AudioImporter importer = AssetImporter.GetAtPath(assetPath) as AudioImporter;
+        if (importer == null) return false;
+        return importer.defaultSampleSettings.loadType == AudioClipLoadType.Streaming;
+    }
+
+    private static void CreateFolderRecursive(string folderPath)
+    {
+        if (AssetDatabase.IsValidFolder(folderPath)) return;
+
+        string[] parts = folderPath.Split('/');
+        string current = parts[0]; // "Assets"
+        for (int i = 1; i < parts.Length; i++)
+        {
+            string next = $"{current}/{parts[i]}";
+            if (!AssetDatabase.IsValidFolder(next))
+                AssetDatabase.CreateFolder(current, parts[i]);
+            current = next;
+        }
+    }
+
+    // =================================================================
+    // DETECÇÃO DE BEATS — FFT + Spectral Flux por banda
+    // =================================================================
+
+    private class BandState
+    {
+        public MusicAffinity affinity;
+        public int binStart;
+        public int binEnd; // exclusivo
+        public List<float> history = new();
+        public float lastBeatTime;
+        public float maxFlux;
+        public List<BeatPoint> beats = new();
+    }
+
+    private List<BeatPoint> DetectBeats(AudioClip targetClip)
+    {
+        if (targetClip == null) return new List<BeatPoint>();
+
         int idx = (int)difficulty;
-        float threshold = ThresholdByDifficulty[idx];
+        float thresholdMultiplier = ThresholdByDifficulty[idx];
         float minDistance = MinDistanceByDifficulty[idx];
         int historySize = HistorySizeByDifficulty[idx];
 
-        float[] samples = new float[clip.samples * clip.channels];
-        clip.GetData(samples, 0);
+        int fftSize = FftSizes[fftSizeIndex];
+        int hop = Mathf.Max(1, fftSize / HopDivisors[hopDivisorIndex]);
 
-        List<float> energyHistory = new();
-        int totalWindows = samples.Length / sampleWindow;
-        int midStart = totalWindows / 4;      
-        int midEnd = totalWindows / 2;      
+        float[] mono = DownmixToMono(targetClip);
+        int sampleRate = targetClip.frequency;
+        float nyquist = sampleRate / 2f;
 
-        for (int w = midStart; w < midEnd && energyHistory.Count < historySize; w++)
+        if (mono.Length < fftSize)
         {
-            int s = w * sampleWindow;
-            if (s + sampleWindow >= samples.Length) break;
-            energyHistory.Add(ComputeEnergy(samples, s, sampleWindow));
+            Debug.LogWarning($"'{targetClip.name}' é curto demais pra janela FFT escolhida ({fftSize} amostras).");
+            return new List<BeatPoint>();
         }
 
-        List<BeatPoint> beats = new();
-        float lastBeatTime = -minDistance * warmupMinDistanceMultiplier;
-        float maxEnergy = 0f;
-        int windowIndex = 0;
+        // Garante bandas válidas mesmo se o usuário setar valores estranhos ou o clipe tiver sample rate baixo.
+        float clampedTrebleMax = Mathf.Min(trebleMaxHz, nyquist - 1f);
+        float clampedMidMax = Mathf.Min(midMaxHz, clampedTrebleMax - 1f);
+        float clampedBassMax = Mathf.Min(bassMaxHz, clampedMidMax - 1f);
 
-        for (int i = 0; i < samples.Length - sampleWindow; i += sampleWindow)
+        float[] window = BuildHannWindow(fftSize);
+        int binCount = fftSize / 2;
+        float freqPerBin = sampleRate / (float)fftSize;
+
+        int bassEndBin = BinFor(clampedBassMax, freqPerBin, binCount);
+        int midEndBin = BinFor(clampedMidMax, freqPerBin, binCount);
+        int trebleEndBin = BinFor(clampedTrebleMax, freqPerBin, binCount);
+
+        var bands = new[]
         {
-            float energy = ComputeEnergy(samples, i, sampleWindow);
-            maxEnergy = Mathf.Max(maxEnergy, energy);
+            new BandState { affinity = MusicAffinity.Bass,   binStart = 1,               binEnd = bassEndBin },
+            new BandState { affinity = MusicAffinity.Mid,    binStart = bassEndBin + 1,  binEnd = midEndBin },
+            new BandState { affinity = MusicAffinity.Treble, binStart = midEndBin + 1,   binEnd = trebleEndBin },
+        };
 
-            float avgEnergy = Average(energyHistory);
-            float stdDev = StdDev(energyHistory, avgEnergy);
+        float initialLastBeat = -minDistance * warmupMinDistanceMultiplier;
+        foreach (var b in bands) b.lastBeatTime = initialLastBeat;
 
-            float time = (float)i / (clip.frequency * clip.channels);
-            bool isWarmup = time < warmupDuration;
-            float activeThreshold = isWarmup
-                ? threshold * warmupThresholdMultiplier
-                : threshold;
+        float[] prevMag = new float[binCount];
+        float[] re = new float[fftSize];
+        float[] im = new float[fftSize];
 
-            float dynamicThreshold = avgEnergy + stdDev * activeThreshold;
+        int totalFrames = Mathf.Max(0, (mono.Length - fftSize) / hop + 1);
+        int minHistoryToDetect = Mathf.Max(4, historySize / 4);
 
-            energyHistory.Add(energy);
-            if (energyHistory.Count > historySize)
-                energyHistory.RemoveAt(0);
+        for (int frame = 0; frame < totalFrames; frame++)
+        {
+            int start = frame * hop;
 
-            if (avgEnergy <= 0f) continue;
-            if (energy <= dynamicThreshold) continue;
-            float activeMinDistance = time < warmupDuration
-                ? Mathf.Lerp(minDistance * warmupMinDistanceMultiplier, minDistance, time / warmupDuration)
-                : minDistance;
-
-            if (time - lastBeatTime < activeMinDistance) continue;
-
-            lastBeatTime = time;
-            beats.Add(new BeatPoint
+            for (int n = 0; n < fftSize; n++)
             {
-                time = time,
-                intensity = energy,
-                affinity = GuessAffinity(samples, i, sampleWindow)
-            });
+                re[n] = mono[start + n] * window[n];
+                im[n] = 0f;
+            }
 
-            windowIndex++;
+            SimpleFFT.Forward(re, im);
+
+            float time = (start + fftSize * 0.5f) / sampleRate;
+            bool isWarmup = time < warmupDuration;
+
+            foreach (var band in bands)
+            {
+                float flux = 0f;
+                for (int k = band.binStart; k < band.binEnd; k++)
+                {
+                    float mag = Mathf.Sqrt(re[k] * re[k] + im[k] * im[k]);
+                    float diff = mag - prevMag[k];
+                    if (diff > 0f) flux += diff; // spectral flux: só conta aumento de energia (ataque/onset)
+                    prevMag[k] = mag;
+                }
+
+                float avg = Average(band.history);
+                float stdDev = StdDev(band.history, avg);
+
+                band.history.Add(flux);
+                if (band.history.Count > historySize)
+                    band.history.RemoveAt(0);
+
+                if (band.history.Count < minHistoryToDetect)
+                    continue; // baseline ainda instável, evita falso positivo no começo
+
+                float activeThreshold = isWarmup ? thresholdMultiplier * warmupThresholdMultiplier : thresholdMultiplier;
+                float dynamicThreshold = avg + stdDev * activeThreshold;
+
+                float activeMinDistance = isWarmup
+                    ? Mathf.Lerp(minDistance * warmupMinDistanceMultiplier, minDistance, time / warmupDuration)
+                    : minDistance;
+
+                if (flux <= dynamicThreshold) continue;
+                if (time - band.lastBeatTime < activeMinDistance) continue;
+
+                band.lastBeatTime = time;
+                band.maxFlux = Mathf.Max(band.maxFlux, flux);
+                band.beats.Add(new BeatPoint { time = time, intensity = flux, affinity = band.affinity });
+            }
         }
 
-        NormalizeIntensity(beats, maxEnergy);
-        return beats;
+        List<BeatPoint> merged = new();
+        foreach (var band in bands)
+        {
+            if (band.maxFlux > 0f)
+            {
+                for (int i = 0; i < band.beats.Count; i++)
+                {
+                    var b = band.beats[i];
+                    b.intensity = Mathf.Clamp01(b.intensity / band.maxFlux);
+                    band.beats[i] = b;
+                }
+            }
+            merged.AddRange(band.beats);
+        }
+
+        merged.Sort((a, b) => a.time.CompareTo(b.time));
+
+        // Duas bandas podem disparar quase no mesmo instante (ex.: kick + snare juntos
+        // formando o "tum-bam" do refrão). Isso funde esses casos num único cubo,
+        // ficando com o de maior intensidade, em vez de gerar dois cubos colados.
+        List<BeatPoint> final = new();
+        float dedupeWindow = minDistance * 0.5f;
+        foreach (var b in merged)
+        {
+            if (final.Count > 0 && b.time - final[final.Count - 1].time < dedupeWindow)
+            {
+                if (b.intensity > final[final.Count - 1].intensity)
+                    final[final.Count - 1] = b;
+                continue;
+            }
+            final.Add(b);
+        }
+
+        return final;
     }
 
-    private float ComputeGlobalAverage(float[] samples)
+    private float[] DownmixToMono(AudioClip targetClip)
     {
-        // Pega apenas os primeiros 5 segundos para calibrar
-        int totalSamples5s = Mathf.Min(
-            clip.frequency * clip.channels * 5,
-            samples.Length
-        );
+        float[] raw = new float[targetClip.samples * targetClip.channels];
+        targetClip.GetData(raw, 0);
 
-        int totalWindows = totalSamples5s / sampleWindow;
-        float sum = 0f;
-        int count = 0;
+        if (targetClip.channels == 1) return raw;
 
-        for (int i = 0; i < totalWindows; i++)
+        float[] mono = new float[targetClip.samples];
+        int channels = targetClip.channels;
+        for (int s = 0; s < targetClip.samples; s++)
         {
-            sum += ComputeEnergy(samples, i * sampleWindow, sampleWindow);
-            count++;
+            float sum = 0f;
+            int baseIdx = s * channels;
+            for (int c = 0; c < channels; c++)
+                sum += raw[baseIdx + c];
+            mono[s] = sum / channels;
         }
-
-        return count > 0 ? sum / count : 0f;
+        return mono;
     }
-    private float ComputeEnergy(float[] samples, int start, int window)
+
+    private static float[] BuildHannWindow(int size)
     {
-        float e = 0f;
-        for (int j = 0; j < window; j++)
-        {
-            float s = samples[start + j];
-            e += s * s;
-        }
-        return e / window;
+        float[] w = new float[size];
+        for (int i = 0; i < size; i++)
+            w[i] = 0.5f * (1f - Mathf.Cos(2f * Mathf.PI * i / (size - 1)));
+        return w;
+    }
+
+    private static int BinFor(float hz, float freqPerBin, int binCount)
+    {
+        return Mathf.Clamp(Mathf.RoundToInt(hz / freqPerBin), 1, binCount - 1);
     }
 
     private float Average(List<float> list)
@@ -291,26 +579,62 @@ public class BeatMapGenerator : EditorWindow
         }
         return Mathf.Sqrt(variance / list.Count);
     }
+}
 
-    private void NormalizeIntensity(List<BeatPoint> beats, float maxEnergy)
+// =====================================================================
+// FFT simples (Cooley-Tukey, radix-2, in-place). Tamanho precisa ser
+// potência de 2 — por isso o dropdown "Tamanho da Janela FFT" só oferece
+// 512/1024/2048/4096.
+// =====================================================================
+public static class SimpleFFT
+{
+    public static void Forward(float[] real, float[] imag)
     {
-        if (maxEnergy <= 0f) return;
-        foreach (var beat in beats)
-            beat.intensity = Mathf.Clamp01(beat.intensity / maxEnergy);
-    }
+        int n = real.Length;
 
-    private MusicAffinity GuessAffinity(float[] samples, int start, int window)
-    {
+        for (int i = 1, j = 0; i < n; i++)
+        {
+            int bit = n >> 1;
+            for (; (j & bit) != 0; bit >>= 1)
+                j ^= bit;
+            j ^= bit;
+            if (i < j)
+            {
+                (real[i], real[j]) = (real[j], real[i]);
+                (imag[i], imag[j]) = (imag[j], imag[i]);
+            }
+        }
 
-        float bass = 0f, mid = 0f, treble = 0f;
-        int third = window / 3;
+        for (int len = 2; len <= n; len <<= 1)
+        {
+            float ang = -2f * Mathf.PI / len;
+            float wReal = Mathf.Cos(ang);
+            float wImag = Mathf.Sin(ang);
 
-        for (int i = 0; i < third; i++) bass += Mathf.Abs(samples[start + i]);
-        for (int i = third; i < third * 2; i++) mid += Mathf.Abs(samples[start + i]);
-        for (int i = third * 2; i < window; i++) treble += Mathf.Abs(samples[start + i]);
+            for (int i = 0; i < n; i += len)
+            {
+                float curReal = 1f, curImag = 0f;
+                for (int k = 0; k < len / 2; k++)
+                {
+                    int a = i + k;
+                    int b = i + k + len / 2;
 
-        if (bass > mid && bass > treble) return MusicAffinity.Bass;
-        if (mid > bass && mid > treble) return MusicAffinity.Mid;
-        return MusicAffinity.Treble;
+                    float uReal = real[a];
+                    float uImag = imag[a];
+                    float vReal = real[b] * curReal - imag[b] * curImag;
+                    float vImag = real[b] * curImag + imag[b] * curReal;
+
+                    real[a] = uReal + vReal;
+                    imag[a] = uImag + vImag;
+                    real[b] = uReal - vReal;
+                    imag[b] = uImag - vImag;
+
+                    float nextReal = curReal * wReal - curImag * wImag;
+                    float nextImag = curReal * wImag + curImag * wReal;
+                    curReal = nextReal;
+                    curImag = nextImag;
+                }
+            }
+        }
     }
 }

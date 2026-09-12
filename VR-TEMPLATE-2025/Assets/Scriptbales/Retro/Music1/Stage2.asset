@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameMusic: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
   BuildSettings:
-    PrimaryBaseColor: {r: 0, g: 0.4943396, b: 0.08651789, a: 1}
-    PrimaryColorLight: {r: 0, g: 2.828427, b: 0.9907483, a: 1}
-    PrimaryColorDark: {r: 0, g: 0.3660378, b: 0.042667016, a: 1}
-    SecondaryColorLight: {r: 0, g: 3.031433, b: 2.9799516, a: 1}
-    SecondaryColorDark: {r: 0, g: 0.10606551, b: 1, a: 1}
-    SecondaryBaseColor: {r: 0.012744819, g: 0, b: 0.97735846, a: 1}
+    PrimaryBaseColor: {r: 0.0031398945, g: 0.23773581, b: 0.044101097, a: 1}
+    PrimaryColorLight: {r: 0, g: 0.9735848, b: 0.34151918, a: 1}
+    PrimaryColorDark: {r: 0, g: 0.7490197, b: 0.08730911, a: 1}
+    SecondaryColorLight: {r: 0, g: 1.2515968, b: 2.828427, a: 1}
+    SecondaryColorDark: {r: 0, g: 0.19012117, b: 1, a: 1}
+    SecondaryBaseColor: {r: 0.004955692, g: 0, b: 0.4113207, a: 1}
     BaseSceneSettings:
       SkyboxMaterial: {fileID: 2100000, guid: a09e2e60f7cbcfb469fd9ba84e6bb618, type: 2}
       GroundMaterial: {fileID: 2100000, guid: b8ec9440f06384746a94b6d5afa3230e, type: 2}
