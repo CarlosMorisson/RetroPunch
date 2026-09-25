@@ -74,7 +74,7 @@ public class ColorReactiveRenderer : MonoBehaviour
 
         if (isOpositeColor)
         {
-            reactiveColor = GetComplementaryColor(reactiveColor);
+            reactiveColor = ColorController.GetComplementaryColor(reactiveColor);
         }
 
         ApplyColor(reactiveColor);
@@ -137,14 +137,5 @@ public class ColorReactiveRenderer : MonoBehaviour
             default:
                 return Color.black;
         }
-    }
-
-    private Color GetComplementaryColor(Color source)
-    {
-        float h, s, v;
-        Color.RGBToHSV(source, out h, out s, out v);
-        h = (h + 0.5f) % 1f;
-
-        return Color.HSVToRGB(h, s, v);
     }
 }

@@ -21,9 +21,15 @@ public class HandSwitch
     public List<GameObject> targetRenderer;
 
     public Material handMaterial;
+    public Material powerHandMaterial;
+    public Material freezeHandMaterial;
     public ParticleSystem successParticle;
     public ParticleSystem failParticle;
     public ParticleSystem touchParticle;
+    [Tooltip("Toca enquanto o Power Time estiver ativo.")]
+    public ParticleSystem powerParticle;
+    [Tooltip("Toca enquanto o Freeze Time estiver ativo.")]
+    public ParticleSystem freezeParticle;
 
     [Header("Identifica��o")]
     [Tooltip("Marque true se essa op��o representa um Controller. Deixe false se representa uma Hand (m�o rastreada).")]
@@ -31,6 +37,13 @@ public class HandSwitch
 
     [HideInInspector]
     public Material instantiatedMaterial;
+    [HideInInspector]
+    public Material powerInstantiatedMaterial;
+    [HideInInspector]
+    public Material freezeInstantiatedMaterial;
+    /// <summary>Instância atualmente atribuída aos renderers (normal, power ou freeze).</summary>
+    [HideInInspector]
+    public Material activeMaterial;
     [HideInInspector]
     public Color originalEmissionColor;
 }
@@ -49,45 +62,53 @@ public class BothHands
 
 /// <summary>
 /// Controla qual BothHands est� ativo no momento.
-/// - Mant�m uma lista de todas as op��es dispon�veis (bothHandsList).
-/// - Randomiza a op��o atual sem repetir at� esgotar todas (usedBothHands),
-///   resetando o ciclo quando todas j� foram usadas.
-/// - Ao definir o BothHands atual, ativa o parentObject do Left/Right escolhidos
-///   e desativa o parentObject de todas as outras op��es da lista.
-/// - Propaga os dados da op��o atual para o HandTouchFeedback, atualizando
-///   o slot correto (rightHand / leftHand / rightController / leftController)
-///   com base no isController da HandSwitch e na lateralidade (Left/Right do BothHands).
+///
+/// GameType.Shoot — usa bothHandsList com randomiza��o sem repeti��o.
+///
+/// Outros GameTypes — usa inputHandsList, que representa as op��es de input
+/// dispon�veis ao jogador (ex: Controller, Hand Tracking). O jogador pode
+/// trocar dinamicamente via SetCurrentInputHands / NextInputHands / PreviousInputHands.
+///
+/// Em ambos os casos, SetCurrentBothHands ativa os parentObjects do par escolhido,
+/// desativa todos os outros (das duas listas) e notifica o HandTouchFeedback.
 /// </summary>
-
 public class SwitchHandsController : MonoBehaviour
 {
-    [Header("Op��es Dispon�veis")]
+    [Header("Shoot — Op��es Randomizadas")]
     public List<BothHands> bothHandsList = new List<BothHands>();
+
+    [Header("Outros Modos — Op��es de Input do Jogador")]
+    [Tooltip("Cada entrada representa um tipo de input (ex: Controller, Hand Tracking). O jogador escolhe dinamicamente.")]
+    public List<BothHands> inputHandsList = new List<BothHands>();
 
     [Header("Op��o Atual")]
     public BothHands currentBothHands;
 
     [Header("Controle de Randomiza��o (somente leitura)")]
-    [SerializeField]
-    private List<BothHands> usedBothHands = new List<BothHands>();
+    [SerializeField] private List<BothHands> usedBothHands = new List<BothHands>();
+
+    [Header("�ndice de Input Atual (somente leitura)")]
+    [SerializeField] private int currentInputIndex = 0;
 
     void Awake()
     {
-        if(GameType.Shoot!=StageLoadController.Instance.gameType)
-            return;
         DeactivateAllParents();
-        RandomizeCurrentBothHands();
+
+        if (StageLoadController.Instance.gameType == GameType.Shoot)
+            RandomizeCurrentBothHands();
+        else
+            SetCurrentInputHands(currentInputIndex);
     }
 
+    // ── Shoot ────────────────────────────────────────────────────────────────
+
     /// <summary>
-    /// Escolhe aleatoriamente um BothHands da lista que ainda n�o foi usado no ciclo atual.
-    /// Quando todos j� tiverem sido usados, libera todos novamente (reseta o ciclo).
+    /// Escolhe aleatoriamente um BothHands de bothHandsList que ainda n�o foi usado no ciclo.
+    /// Quando todos tiverem sido usados, reseta o ciclo e escolhe novamente.
     /// </summary>
     [ContextMenu("Teste Randomiza")]
     public void RandomizeCurrentBothHands()
     {
-        if(StageLoadController.Instance.gameType != GameType.Shoot)
-            return;
         if (bothHandsList == null || bothHandsList.Count == 0)
         {
             Debug.LogWarning("[SwitchHandsController] bothHandsList est� vazia.");
@@ -98,27 +119,49 @@ public class SwitchHandsController : MonoBehaviour
         foreach (BothHands item in bothHandsList)
         {
             if (!usedBothHands.Contains(item))
-            {
                 available.Add(item);
-            }
         }
+
         if (available.Count == 0)
         {
             usedBothHands.Clear();
             available.AddRange(bothHandsList);
         }
 
-        int randomIndex = Random.Range(0, available.Count);
-        BothHands chosen = available[randomIndex];
-
+        BothHands chosen = available[Random.Range(0, available.Count)];
         usedBothHands.Add(chosen);
-
         SetCurrentBothHands(chosen);
     }
 
+    // ── Input do Jogador (n�o-Shoot) ─────────────────────────────────────────
+
     /// <summary>
-    /// Define o BothHands atual: ativa seus parentObjects, desativa os das outras op��es
-    /// e propaga os dados para o HandTouchFeedback.
+    /// Seleciona o par de m�os de inputHandsList pelo �ndice.
+    /// O �ndice faz wrap circular (negativo e maior que o tamanho s�o tratados corretamente).
+    /// </summary>
+    public void SetCurrentInputHands(int index)
+    {
+        if (inputHandsList == null || inputHandsList.Count == 0)
+        {
+            Debug.LogWarning("[SwitchHandsController] inputHandsList est� vazia.");
+            return;
+        }
+
+        currentInputIndex = ((index % inputHandsList.Count) + inputHandsList.Count) % inputHandsList.Count;
+        SetCurrentBothHands(inputHandsList[currentInputIndex]);
+    }
+
+    /// <summary>Avan�a para o pr�ximo par de input (com wrap).</summary>
+    public void NextInputHands() => SetCurrentInputHands(currentInputIndex + 1);
+
+    /// <summary>Volta para o par de input anterior (com wrap).</summary>
+    public void PreviousInputHands() => SetCurrentInputHands(currentInputIndex - 1);
+
+    // ── Comum ─────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Define o BothHands atual: desativa todos os parents das duas listas,
+    /// ativa o par escolhido e notifica o HandTouchFeedback.
     /// </summary>
     public void SetCurrentBothHands(BothHands newHands)
     {
@@ -133,55 +176,29 @@ public class SwitchHandsController : MonoBehaviour
         DeactivateAllParents();
         SetParentActive(newHands, true);
 
-        ApplyToHandTouchFeedback(newHands);
+        if (HandTouchFeedback.Instance != null)
+            HandTouchFeedback.Instance.OnHandsSwitched(newHands);
     }
 
     private void SetParentActive(BothHands hands, bool active)
     {
         if (hands == null) return;
 
-        if (hands.LeftHand != null && hands.LeftHand.parentObject != null)
-        {
+        if (hands.LeftHand?.parentObject != null)
             hands.LeftHand.parentObject.SetActive(active);
-        }
 
-        if (hands.RightHand != null && hands.RightHand.parentObject != null)
-        {
+        if (hands.RightHand?.parentObject != null)
             hands.RightHand.parentObject.SetActive(active);
-        }
     }
 
     private void DeactivateAllParents()
     {
-        if (bothHandsList == null) return;
+        if (bothHandsList != null)
+            foreach (BothHands bh in bothHandsList)
+                SetParentActive(bh, false);
 
-        foreach (BothHands bh in bothHandsList)
-        {
-            SetParentActive(bh, false);
-        }
-    }
-
-    /// <summary>
-    /// Envia LeftHand e RightHand do BothHands atual para o HandTouchFeedback,
-    /// que decide o slot correto (rightHand/leftHand/rightController/leftController)
-    /// com base em isController + lateralidade.
-    /// </summary>
-    private void ApplyToHandTouchFeedback(BothHands hands)
-    {
-        if (HandTouchFeedback.Instance == null)
-        {
-            Debug.LogWarning("[SwitchHandsController] HandTouchFeedback.Instance n�o encontrado na cena.");
-            return;
-        }
-
-        if (hands.LeftHand != null)
-        {
-            HandTouchFeedback.Instance.UpdateHandData(hands.LeftHand, isRight: false);
-        }
-
-        if (hands.RightHand != null)
-        {
-            HandTouchFeedback.Instance.UpdateHandData(hands.RightHand, isRight: true);
-        }
+        if (inputHandsList != null)
+            foreach (BothHands bh in inputHandsList)
+                SetParentActive(bh, false);
     }
 }

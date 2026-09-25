@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MeshTrailEmitter : MonoBehaviour
 {
@@ -7,26 +8,36 @@ public class MeshTrailEmitter : MonoBehaviour
     public float spawnInterval = 0.05f;
     public float trailLifetime = 0.4f;
     public float minAlpha = 0.05f;
+
     [Header("Hierarchy")]
     public Transform trailParent;
+
+    [Header("Material Source")]
+    [Tooltip("Renderer do cubo dono desse emitter. Se definido, os ghosts usam o material atual desse renderer.")]
+    public Renderer materialSource;
 
     private SkinnedMeshRenderer skinnedMesh;
     private MeshRenderer meshRenderer;
     private bool emitting;
+
+    private readonly List<GameObject> activeGhosts = new List<GameObject>();
 
     void Awake()
     {
         skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
         meshRenderer = GetComponentInChildren<MeshRenderer>();
     }
+
     private void OnEnable()
     {
         StartTrail();
     }
+
     private void OnDisable()
     {
         StopTrail();
     }
+
     public void StartTrail()
     {
         if (!emitting)
@@ -36,6 +47,21 @@ public class MeshTrailEmitter : MonoBehaviour
     public void StopTrail()
     {
         emitting = false;
+    }
+
+    /// <summary>
+    /// Para a emissão e destrói todos os ghosts ainda ativos provenientes deste emitter.
+    /// </summary>
+    public void StopAndKillGhosts()
+    {
+        StopTrail();
+
+        activeGhosts.RemoveAll(g => g == null);
+
+        foreach (GameObject ghost in activeGhosts)
+            Destroy(ghost);
+
+        activeGhosts.Clear();
     }
 
     IEnumerator EmitTrail()
@@ -65,7 +91,7 @@ public class MeshTrailEmitter : MonoBehaviour
             mf.mesh = mesh;
 
             var mr = ghost.AddComponent<MeshRenderer>();
-            mr.material = skinnedMesh.material;
+            mr.material = ResolveMaterial(skinnedMesh.material);
         }
         else if (meshRenderer != null)
         {
@@ -80,7 +106,7 @@ public class MeshTrailEmitter : MonoBehaviour
             mf.mesh = sourceMF.mesh;
 
             var mr = ghost.AddComponent<MeshRenderer>();
-            mr.material = meshRenderer.material;
+            mr.material = ResolveMaterial(meshRenderer.material);
         }
         else
         {
@@ -88,7 +114,15 @@ public class MeshTrailEmitter : MonoBehaviour
             return;
         }
 
-        ghost.AddComponent<MeshTrailGhost>()
-             .Init(trailLifetime, minAlpha);
+        ghost.AddComponent<MeshTrailGhost>().Init(trailLifetime, minAlpha);
+        activeGhosts.Add(ghost);
+    }
+
+    // Retorna o material do materialSource se definido, senão usa o fallback.
+    private Material ResolveMaterial(Material fallback)
+    {
+        if (materialSource != null)
+            return materialSource.material;
+        return fallback;
     }
 }

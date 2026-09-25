@@ -30,6 +30,8 @@ public class PowerEffect : MonoBehaviour
     private const string TRANSITION_AUDIO = "TransitionEffect";
 
     public static event Action OnPowerStarted;
+    /// <summary>true ao iniciar o power, false ao terminar.</summary>
+    public static event Action<bool> OnPowerChanged;
 
     private void Awake()
     {
@@ -74,6 +76,7 @@ public class PowerEffect : MonoBehaviour
     private IEnumerator FreezeRoutine()
     {
         isPowered = true;
+        OnPowerChanged?.Invoke(true);
 
         if (AudioController.Instance != null)
         {
@@ -127,6 +130,7 @@ public class PowerEffect : MonoBehaviour
 
         powerRoutine = null;
         isPowered = false;
+        OnPowerChanged?.Invoke(false);
     }
 
     private void OnDestroy()

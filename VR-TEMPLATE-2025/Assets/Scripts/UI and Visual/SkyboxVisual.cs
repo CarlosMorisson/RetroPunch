@@ -13,13 +13,21 @@ public class SkyboxSettings
     public float StartHorizontalSkyHeight;
     public float MultiplierHorizontalSkyHeight;
 
-    [Header("Start Density")]
+    [Header("Star Size")]
     public float StartStarDensity;
     public float MultiplierStartDensity;
 
-    [Header("Sun Size")]
+    [Header("Star Density (_StarDensity)")]
+    public float StartStarDensityAmount = 15f;
+    public float MultiplierStarDensityAmount = 5f;
+
+    [Header("Sun Mask Size")]
     public float StartDiscSize;
     public float MultiplierDiscSize;
+
+    [Header("Sun Size (_SunSize)")]
+    public float StartSunSize = 0.5f;
+    public float MultiplierSunSize = 0.15f;
 
     [Header("Cor")]
     public float MinColor;
@@ -56,6 +64,10 @@ public class SkyboxVisual : MonoBehaviour
     [Tooltip("Limita o quanto a reação da música (grave/agudo) pode empurrar todos os parâmetros do shader do skybox, evitando deformação excessiva em músicas muito intensas.")]
     [Range(0f, 5f)] public float maxReactionIntensity = 2f;
 
+    [Header("Auto Normalization (AGC)")]
+    [Tooltip("Velocidade com que o pico recente de cada banda (grave/médio/agudo) decai, permitindo que a reação sempre acompanhe a dinâmica da música atual em vez de saturar no limite. Valores maiores fazem a normalização se readaptar mais rápido a mudanças de volume/intensidade da música.")]
+    public float agcDecayRate = 0.3f;
+
     [Header("Impact Settings")]
     public float successBoostIntensity = 0.5f;
     public float failDeboostIntensity = -0.3f;
@@ -69,9 +81,14 @@ public class SkyboxVisual : MonoBehaviour
     private float smoothedMid;
     private float smoothedTreble;
 
+    private float bassPeak = 0.0001f;
+    private float midPeak = 0.0001f;
+    private float treblePeak = 0.0001f;
+
     private SceneSettings baseScene;
     private SceneSettings freezeScene;
     private SceneSettings powerScene;
+    private SceneSettings opposideScene;
 
     private Material skyboxInstance;
     private Material groundInstance; 
@@ -80,7 +97,16 @@ public class SkyboxVisual : MonoBehaviour
 
     private Color baseSkyColor;
 
-    private const string COLOR_NAME = "_SkyColor";
+    private static readonly int ID_SkyColor = Shader.PropertyToID("_SkyColor");
+    private static readonly int ID_GridColor = Shader.PropertyToID("_GridColor");
+    private static readonly int ID_GroundColor = Shader.PropertyToID("_GroundColor");
+    private static readonly int ID_HorizonStrength = Shader.PropertyToID("_HorizonStrength");
+    private static readonly int ID_HorizonHeight = Shader.PropertyToID("_HorizonHeight");
+    private static readonly int ID_StarSize = Shader.PropertyToID("_StarSize");
+    private static readonly int ID_StarDensity = Shader.PropertyToID("_StarDensity");
+    private static readonly int ID_SunMaskSize = Shader.PropertyToID("_SunMaskSize");
+    private static readonly int ID_SunSize = Shader.PropertyToID("_SunSize");
+    private static readonly int ID_GridSpeed = Shader.PropertyToID("_GridSpeed");
 
     private bool isTransitioning = false;
 
@@ -109,6 +135,7 @@ public class SkyboxVisual : MonoBehaviour
         baseScene = baseSceneSettings;
         freezeScene = freezeSceneSettings;
         powerScene = powerSceneSettings;
+        opposideScene = CreateOpposideScene(baseScene);
 
         ApplySceneInstant(baseScene);
     }
@@ -130,12 +157,45 @@ public class SkyboxVisual : MonoBehaviour
         if (playerPlataformRenderer != null) playerPlataformRenderer.material = plataformInstance;
         if (wallRenderer != null) wallRenderer.material = wallInstance;
 
-        baseSkyColor = skyboxInstance.GetColor(COLOR_NAME);
+        baseSkyColor = skyboxInstance.GetColor(ID_SkyColor);
     }
 
     public void SetBaseSkybox() => SmoothTransition(baseScene);
     public void SetFreezeSkybox() => SmoothTransition(freezeScene);
     public void SetPowerSkybox() => SmoothTransition(powerScene);
+    [ContextMenu("Opposide Color")]
+    public void SetOpposideSkybox() => SmoothTransition(opposideScene);
+
+    // Cria uma copia da cena base com as cores invertidas no espectro (matiz + 180 graus),
+    // igual ao isOpositeColor do ColorReactiveRenderer
+    SceneSettings CreateOpposideScene(SceneSettings source)
+    {
+        SceneSettings opposide = new SceneSettings
+        {
+            SkyboxMaterial = CreateOpposideMaterial(source.SkyboxMaterial),
+            GroundMaterial = CreateOpposideMaterial(source.GroundMaterial),
+            PlataformMaterial = CreateOpposideMaterial(source.PlataformMaterial),
+            WallMaterial = CreateOpposideMaterial(source.WallMaterial)
+        };
+        return opposide;
+    }
+
+    Material CreateOpposideMaterial(Material source)
+    {
+        Material mat = new Material(source);
+
+        InvertColorProperty(mat, ID_SkyColor);
+        InvertColorProperty(mat, ID_GridColor);
+        InvertColorProperty(mat, ID_GroundColor);
+
+        return mat;
+    }
+
+    void InvertColorProperty(Material mat, int propertyId)
+    {
+        if (mat.HasProperty(propertyId))
+            mat.SetColor(propertyId, ColorController.GetComplementaryColor(mat.GetColor(propertyId)));
+    }
 
     void SmoothTransition(SceneSettings target, float duration = 0.2f)
     {
@@ -156,53 +216,55 @@ public class SkyboxVisual : MonoBehaviour
 
         Sequence seq = DOTween.Sequence().SetTarget(this);
 
-        seq.Join(TweenMaterialColor(skyboxInstance, targetSky, "_SkyColor", duration));
-        seq.Join(TweenMaterialColor(groundInstance, targetGround, "_GridColor", duration));
-        seq.Join(TweenMaterialColor(groundInstance, targetGround, "_GroundColor", duration));
-        seq.Join(TweenMaterialColor(plataformInstance, targetPlatform, "_GridColor", duration));
-        seq.Join(TweenMaterialColor(plataformInstance, targetPlatform, "_GroundColor", duration));
+        seq.Join(TweenMaterialColor(skyboxInstance, targetSky, ID_SkyColor, duration));
+        seq.Join(TweenMaterialColor(groundInstance, targetGround, ID_GridColor, duration));
+        seq.Join(TweenMaterialColor(groundInstance, targetGround, ID_GroundColor, duration));
+        seq.Join(TweenMaterialColor(plataformInstance, targetPlatform, ID_GridColor, duration));
+        seq.Join(TweenMaterialColor(plataformInstance, targetPlatform, ID_GroundColor, duration));
 
-        seq.Join(TweenFloat(skyboxInstance, targetSky, "_HorizonStrength", duration));
-        seq.Join(TweenFloat(skyboxInstance, targetSky, "_HorizonSkyHeight", duration));
-        seq.Join(TweenFloat(skyboxInstance, targetSky, "_StarSize", duration));
-        seq.Join(TweenFloat(skyboxInstance, targetSky, "_SunMaskSize", duration));
+        seq.Join(TweenFloat(skyboxInstance, targetSky, ID_HorizonStrength, duration));
+        seq.Join(TweenFloat(skyboxInstance, targetSky, ID_HorizonHeight, duration));
+        seq.Join(TweenFloat(skyboxInstance, targetSky, ID_StarSize, duration));
+        seq.Join(TweenFloat(skyboxInstance, targetSky, ID_StarDensity, duration));
+        seq.Join(TweenFloat(skyboxInstance, targetSky, ID_SunMaskSize, duration));
+        seq.Join(TweenFloat(skyboxInstance, targetSky, ID_SunSize, duration));
 
         seq.OnComplete(() =>
         {
-            baseSkyColor = skyboxInstance.GetColor(COLOR_NAME);
+            baseSkyColor = skyboxInstance.GetColor(ID_SkyColor);
             isTransitioning = false;
         });
 
         RenderSettings.skybox = skyboxInstance;
     }
 
-    Tween TweenMaterialColor(Material current, Material target, string property, float duration)
+    Tween TweenMaterialColor(Material current, Material target, int propertyId, float duration)
     {
-        if (!current.HasProperty(property) || !target.HasProperty(property))
+        if (!current.HasProperty(propertyId) || !target.HasProperty(propertyId))
             return null;
 
-        Color start = current.GetColor(property);
-        Color end = target.GetColor(property);
+        Color start = current.GetColor(propertyId);
+        Color end = target.GetColor(propertyId);
 
         return DOTween.To(() => start, x =>
         {
             start = x;
-            current.SetColor(property, x);
+            current.SetColor(propertyId, x);
         }, end, duration).SetEase(Ease.InOutSine);
     }
 
-    Tween TweenFloat(Material current, Material target, string property, float duration)
+    Tween TweenFloat(Material current, Material target, int propertyId, float duration)
     {
-        if (!current.HasProperty(property) || !target.HasProperty(property))
+        if (!current.HasProperty(propertyId) || !target.HasProperty(propertyId))
             return null;
 
-        float start = current.GetFloat(property);
-        float end = target.GetFloat(property);
+        float start = current.GetFloat(propertyId);
+        float end = target.GetFloat(propertyId);
 
         return DOTween.To(() => start, x =>
         {
             start = x;
-            current.SetFloat(property, x);
+            current.SetFloat(propertyId, x);
         }, end, duration).SetEase(Ease.InOutSine);
     }
 
@@ -246,25 +308,42 @@ public class SkyboxVisual : MonoBehaviour
             Time.deltaTime * smoothSpeed
         );
 
-        float bassReaction = Mathf.Clamp(smoothedBass + currentImpactBoost, -maxReactionIntensity, maxReactionIntensity);
-        float midReaction = Mathf.Clamp(smoothedMid + currentImpactBoost, -maxReactionIntensity, maxReactionIntensity);
-        float trebleReaction = Mathf.Clamp(smoothedTreble + currentImpactBoost, -maxReactionIntensity, maxReactionIntensity);
+        float decay = Mathf.Exp(-agcDecayRate * Time.deltaTime);
+        bassPeak = Mathf.Max(smoothedBass, Mathf.Max(bassPeak * decay, 0.0001f));
+        midPeak = Mathf.Max(smoothedMid, Mathf.Max(midPeak * decay, 0.0001f));
+        treblePeak = Mathf.Max(smoothedTreble, Mathf.Max(treblePeak * decay, 0.0001f));
 
-        skyboxInstance.SetFloat("_HorizonStrength",
+        float bassNorm = smoothedBass / bassPeak;
+        float midNorm = smoothedMid / midPeak;
+        float trebleNorm = smoothedTreble / treblePeak;
+
+        float bassReaction = Mathf.Clamp(bassNorm * maxReactionIntensity + currentImpactBoost, -maxReactionIntensity, maxReactionIntensity);
+        float midReaction = Mathf.Clamp(midNorm * maxReactionIntensity + currentImpactBoost, -maxReactionIntensity, maxReactionIntensity);
+        float trebleReaction = Mathf.Clamp(trebleNorm * maxReactionIntensity + currentImpactBoost, -maxReactionIntensity, maxReactionIntensity);
+
+        skyboxInstance.SetFloat(ID_HorizonStrength,
             SkyboxSettings.StartHorizontalStrenght +
             bassReaction * SkyboxSettings.MultiplierHorizontalStrenght);
 
-        skyboxInstance.SetFloat("_HorizonSkyHeight",
+        skyboxInstance.SetFloat(ID_HorizonHeight,
             SkyboxSettings.StartHorizontalSkyHeight +
             midReaction * SkyboxSettings.MultiplierHorizontalSkyHeight);
 
-        skyboxInstance.SetFloat("_StarSize",
+        skyboxInstance.SetFloat(ID_StarSize,
             SkyboxSettings.StartStarDensity +
             trebleReaction * SkyboxSettings.MultiplierStartDensity);
 
-        skyboxInstance.SetFloat("_SunMaskSize",
+        skyboxInstance.SetFloat(ID_StarDensity,
+            SkyboxSettings.StartStarDensityAmount +
+            trebleReaction * SkyboxSettings.MultiplierStarDensityAmount);
+
+        skyboxInstance.SetFloat(ID_SunMaskSize,
             SkyboxSettings.StartDiscSize +
             trebleReaction * SkyboxSettings.MultiplierDiscSize);
+
+        skyboxInstance.SetFloat(ID_SunSize,
+            SkyboxSettings.StartSunSize +
+            trebleReaction * SkyboxSettings.MultiplierSunSize);
 
         float colorT = Mathf.Clamp01(midReaction);
 
@@ -277,7 +356,7 @@ public class SkyboxVisual : MonoBehaviour
         Color reactiveColor = baseSkyColor * intensity;
         reactiveColor.a = baseSkyColor.a;
 
-        skyboxInstance.SetColor(COLOR_NAME, reactiveColor);
+        skyboxInstance.SetColor(ID_SkyColor, reactiveColor);
 
         Vector2 gridSpeed = new Vector2(
             0,
@@ -287,12 +366,12 @@ public class SkyboxVisual : MonoBehaviour
 
         if (groundInstance != null)
         {
-            groundInstance.SetVector("_GridSpeed", gridSpeed);
+            groundInstance.SetVector(ID_GridSpeed, gridSpeed);
         }
 
         if (plataformInstance != null)
         {
-            plataformInstance.SetVector("_GridSpeed", gridSpeed);
+            plataformInstance.SetVector(ID_GridSpeed, gridSpeed);
         }
     }
 }

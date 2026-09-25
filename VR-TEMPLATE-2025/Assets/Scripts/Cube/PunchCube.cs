@@ -34,6 +34,7 @@ public class PunchCube : CubeCollider
 
     private Renderer cachedRenderer;
     private Material originalMaterial;
+    private MeshTrailEmitter meshTrailEmitter;
 
     private bool hasMisstaken = false;
     private bool eventsRegistered=false;
@@ -47,6 +48,10 @@ public class PunchCube : CubeCollider
         cachedRenderer = GetComponentInChildren<Renderer>();
         if (cachedRenderer != null)
             originalMaterial = cachedRenderer.material;
+
+        meshTrailEmitter = GetComponentInChildren<MeshTrailEmitter>();
+        if (meshTrailEmitter != null && cachedRenderer != null)
+            meshTrailEmitter.materialSource = cachedRenderer;
     }
 
     protected override void OnEnable()
@@ -176,11 +181,11 @@ public class PunchCube : CubeCollider
 
         if (collision.gameObject.CompareTag(PLAYER_TAG))
         {
+                print(collision.gameObject.name);
             if (PowerEffect.Instance.isPowered)
             {
                 collisionLocation = collision.contacts[0].point;
                 HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
-                print(collision.gameObject.name);
                 HandleSuccess();
                 return;
             }
@@ -188,7 +193,6 @@ public class PunchCube : CubeCollider
             {
                 collisionLocation = collision.contacts[0].point;
                 HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
-                print(collision.gameObject.name);
                 HandleSuccess();
             }
             else
@@ -228,6 +232,8 @@ public class PunchCube : CubeCollider
 
     private IEnumerator FailRoutine()
     {
+        meshTrailEmitter?.StopAndKillGhosts();
+
         if (cachedRenderer != null && failMaterial != null)
         {
             for (int i = 0; i < blinkCount; i++)

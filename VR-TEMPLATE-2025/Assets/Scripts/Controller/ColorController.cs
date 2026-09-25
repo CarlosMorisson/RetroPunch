@@ -144,6 +144,24 @@ public class ColorController : MonoBehaviour
     public void SetFreezeColor() => ApplyColorSet(settings.PrimaryColorFreezeLight, settings.PrimaryColorFreezeDark, settings.SecondaryColorFreezeLight, settings.SecondaryColorFreezeDark);
     public void SetPowerColor() => ApplyColorSet(settings.PrimaryColorPowerLight, settings.PrimaryColorPowerDark, settings.SecondaryColorPowerLight, settings.SecondaryColorPowerDark);
     public void SetCommonColor() => ApplyColorSet(settings.PrimaryColorLight, settings.PrimaryColorDark, settings.SecondaryColorLight, settings.SecondaryColorDark);
+    public void SetOpposideColor() => ApplyColorSet(
+        GetComplementaryColor(settings.PrimaryColorLight),
+        GetComplementaryColor(settings.PrimaryColorDark),
+        GetComplementaryColor(settings.SecondaryColorLight),
+        GetComplementaryColor(settings.SecondaryColorDark));
+
+    /// <summary>
+    /// Retorna a cor oposta no espectro (gira o matiz 180 graus), mantendo saturacao, intensidade HDR e alpha.
+    /// </summary>
+    public static Color GetComplementaryColor(Color source)
+    {
+        Color.RGBToHSV(source, out float h, out float s, out float v);
+        h = (h + 0.5f) % 1f;
+
+        Color result = Color.HSVToRGB(h, s, v, true);
+        result.a = source.a;
+        return result;
+    }
 
     void ApplyColorSet(Color pLight, Color pDark, Color sLight, Color sDark, float duration = 0.2f)
     {

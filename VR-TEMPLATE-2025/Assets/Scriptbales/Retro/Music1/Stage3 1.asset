@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameMusic: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
   BuildSettings:
-    PrimaryBaseColor: {r: 0.3433962, g: 0.3407029, b: 0, a: 1}
-    PrimaryColorLight: {r: 2.4438024, g: 2.6390157, b: 0.45311397, a: 1}
-    PrimaryColorDark: {r: 1.5964533, g: 1.5964533, b: 0, a: 1}
-    SecondaryColorLight: {r: 1, g: 1, b: 1, a: 1}
-    SecondaryColorDark: {r: 0.381132, g: 0.381132, b: 0.381132, a: 1}
-    SecondaryBaseColor: {r: 0, g: 0, b: 0, a: 1}
+    PrimaryBaseColor: {r: 0.021237835, g: 0, b: 0.22264141, a: 1}
+    PrimaryColorLight: {r: 0, g: 0.5411765, b: 0.7490196, a: 1}
+    PrimaryColorDark: {r: 0, g: 0.27058825, b: 0.3764706, a: 1}
+    SecondaryColorLight: {r: 0.7490196, g: 0, b: 0.6862745, a: 1}
+    SecondaryColorDark: {r: 0.43137255, g: 0, b: 0.39215687, a: 1}
+    SecondaryBaseColor: {r: 0.19607843, g: 0, b: 0.21568628, a: 1}
     BaseSceneSettings:
-      SkyboxMaterial: {fileID: 2100000, guid: bc956c2a94277984ab315b9e44015434, type: 2}
-      GroundMaterial: {fileID: 2100000, guid: d9d66429d76d45e4588709a0f48707ed, type: 2}
-      PlataformMaterial: {fileID: 2100000, guid: d9d66429d76d45e4588709a0f48707ed, type: 2}
-      WallMaterial: {fileID: 2100000, guid: 92856d9b3c4a26541bc6bfd8cde2e88b, type: 2}
+      SkyboxMaterial: {fileID: 2100000, guid: 20fca97cf5b8e92459331b3cd74c4be1, type: 2}
+      GroundMaterial: {fileID: 2100000, guid: a4115c037cd9c4f4c9b1b73355446825, type: 2}
+      PlataformMaterial: {fileID: 2100000, guid: a4115c037cd9c4f4c9b1b73355446825, type: 2}
+      WallMaterial: {fileID: 2100000, guid: 07d3f86d3ccea2a4cb9b80044174c061, type: 2}
     PrimaryBaseFreezeColor: {r: 0, g: 0.56412506, b: 1, a: 1}
     PrimaryColorFreezeLight: {r: 0, g: 0.27607727, b: 0.6075471, a: 1}
     PrimaryColorFreezeDark: {r: 0, g: 0.6882615, b: 1, a: 1}

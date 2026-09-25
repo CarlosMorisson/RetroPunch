@@ -23,6 +23,10 @@ public class FreezeEffect : MonoBehaviour
     public UnityEvent OnStartFreezeTime;
     public UnityEvent OnFinishFreezeTime;
 
+    public static bool IsFrozen { get; private set; }
+    /// <summary>true ao iniciar o freeze, false ao terminar.</summary>
+    public static event System.Action<bool> OnFreezeChanged;
+
     private Coroutine freezeRoutine;
     private Tween objectScaleTween;
     private Tween clockFillTween;
@@ -80,6 +84,8 @@ public class FreezeEffect : MonoBehaviour
                 .SetEase(Ease.Linear); 
         }
 
+        IsFrozen = true;
+        OnFreezeChanged?.Invoke(true);
         OnStartFreezeTime?.Invoke();
 
         yield return new WaitForSecondsRealtime(freezeDuration);
@@ -99,6 +105,8 @@ public class FreezeEffect : MonoBehaviour
 
         yield return LerpTimeScale(freezeTimeScale, defaultTimeScale, restoreDuration);
 
+        IsFrozen = false;
+        OnFreezeChanged?.Invoke(false);
         OnFinishFreezeTime?.Invoke();
         AudioController.Instance.Play(TRANSITION_AUDIO);
         freezeRoutine = null;

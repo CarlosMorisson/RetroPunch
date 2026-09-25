@@ -39,6 +39,7 @@ public class MultiPunchCube : CubeCollider
     private Vector3 originalLocalScale;
 
     private BuildMovemmentVisual[] visualBoosters;
+    private MeshTrailEmitter meshTrailEmitter;
 
     private bool hasMisstaken = false;
 
@@ -52,6 +53,11 @@ public class MultiPunchCube : CubeCollider
         cachedRenderer = GetComponentInChildren<Renderer>();
         if (cachedRenderer != null)
             originalMaterial = cachedRenderer.material;
+
+        meshTrailEmitter = GetComponentInChildren<MeshTrailEmitter>();
+        if (meshTrailEmitter != null && cachedRenderer != null)
+            meshTrailEmitter.materialSource = cachedRenderer;
+
         foreach (var p in punchPoints)
         {
             p.sphereLocalScale=p.sphere.localScale;
@@ -307,6 +313,8 @@ public class MultiPunchCube : CubeCollider
 
     IEnumerator FailRoutine()
     {
+        meshTrailEmitter?.StopAndKillGhosts();
+
         if (cachedRenderer != null && failMaterial != null)
         {
             for (int i = 0; i < blinkCount; i++)
