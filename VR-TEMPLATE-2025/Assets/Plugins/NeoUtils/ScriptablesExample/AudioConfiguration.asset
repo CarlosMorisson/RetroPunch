@@ -1,0 +1,197 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecf4bc94ec25d3946a7ba31273ea51a5, type: 3}
+  m_Name: AudioConfiguration
+  m_EditorClassIdentifier: 
+  Audios:
+    _valueKeyPairList:
+    - Key: Voice
+      Value:
+        AudioMixerGroup: {fileID: -6665460119565234226, guid: 0cefb3748ba55a54aa76b46c9bde0e41,
+          type: 2}
+        PoolLenght: 2
+        Sounds:
+          _valueKeyPairList:
+          - Key: BG
+            Value:
+              Clip: {fileID: 8300000, guid: a59855a5d9206c34b9950d13cdb27889, type: 3}
+              Loop: 1
+              Priority: 1
+              Volume: 0.02
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+    - Key: SFX
+      Value:
+        AudioMixerGroup: {fileID: -3926276308457511099, guid: 0cefb3748ba55a54aa76b46c9bde0e41,
+          type: 2}
+        PoolLenght: 10
+        Sounds:
+          _valueKeyPairList:
+          - Key: Bounce0
+            Value:
+              Clip: {fileID: 8300000, guid: 816627af93b3a4d40a962241f0b3037b, type: 3}
+              Loop: 0
+              Priority: 1
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: Bounce1
+            Value:
+              Clip: {fileID: 8300000, guid: 8d9f60d4f25a71346911624e85760443, type: 3}
+              Loop: 0
+              Priority: 1
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: Bounce2
+            Value:
+              Clip: {fileID: 8300000, guid: 81a54fcf7b4f32d48a27204313c6da3d, type: 3}
+              Loop: 0
+              Priority: 1
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: Bounce3
+            Value:
+              Clip: {fileID: 8300000, guid: 1706ecdfe8f4dff44bfb324bdd5cb05a, type: 3}
+              Loop: 0
+              Priority: 1
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: Break
+            Value:
+              Clip: {fileID: 8300000, guid: 6c84d54daa22b59458f7ba4b118dfc44, type: 3}
+              Loop: 0
+              Priority: 2
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: Impact
+            Value:
+              Clip: {fileID: 8300000, guid: b4684c633148cbb41bf303996ab4dba9, type: 3}
+              Loop: 0
+              Priority: 3
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: Score
+            Value:
+              Clip: {fileID: 8300000, guid: c8de95490b0470942b514d861145df4e, type: 3}
+              Loop: 0
+              Priority: 4
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: Die
+            Value:
+              Clip: {fileID: 8300000, guid: 5f67133c1ea149a4f88998615c1614ce, type: 3}
+              Loop: 0
+              Priority: 5
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: Speed
+            Value:
+              Clip: {fileID: 8300000, guid: 9f14d54c9f3adb040a1591a8b1b9278f, type: 3}
+              Loop: 0
+              Priority: 17
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+    - Key: Master
+      Value:
+        AudioMixerGroup: {fileID: 24300002, guid: 0cefb3748ba55a54aa76b46c9bde0e41,
+          type: 2}
+        PoolLenght: 5
+        Sounds:
+          _valueKeyPairList:
+          - Key: -1
+            Value:
+              Clip: {fileID: 8300000, guid: 51ef18d66238d0549adb619d1b229732, type: 3}
+              Loop: 0
+              Priority: 0
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: 0
+            Value:
+              Clip: {fileID: 8300000, guid: 1ede2eb353e703d4fb4e2d053bd8c924, type: 3}
+              Loop: 0
+              Priority: 0
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: 1
+            Value:
+              Clip: {fileID: 8300000, guid: e1a82cdef848258449a2d7ed5aefb6f3, type: 3}
+              Loop: 0
+              Priority: 0
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: 2
+            Value:
+              Clip: {fileID: 8300000, guid: ef3dbcb02e033f24587579868bc00dff, type: 3}
+              Loop: 0
+              Priority: 0
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: 3
+            Value:
+              Clip: {fileID: 8300000, guid: 27ef6b3ad76bf744d806467b332d5127, type: 3}
+              Loop: 0
+              Priority: 0
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
+          - Key: 4
+            Value:
+              Clip: {fileID: 8300000, guid: cb81d71717d85c14a8337082a90f44c2, type: 3}
+              Loop: 0
+              Priority: 0
+              Volume: 1
+              Pitch: 1
+              Pan: 0
+              MinDistance: 0
+              MaxDistance: 0
