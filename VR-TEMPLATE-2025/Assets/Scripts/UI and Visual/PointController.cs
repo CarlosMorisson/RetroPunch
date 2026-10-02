@@ -48,7 +48,7 @@ public class PointController : MonoBehaviour
 
     #region TotalCube
     private string _sucessPercentage;
-    private int _percentageInt;
+    private float _percentage;
     private int _totalCube;
     public int TotalCube
     {
@@ -131,7 +131,7 @@ public class PointController : MonoBehaviour
 
     public void IncreasePoint()
     {
-        _consecutiveErrors = 0; // SOLUÇÃO: Quando acerta, o erro consecutivo é ZERADO
+        _consecutiveErrors = 0; // SOLUï¿½ï¿½O: Quando acerta, o erro consecutivo ï¿½ ZERADO
 
         Accept++;
         Consecutives++;
@@ -141,7 +141,7 @@ public class PointController : MonoBehaviour
 
     public void IncreaseError()
     {
-        _consecutiveErrors++; // SOLUÇÃO: Aumenta a contagem de erros seguidos
+        _consecutiveErrors++; // SOLUï¿½ï¿½O: Aumenta a contagem de erros seguidos
 
         Errors++;
         Consecutives = 0;
@@ -155,16 +155,16 @@ public class PointController : MonoBehaviour
     {
         if (TotalCube <= 0)
         {
-            _sucessPercentage = "0%";
+            _percentage = 0f;
+            _sucessPercentage = DecimalFormat.Percent(0f);
             return;
         }
 
-        float percentage = (float)Accept * 100 / TotalCube;
-        _percentageInt = (int)percentage;
-        _sucessPercentage = percentage.ToString("F1") + "%";
+        _percentage = (float)Accept * 100 / TotalCube;
+        _sucessPercentage = DecimalFormat.Percent(_percentage);
     }
 
-    public float GetPercentageSucessInt() => _percentageInt;
+    public float GetPercentageSucess() => _percentage;
     public string GetPercentageSucessString() => _sucessPercentage;
 
     public void CheckBestConsecutive()
@@ -182,9 +182,9 @@ public class PointController : MonoBehaviour
         int error = PlayerPrefs.GetInt(MAIN_TOTAL_ERRORS) + Errors;
         float accuracy = PlayerPrefs.GetFloat(MAIN_TOTAL_ACCURACY);
         if (accuracy == 0)
-            accuracy = _percentageInt;
+            accuracy = _percentage;
         else
-            accuracy = (_percentageInt + accuracy) / 2;
+            accuracy = (_percentage + accuracy) / 2;
 
         PlayerPrefs.SetInt(MAIN_TOTAL_SCORE, score);
         PlayerPrefs.SetInt(MAIN_TOTAL_ERRORS, error);
@@ -265,7 +265,7 @@ public class PointController : MonoBehaviour
 
     public int GetBestConsecutiveInScene() { return _bestConsecutiveInScene; }
     public int GetBestConsecutive() { return _bestConsecutives; }
-    public int GetConsecutiveErrors() { return _consecutiveErrors; } // Get útil caso precise expor para a UI
+    public int GetConsecutiveErrors() { return _consecutiveErrors; } // Get ï¿½til caso precise expor para a UI
 }
 
 [System.Serializable]

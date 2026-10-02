@@ -49,3 +49,33 @@ MonoBehaviour:
     volume: 0.5
     pitch: 1
     mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Fall
+    clip: {fileID: 8300000, guid: 42bff29b080d75547b6b25a5bf1da430, type: 3}
+    loop: 0
+    volume: 0.5
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Firework
+    clip: {fileID: 8300000, guid: 9e08daee48f56bb4f802a72e7695040d, type: 3}
+    loop: 0
+    volume: 0.5
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Firework2
+    clip: {fileID: 8300000, guid: 5887ad67c35996d4996008ae3e3adf39, type: 3}
+    loop: 0
+    volume: 0.5
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Grow
+    clip: {fileID: 8300000, guid: 3ce86c20816eea84b921989e63a8fc12, type: 3}
+    loop: 0
+    volume: 0.5
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Equip
+    clip: {fileID: 8300000, guid: abeff3675c661cf498f66158ef4fc236, type: 3}
+    loop: 0
+    volume: 0.5
+    pitch: 1
+    mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}

@@ -31,6 +31,11 @@ public class SongController : MonoBehaviour
     public AudioSource SequenceAudioSource;
     [Range(1f, 3f)] public float maxSequencePitch = 2.0f; // Limite m�ximo do pitch
     [Range(0f, 0.5f)] public float pitchIncreaseStep = 0.05f;
+    [Header("Pitch Down Stop")]
+    [Tooltip("Tempo (em segundos) que o pitch leva pra descer até 0 antes da música parar.")]
+    [Min(0f)] public float pitchDownDuration = 2f;
+    [Header("Victory")]
+    public List<AudioClip> VictoryAudio;
 
     private List<AudioClip> playedTouchAudios = new List<AudioClip>();
     private List<AudioClip> playedFailAudio = new List<AudioClip>();
@@ -44,6 +49,8 @@ public class SongController : MonoBehaviour
 
     private float[] spectrumData;
     private Coroutine impactRoutine;
+    private Coroutine pitchDownRoutine;
+    private bool isStopped = false;
 
     private float baseVolume;
     private float basePitch;
@@ -59,7 +66,8 @@ public class SongController : MonoBehaviour
         if (audioSource != null)
         {
             UIResult.Instance.UpdateSlider(audioSource.time);
-            if (!audioSource.isPlaying && audioSource.time == 0)
+            // Depois do StopSong o source fica parado com time 0, então não pode contar como fim da música
+            if (!isStopped && !audioSource.isPlaying && audioSource.time == 0)
             {
                 FinishSong();
             }
@@ -145,9 +153,100 @@ public class SongController : MonoBehaviour
         isPaused = true;
         GameState.Instance.GameStateEnd();
     }
+
+    /// <summary>
+    /// Diminui o pitch da música gradativamente até 0 durante pitchDownDuration e depois chama StopSong.
+    /// </summary>
+    [ContextMenu("Pitch Down e Stop")]
+    public void PitchDownAndStop()
+    {
+        if (audioSource == null || isStopped)
+            return;
+
+        if (impactRoutine != null)
+        {
+            StopCoroutine(impactRoutine);
+            impactRoutine = null;
+        }
+
+        if (pitchDownRoutine != null)
+            StopCoroutine(pitchDownRoutine);
+
+        pitchDownRoutine = StartCoroutine(PitchDownRoutine());
+    }
+
+    private IEnumerator PitchDownRoutine()
+    {
+        float startPitch = audioSource.pitch;
+        float t = 0f;
+
+        // Tempo sem escala pra não ser afetado pelo slow motion do FreezeEffect
+        while (t < pitchDownDuration)
+        {
+            t += Time.unscaledDeltaTime;
+            audioSource.pitch = Mathf.Lerp(startPitch, 0f, t / pitchDownDuration);
+            yield return null;
+        }
+
+        audioSource.pitch = 0f;
+        pitchDownRoutine = null;
+        StopSong();
+    }
+
+    [ContextMenu("Stop Song")]
+    public void StopSong()
+    {
+        if (audioSource == null)
+            return;
+
+        if (pitchDownRoutine != null)
+        {
+            StopCoroutine(pitchDownRoutine);
+            pitchDownRoutine = null;
+        }
+
+        isStopped = true;
+        audioSource.Stop();
+
+        // O AudioSource é reaproveitado pelo AudioController, então devolve o pitch original
+        audioSource.pitch = basePitch;
+    }
+
+    /// <summary>
+    /// Troca o clip do audioSource por um aleatório da lista VictoryAudio e dá play.
+    /// </summary>
+    [ContextMenu("Play Victory")]
+    public void PlayVictory()
+    {
+        PauseSong();
+        if (audioSource == null || VictoryAudio == null || VictoryAudio.Count == 0)
+            return;
+
+        if (pitchDownRoutine != null)
+        {
+            StopCoroutine(pitchDownRoutine);
+            pitchDownRoutine = null;
+        }
+
+        if (impactRoutine != null)
+        {
+            StopCoroutine(impactRoutine);
+            impactRoutine = null;
+        }
+
+        // Marca como parada pra quando o clip de vitória acabar o Update não chamar o FinishSong de novo
+        isStopped = true;
+
+        audioSource.Stop();
+        audioSource.pitch = basePitch;
+        audioSource.volume = baseVolume;
+        audioSource.clip = VictoryAudio[UnityEngine.Random.Range(0, VictoryAudio.Count)];
+        audioSource.Play();
+    }
+
     public void ImpactBoost(float intensity, float duration)
     {
-        if (audioSource == null || !audioSource.isPlaying)
+        if (audioSource == null || !audioSource.isPlaying || pitchDownRoutine != null)
             return;
 
         intensity = Mathf.Clamp01(intensity);

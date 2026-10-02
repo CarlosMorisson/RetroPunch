@@ -30,10 +30,26 @@ public class ObjectPooler : MonoBehaviour
         {
             Debug.LogWarning("Another ObjectPooler instance found, destroying this one.");
             Destroy(gameObject);
+            return;
+        }
+
+        DisableSceneTemplates();
+    }
+
+    // Os "prefabs" dos pools sao objetos da cena. Se ficarem ativos eles jogam como um cubo normal
+    // (andam, falham, encolhem o filho pra scale 0 e sao desativados), e todo Instantiate feito
+    // depois clona esse estado quebrado: o cubo nasce com o filho em scale 0 (objeto "vazio").
+    // Desativando aqui, o template fica intacto e serve apenas de molde.
+    private void DisableSceneTemplates()
+    {
+        foreach (Pool pool in pools)
+        {
+            if (pool.prefab != null && pool.prefab.scene.IsValid())
+                pool.prefab.SetActive(false);
         }
     }
 
-    // ObjectPooler — inicializa o pool em chunks por frame
+    // ObjectPooler ï¿½ inicializa o pool em chunks por frame
     void Start()
     {
         poolDictionary = new Dictionary<string, Queue<GameObject>>();
@@ -46,7 +62,7 @@ public class ObjectPooler : MonoBehaviour
         {
             Queue<GameObject> objectPool = new Queue<GameObject>();
 
-            // Instancia só 20% do tamanho configurado no início
+            // Instancia sï¿½ 20% do tamanho configurado no inï¿½cio
             int initialSize = Mathf.Max(1, pool.size / 5);
 
             for (int i = 0; i < initialSize; i++)
@@ -111,9 +127,13 @@ public class ObjectPooler : MonoBehaviour
     {
         if (!poolDictionary.ContainsKey(tag))
         {
-            Debug.LogWarning($"Pool '{tag}' não existe.");
+            Debug.LogWarning($"Pool '{tag}' nï¿½o existe.");
             return;
         }
+
+        // Ja esta no pool: evita liberar de novo a celula de grid (OnObjectReturned) de outro cubo.
+        if (!obj.activeSelf)
+            return;
 
         DOTween.Kill(obj.transform);
         foreach (Transform child in obj.GetComponentsInChildren<Transform>())

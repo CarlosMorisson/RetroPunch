@@ -85,6 +85,36 @@ public class BeatMapGenerator : EditorWindow
         60
     };
 
+    // Quantos cubos "densos" seguidos (gap perto do mínimo) antes de forçar um respiro.
+    private static readonly int[] MaxStreakByDifficulty =
+    {
+        3,  // Beginner
+        4,  // VeryEasy
+        5,  // Easier
+        6,  // Easy
+        8,  // Normal
+        10, // Medium
+        12
+    };
+
+    // ---------------------------------------------------------------
+    // Ritmo / Respiro (pacing)
+    // Nunca altera o tempo de um cubo: só escolhe QUAIS onsets detectados viram cubo.
+    // ---------------------------------------------------------------
+    private bool showPacing = true;
+    private bool usePacing = true;
+    private bool snapToBeatGrid = true;
+    private float gridToleranceMs = 60f;
+    private int phraseBars = 4;
+    private float breathGapMultiplier = 2.5f;
+    private float energyInfluence = 0.5f;
+
+    private const float DenseGapFactor = 1.5f;     // gap < minDistance * isso conta como "denso"
+    private const float LookaheadFactor = 0.3f;    // janela pra procurar um onset melhor à frente
+    private const float MaxGridRejectRatio = 0.6f; // acima disso o grid provavelmente está errado
+
+    private string lastStats = "";
+
     // ---------------------------------------------------------------
     // Geração em lote (novo)
     // ---------------------------------------------------------------
@@ -139,6 +169,33 @@ public class BeatMapGenerator : EditorWindow
         warmupThresholdMultiplier = EditorGUILayout.Slider(
             "Warmup Threshold Mult", warmupThresholdMultiplier, 1.2f, 4f);
 
+        GUILayout.Space(8);
+        showPacing = EditorGUILayout.Foldout(showPacing, "Ritmo / Respiro", true, EditorStyles.foldoutHeader);
+        if (showPacing)
+        {
+            EditorGUI.indentLevel++;
+            usePacing = EditorGUILayout.Toggle("Ativar Ritmo/Respiro", usePacing);
+            EditorGUI.BeginDisabledGroup(!usePacing);
+            snapToBeatGrid = EditorGUILayout.Toggle(
+                new GUIContent("Somente no Beat", "Descarta onsets fora do grid de beats detectado (BPM)."),
+                snapToBeatGrid);
+            gridToleranceMs = EditorGUILayout.Slider("Tolerância do Grid (ms)", gridToleranceMs, 20f, 120f);
+            phraseBars = EditorGUILayout.IntSlider(
+                new GUIContent("Frase (compassos)", "Tamanho do ciclo sobe → pico → respiro, em compassos de 4 beats."),
+                phraseBars, 1, 16);
+            breathGapMultiplier = EditorGUILayout.Slider(
+                new GUIContent("Gap no Respiro (x)", "Quanto o espaço mínimo entre cubos cresce nos momentos de respiro."),
+                breathGapMultiplier, 1f, 6f);
+            energyInfluence = EditorGUILayout.Slider(
+                new GUIContent("Influência da Energia", "0 = só o ciclo da frase, 1 = só a energia da música."),
+                energyInfluence, 0f, 1f);
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.IntField("  Máx. Cubos Densos Seguidos", MaxStreakByDifficulty[idx]);
+            EditorGUI.EndDisabledGroup();
+            EditorGUI.EndDisabledGroup();
+            EditorGUI.indentLevel--;
+        }
+
         GUILayout.Space(10);
 
         EditorGUILayout.BeginHorizontal();
@@ -160,13 +217,19 @@ public class BeatMapGenerator : EditorWindow
                 $"Beats detectados: {previewBeats.Count}",
                 EditorStyles.boldLabel);
 
+            if (!string.IsNullOrEmpty(lastStats))
+                EditorGUILayout.HelpBox(lastStats, MessageType.None);
+
             scrollPos = EditorGUILayout.BeginScrollView(
                 scrollPos, GUILayout.Height(200));
 
+            float prevTime = float.NaN;
             foreach (var b in previewBeats)
             {
+                string gap = float.IsNaN(prevTime) ? "" : $"   gap={b.time - prevTime:F2}s";
                 EditorGUILayout.LabelField(
-                    $"t={b.time:F3}s   intensity={b.intensity:F2}   affinity={b.affinity}");
+                    $"t={b.time:F3}s   intensity={b.intensity:F2}   affinity={b.affinity}{gap}");
+                prevTime = b.time;
             }
 
             EditorGUILayout.EndScrollView();
@@ -321,6 +384,8 @@ public class BeatMapGenerator : EditorWindow
                     if (!wasLoaded)
                         audioClip.UnloadAudioData();
 
+                    Debug.Log($"[BeatMap] {audioClip.name} ({difficulty}): {beats.Count} cubos — {lastStats}");
+
                     SongBeatMap beatMap = ScriptableObject.CreateInstance<SongBeatMap>();
                     beatMap.audioClip = audioClip;
                     beatMap.beats = beats;
@@ -439,6 +504,10 @@ public class BeatMapGenerator : EditorWindow
         int totalFrames = Mathf.Max(0, (mono.Length - fftSize) / hop + 1);
         int minHistoryToDetect = Mathf.Max(4, historySize / 4);
 
+        // Curvas por frame usadas pelo pacing: força de onset (pro beat tracking) e energia (pra densidade).
+        float[] onsetStrength = new float[totalFrames];
+        float[] frameEnergy = new float[totalFrames];
+
         for (int frame = 0; frame < totalFrames; frame++)
         {
             int start = frame * hop;
@@ -463,7 +532,10 @@ public class BeatMapGenerator : EditorWindow
                     float diff = mag - prevMag[k];
                     if (diff > 0f) flux += diff; // spectral flux: só conta aumento de energia (ataque/onset)
                     prevMag[k] = mag;
+                    frameEnergy[frame] += mag;
                 }
+
+                onsetStrength[frame] += flux;
 
                 float avg = Average(band.history);
                 float stdDev = StdDev(band.history, avg);
@@ -524,7 +596,350 @@ public class BeatMapGenerator : EditorWindow
             final.Add(b);
         }
 
-        return final;
+        float frameRate = sampleRate / (float)hop;
+        float frameOffset = fftSize * 0.5f / sampleRate;
+
+        if (!usePacing)
+        {
+            lastStats = BuildStats(final, minDistance, 0f, false, targetClip.length);
+            return final;
+        }
+
+        List<BeatPoint> paced = ApplyPacing(final, onsetStrength, frameEnergy, frameRate, frameOffset, minDistance, idx,
+            out float bpm, out bool gridUsed);
+        lastStats = BuildStats(paced, minDistance, bpm, gridUsed, targetClip.length);
+        return paced;
+    }
+
+    // =================================================================
+    // PACING — Ritmo / Respiro
+    // Recebe os onsets detectados (já no tempo exato da música) e escolhe quais viram cubo.
+    // Nenhum tempo é alterado ou criado: todo cubo continua exatamente em cima de um onset.
+    // =================================================================
+    private List<BeatPoint> ApplyPacing(List<BeatPoint> candidates, float[] onsetStrength, float[] frameEnergy,
+        float frameRate, float frameOffset, float minDistance, int diffIdx, out float bpm, out bool gridUsed)
+    {
+        gridUsed = false;
+
+        // 1. Beat tracking → grid de beats reais da música (acompanha variações leves de tempo).
+        List<float> beatTimes = TrackBeats(onsetStrength, frameRate, frameOffset, out bpm);
+        bool hasGrid = beatTimes.Count >= 8;
+
+        // Dificuldades mais altas aceitam contratempo (meio beat); as mais baixas só o beat cheio.
+        int subdivisions = diffIdx >= (int)BeatMapDifficulty.Normal ? 2 : 1;
+        List<float> grid = hasGrid ? BuildSubdividedGrid(beatTimes, subdivisions) : null;
+        float tolerance = gridToleranceMs / 1000f;
+
+        // 2. Reforça "cubo no beat": descarta onsets fora do grid. Se o grid descartaria demais,
+        //    o BPM detectado provavelmente está errado — aí usa o grid só como preferência.
+        List<BeatPoint> pool = candidates;
+        if (hasGrid && snapToBeatGrid)
+        {
+            List<BeatPoint> onGrid = new();
+            foreach (var c in candidates)
+                if (DistanceToNearest(grid, c.time) <= tolerance)
+                    onGrid.Add(c);
+
+            float rejected = 1f - onGrid.Count / (float)Mathf.Max(1, candidates.Count);
+            if (rejected <= MaxGridRejectRatio)
+            {
+                pool = onGrid;
+                gridUsed = true;
+            }
+            else
+            {
+                Debug.LogWarning(
+                    $"[BeatMap] Grid de beats ({bpm:F0} BPM) descartaria {rejected:P0} dos onsets; " +
+                    "usando o grid só como preferência.");
+            }
+        }
+
+        // 3. Curva de energia suavizada (~1.5s) e normalizada (p95 = 1).
+        float[] energy = SmoothAndNormalize(frameEnergy, Mathf.Max(1, Mathf.RoundToInt(frameRate * 1.5f)));
+
+        int maxStreak = MaxStreakByDifficulty[diffIdx];
+        float breathGap = minDistance * breathGapMultiplier;
+        int phraseBeats = Mathf.Max(1, phraseBars * 4);
+
+        // 4. Seleção gulosa com gap variável: o espaço mínimo entre cubos sobe e desce ao longo
+        //    da frase e com a energia. Depois de muitos cubos densos seguidos, força um respiro.
+        List<BeatPoint> result = new();
+        float lastTime = float.NegativeInfinity;
+        int streak = 0;
+        int i = 0;
+
+        while (i < pool.Count)
+        {
+            float t = pool[i].time;
+            float need = RequiredGap(t, minDistance, beatTimes, hasGrid, phraseBeats, energy, frameRate, frameOffset);
+            if (streak >= maxStreak)
+                need = Mathf.Max(need, breathGap);
+
+            if (t - lastTime < need)
+            {
+                i++;
+                continue;
+            }
+
+            // Olha um pouco à frente: se tiver um onset mais forte / mais no beat logo depois, fica com ele.
+            int best = i;
+            float bestScore = Score(pool[i], grid, beatTimes, hasGrid, tolerance);
+            for (int j = i + 1; j < pool.Count && pool[j].time <= t + need * LookaheadFactor; j++)
+            {
+                float s = Score(pool[j], grid, beatTimes, hasGrid, tolerance);
+                if (s > bestScore)
+                {
+                    bestScore = s;
+                    best = j;
+                }
+            }
+
+            BeatPoint chosen = pool[best];
+            float gap = chosen.time - lastTime;
+            streak = gap < minDistance * DenseGapFactor ? streak + 1 : 0;
+
+            result.Add(chosen);
+            lastTime = chosen.time;
+            i = best + 1;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Gap mínimo exigido no tempo t. Mistura um ciclo por frase (sobe → pico → respira)
+    /// com a energia da música: densidade 1 = minDistance, densidade 0 = minDistance * breathGapMultiplier.
+    /// </summary>
+    private float RequiredGap(float t, float minDistance, List<float> beatTimes, bool hasGrid, int phraseBeats,
+        float[] energy, float frameRate, float frameOffset)
+    {
+        float phase;
+        if (hasGrid)
+        {
+            phase = Mathf.Repeat(BeatPosition(beatTimes, t), phraseBeats) / phraseBeats;
+        }
+        else
+        {
+            // Sem grid confiável: usa ~2s por compasso como aproximação.
+            float phraseSeconds = phraseBars * 2f;
+            phase = Mathf.Repeat(t, phraseSeconds) / phraseSeconds;
+        }
+
+        // Sobe durante 80% da frase, desce até o respiro no fim (e início da próxima).
+        float wave = phase < 0.8f
+            ? Mathf.SmoothStep(0f, 1f, phase / 0.8f)
+            : Mathf.SmoothStep(1f, 0f, (phase - 0.8f) / 0.2f);
+
+        int frame = Mathf.Clamp(Mathf.RoundToInt((t - frameOffset) * frameRate), 0, energy.Length - 1);
+        float density = Mathf.Lerp(wave, energy[frame], energyInfluence);
+
+        return minDistance * Mathf.Lerp(breathGapMultiplier, 1f, density);
+    }
+
+    /// <summary>Intensidade ponderada pelo alinhamento com o beat (beat cheio vale mais que contratempo).</summary>
+    private static float Score(BeatPoint b, List<float> grid, List<float> beatTimes, bool hasGrid, float tolerance)
+    {
+        if (!hasGrid) return b.intensity;
+
+        float onBeat = 1f - Mathf.Clamp01(DistanceToNearest(beatTimes, b.time) / tolerance);
+        float onSub = 1f - Mathf.Clamp01(DistanceToNearest(grid, b.time) / tolerance);
+        float align = Mathf.Max(onBeat, onSub * 0.7f);
+
+        return b.intensity * (1f + 0.5f * align);
+    }
+
+    /// <summary>
+    /// Beat tracker por programação dinâmica (Ellis 2007): estima o período por autocorrelação
+    /// da curva de onset e acha a sequência de beats que melhor casa com os onsets mantendo o período.
+    /// </summary>
+    private static List<float> TrackBeats(float[] onset, float frameRate, float frameOffset, out float bpm)
+    {
+        bpm = 0f;
+        List<float> beats = new();
+        int n = onset.Length;
+        if (n < 16) return beats;
+
+        float mean = 0f;
+        foreach (float v in onset) mean += v;
+        mean /= n;
+        float variance = 0f;
+        foreach (float v in onset) variance += (v - mean) * (v - mean);
+        float std = Mathf.Sqrt(variance / n);
+        if (std <= 0f) return beats;
+
+        // Autocorrelação ponderada em torno de 120 BPM pra evitar erro de oitava (60/240).
+        int minLag = Mathf.Max(1, Mathf.RoundToInt(frameRate * 60f / 200f));
+        int maxLag = Mathf.Min(n / 2, Mathf.RoundToInt(frameRate * 60f / 60f));
+        if (maxLag <= minLag + 1) return beats;
+
+        float[] ac = new float[maxLag + 2];
+        int bestLag = minLag;
+        float bestWeighted = float.MinValue;
+        for (int lag = minLag - 1; lag <= maxLag + 1; lag++)
+        {
+            if (lag < 1) continue;
+            double sum = 0;
+            for (int k = 0; k + lag < n; k++)
+                sum += (onset[k] - mean) * (onset[k + lag] - mean);
+            ac[lag] = (float)(sum / (n - lag));
+
+            if (lag < minLag || lag > maxLag) continue;
+            float lagBpm = 60f * frameRate / lag;
+            float octaves = Mathf.Log(lagBpm / 120f, 2f);
+            float weighted = ac[lag] * Mathf.Exp(-0.5f * octaves * octaves);
+            if (weighted > bestWeighted)
+            {
+                bestWeighted = weighted;
+                bestLag = lag;
+            }
+        }
+
+        // Refino sub-frame do período (interpolação parabólica).
+        float period = bestLag;
+        float a = ac[Mathf.Max(1, bestLag - 1)], b = ac[bestLag], c = ac[bestLag + 1];
+        float denom = a - 2f * b + c;
+        if (Mathf.Abs(denom) > 1e-9f)
+            period += Mathf.Clamp(0.5f * (a - c) / denom, -0.5f, 0.5f);
+        bpm = 60f * frameRate / period;
+
+        // Programação dinâmica.
+        const float tightness = 100f;
+        float[] norm = new float[n];
+        for (int k = 0; k < n; k++) norm[k] = onset[k] / std;
+
+        float[] score = new float[n];
+        int[] back = new int[n];
+        int lo = Mathf.RoundToInt(period * 2f);
+        int hi = Mathf.Max(1, Mathf.RoundToInt(period * 0.5f));
+
+        for (int t = 0; t < n; t++)
+        {
+            int bestPrev = -1;
+            float bestVal = float.MinValue;
+            for (int p = Mathf.Max(0, t - lo); p <= t - hi; p++)
+            {
+                float r = Mathf.Log((t - p) / period);
+                float val = score[p] - tightness * r * r;
+                if (val > bestVal)
+                {
+                    bestVal = val;
+                    bestPrev = p;
+                }
+            }
+
+            score[t] = norm[t] + (bestPrev >= 0 ? Mathf.Max(0f, bestVal) : 0f);
+            back[t] = bestVal > 0f ? bestPrev : -1;
+        }
+
+        // Começa do melhor frame no último período e volta pelos backlinks.
+        int end = n - 1;
+        for (int t = Mathf.Max(0, n - Mathf.CeilToInt(period)); t < n; t++)
+            if (score[t] > score[end]) end = t;
+
+        List<int> frames = new();
+        for (int t = end; t >= 0; t = back[t])
+            frames.Add(t);
+        frames.Reverse();
+
+        foreach (int f in frames)
+            beats.Add(f / frameRate + frameOffset);
+
+        return beats;
+    }
+
+    private static List<float> BuildSubdividedGrid(List<float> beatTimes, int subdivisions)
+    {
+        List<float> grid = new();
+        for (int k = 0; k < beatTimes.Count; k++)
+        {
+            grid.Add(beatTimes[k]);
+            if (k + 1 >= beatTimes.Count) break;
+
+            float span = beatTimes[k + 1] - beatTimes[k];
+            for (int s = 1; s < subdivisions; s++)
+                grid.Add(beatTimes[k] + span * s / subdivisions);
+        }
+        return grid;
+    }
+
+    /// <summary>Posição contínua em beats (ex.: 12.5 = meio caminho entre o beat 12 e o 13).</summary>
+    private static float BeatPosition(List<float> beatTimes, float t)
+    {
+        int k = beatTimes.BinarySearch(t);
+        if (k < 0) k = ~k - 1;
+
+        if (k < 0)
+        {
+            float span0 = beatTimes[1] - beatTimes[0];
+            return (t - beatTimes[0]) / span0;
+        }
+        if (k >= beatTimes.Count - 1)
+        {
+            int last = beatTimes.Count - 1;
+            float spanN = beatTimes[last] - beatTimes[last - 1];
+            return last + (t - beatTimes[last]) / spanN;
+        }
+
+        return k + (t - beatTimes[k]) / (beatTimes[k + 1] - beatTimes[k]);
+    }
+
+    private static float DistanceToNearest(List<float> sorted, float t)
+    {
+        int k = sorted.BinarySearch(t);
+        if (k >= 0) return 0f;
+        k = ~k;
+
+        float best = float.MaxValue;
+        if (k < sorted.Count) best = sorted[k] - t;
+        if (k > 0) best = Mathf.Min(best, t - sorted[k - 1]);
+        return best;
+    }
+
+    private static float[] SmoothAndNormalize(float[] values, int window)
+    {
+        int n = values.Length;
+        float[] result = new float[n];
+        if (n == 0) return result;
+
+        double[] prefix = new double[n + 1];
+        for (int k = 0; k < n; k++) prefix[k + 1] = prefix[k] + values[k];
+
+        int half = window / 2;
+        for (int k = 0; k < n; k++)
+        {
+            int from = Mathf.Max(0, k - half);
+            int to = Mathf.Min(n, k + half + 1);
+            result[k] = (float)((prefix[to] - prefix[from]) / (to - from));
+        }
+
+        float[] sorted = (float[])result.Clone();
+        System.Array.Sort(sorted);
+        float p95 = sorted[Mathf.Clamp(Mathf.FloorToInt(n * 0.95f), 0, n - 1)];
+        if (p95 > 0f)
+            for (int k = 0; k < n; k++)
+                result[k] = Mathf.Clamp01(result[k] / p95);
+
+        return result;
+    }
+
+    private string BuildStats(List<BeatPoint> beats, float minDistance, float bpm, bool gridUsed, float songLength)
+    {
+        if (beats.Count == 0) return "Nenhum cubo gerado.";
+
+        int breaths = 0;
+        float longest = 0f;
+        float breathGap = minDistance * breathGapMultiplier;
+        for (int k = 1; k < beats.Count; k++)
+        {
+            float gap = beats[k].time - beats[k - 1].time;
+            if (gap >= breathGap) breaths++;
+            longest = Mathf.Max(longest, gap);
+        }
+
+        float perMinute = songLength > 0f ? beats.Count / (songLength / 60f) : 0f;
+        string bpmText = bpm > 0f ? $"{bpm:F1} BPM{(gridUsed ? " (somente no beat)" : " (preferência)")}" : "sem BPM";
+
+        return $"{bpmText}   |   {perMinute:F0} cubos/min   |   {breaths} respiros   |   maior gap {longest:F2}s";
     }
 
     private float[] DownmixToMono(AudioClip targetClip)

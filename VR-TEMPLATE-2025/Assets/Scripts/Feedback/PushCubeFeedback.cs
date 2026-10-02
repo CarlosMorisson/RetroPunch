@@ -21,8 +21,10 @@ public class PushCubeFeedback : MonoBehaviour
     private Color originalEmission1;
     private Color originalEmission2;
 
-    private void Awake()
-    {
+    private bool originalEmissionKeyword1;
+    private bool originalEmissionKeyword2;
+
+    private void Awake()    {
         if (lineRenderer != null)
         {
             lineRenderer.positionCount = 2;
@@ -41,7 +43,8 @@ public class PushCubeFeedback : MonoBehaviour
 
         if (meshRenderer1 != null)
         {
-            mat1 = meshRenderer1.material; 
+            mat1 = meshRenderer1.material;
+            originalEmissionKeyword1 = mat1.IsKeywordEnabled("_EMISSION");
             if (mat1.HasProperty("_EmissionColor"))
             {
                 originalEmission1 = mat1.GetColor("_EmissionColor");
@@ -51,6 +54,7 @@ public class PushCubeFeedback : MonoBehaviour
         if (meshRenderer2 != null)
         {
             mat2 = meshRenderer2.material;
+            originalEmissionKeyword2 = mat2.IsKeywordEnabled("_EMISSION");
             if (mat2.HasProperty("_EmissionColor"))
             {
                 originalEmission2 = mat2.GetColor("_EmissionColor");
@@ -58,11 +62,42 @@ public class PushCubeFeedback : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        ResetMaterial(mat1, originalEmission1, originalEmissionKeyword1);
+        ResetMaterial(mat2, originalEmission2, originalEmissionKeyword2);
+
+        if (lineRenderer != null)
+        {
+            lineRenderer.enabled = false;
+        }
+    }
+
     /// <summary>
-    /// Função que recebe a posição do objeto e a direção do movimento para gerar o feedback visual.
+    /// Cancela o blink em andamento e restaura a cor de emissÃ£o original do material.
     /// </summary>
-    /// <param name="targetPosition">Posição central do cubo.</param>
-    /// <param name="moveDirection">Vetor de direção para onde o cubo está indo.</param>
+    private void ResetMaterial(Material mat, Color originalColor, bool emissionKeywordEnabled)
+    {
+        if (mat == null) return;
+
+        mat.DOKill();
+
+        if (mat.HasProperty("_EmissionColor"))
+        {
+            mat.SetColor("_EmissionColor", originalColor);
+        }
+
+        if (emissionKeywordEnabled)
+            mat.EnableKeyword("_EMISSION");
+        else
+            mat.DisableKeyword("_EMISSION");
+    }
+
+    /// <summary>
+    /// Funï¿½ï¿½o que recebe a posiï¿½ï¿½o do objeto e a direï¿½ï¿½o do movimento para gerar o feedback visual.
+    /// </summary>
+    /// <param name="targetPosition">Posiï¿½ï¿½o central do cubo.</param>
+    /// <param name="moveDirection">Vetor de direï¿½ï¿½o para onde o cubo estï¿½ indo.</param>
     public void HandlePushFeedback(Vector3 targetPosition, Vector3 moveDirection)
     {
         BlinkMaterial(mat1, originalEmission1);

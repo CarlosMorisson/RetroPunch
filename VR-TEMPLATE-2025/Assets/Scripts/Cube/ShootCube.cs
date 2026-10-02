@@ -207,6 +207,8 @@ public class ShootCube : CubeCollider
                 breakCube.TriggerExplosion(collisionLocation, transform);
         }
 
+        // Sem isso o root ficava ativo para sempre e nunca voltava ao pool.
+        ReturnToPool(PrefabTag);
         gameObject.SetActive(false);
     }
 

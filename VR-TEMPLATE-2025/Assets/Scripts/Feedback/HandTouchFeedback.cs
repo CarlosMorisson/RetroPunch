@@ -45,6 +45,10 @@ public class HandTouchFeedback : MonoBehaviour
     private const float FAIL_HAPTIC_DURATION = 0.25f;
     private const float FAIL_HAPTIC_FREQUENCY = 0.5f;
 
+    private const float SWITCH_HAPTIC_INTENSITY = 1f;
+    private const float SWITCH_HAPTIC_DURATION = 2f;
+    private const float SWITCH_HAPTIC_FREQUENCY = 0.5f;
+
     void Awake()
     {
         Instance = this;
@@ -277,6 +281,19 @@ public class HandTouchFeedback : MonoBehaviour
             else
                 hapticPlayer.SendHapticImpulse(FAIL_HAPTIC_INTENSITY, FAIL_HAPTIC_DURATION, FAIL_HAPTIC_FREQUENCY);
         }
+    }
+
+    /// <summary>
+    /// Chamado pelo SwitchHandsController quando a troca de mãos acontece de fato.
+    /// Vibra os dois controles para avisar o jogador da nova mão.
+    /// </summary>
+    public void PlaySwitchHaptic()
+    {
+        if (leftHapticPlayer != null)
+            leftHapticPlayer.SendHapticImpulse(SWITCH_HAPTIC_INTENSITY, SWITCH_HAPTIC_DURATION, SWITCH_HAPTIC_FREQUENCY);
+
+        if (rightHapticPlayer != null)
+            rightHapticPlayer.SendHapticImpulse(SWITCH_HAPTIC_INTENSITY, SWITCH_HAPTIC_DURATION, SWITCH_HAPTIC_FREQUENCY);
     }
 
     private bool IsRightHand(HandSwitch hand)

@@ -50,6 +50,7 @@ public class PushCube : CubeCollider
 
     private bool hasMisstaken = false;
     private Rigidbody rb;
+    private MeshTrailEmitter meshTrailEmitter;
 
     private const string PORTAL_NAME = "Portal";
 
@@ -68,6 +69,8 @@ public class PushCube : CubeCollider
         cachedRenderer = GetComponentInChildren<Renderer>();
         if (cachedRenderer != null)
             originalMaterial = cachedRenderer.material;
+
+        meshTrailEmitter = GetComponentInChildren<MeshTrailEmitter>();
     }
 
     protected override void OnEnable()
@@ -161,7 +164,8 @@ public class PushCube : CubeCollider
     public IEnumerator LifeTime()
     {
         yield return new WaitForSeconds(CubeLifeTime);
-        FailFeedback();
+        if (TryResolve())
+            FailFeedback();
     }
 
     #endregion
@@ -171,6 +175,10 @@ public class PushCube : CubeCollider
 
     protected override void OnCollisionEnter(Collision collision)
     {
+        // Apenas o primeiro toque do jogador é registrado; os demais são bloqueados até o próximo OnEnable.
+        if (collision.gameObject.CompareTag(PLAYER_TAG) && !TryLockTouch())
+            return;
+
         base.OnCollisionEnter(collision);
 
         if (collision.gameObject.CompareTag(WALL_TAG))
@@ -187,7 +195,7 @@ public class PushCube : CubeCollider
             HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
             StartCoroutine(WaitToDestroy());
         }
-        if (collision.gameObject.CompareTag(PORTAL_NAME))
+        if (collision.gameObject.CompareTag(PORTAL_NAME) && !IsResolved)
         {
             PortalFeedback portalGame = collision.gameObject.GetComponent<PortalFeedback>();
             if (portalGame.PushType == pushDirection || pushDirection == PushType.Freeze || pushDirection == PushType.Power)
@@ -250,6 +258,7 @@ public class PushCube : CubeCollider
     }
     public void SucessFeedback()
     {
+        meshTrailEmitter?.StopAndKillGhosts();
         feedbackRotate.gameObject.SetActive(true);
         feedbackRotate.GetComponent<BreakCube>().TriggerExplosion(collisionLocation, transform);
         ReturnToPool(PrefabTag);
@@ -264,6 +273,8 @@ public class PushCube : CubeCollider
 
     private IEnumerator FailRoutine()
     {
+        meshTrailEmitter?.StopAndKillGhosts();
+
         if (cachedRenderer != null && failMaterial != null)
         {
             for (int i = 0; i < blinkCount; i++)

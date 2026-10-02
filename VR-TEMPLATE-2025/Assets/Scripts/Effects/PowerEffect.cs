@@ -18,6 +18,8 @@ public class PowerEffect : MonoBehaviour
     [SerializeField] private Image FreezeClookImage;
 
     [HideInInspector] public bool isPowered = false;
+    /// <summary>true enquanto o Power Time estiver ativo (não conta o tempo esperando na fila).</summary>
+    public static bool IsRunning => Instance != null && Instance.isPowered;
 
     [Header("Events")]
     public UnityEvent OnStartPowerTime;
@@ -75,6 +77,9 @@ public class PowerEffect : MonoBehaviour
     }
     private IEnumerator FreezeRoutine()
     {
+        // Se o Freeze Time estiver ativo, o power fica na fila até ele acabar.
+        yield return new WaitUntil(() => !FreezeEffect.IsActive);
+
         isPowered = true;
         OnPowerChanged?.Invoke(true);
 

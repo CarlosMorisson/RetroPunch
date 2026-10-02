@@ -24,6 +24,8 @@ public class FreezeEffect : MonoBehaviour
     public UnityEvent OnFinishFreezeTime;
 
     public static bool IsFrozen { get; private set; }
+    /// <summary>true durante toda a rotina (slow down, freeze e restore) — o time scale está sob controle do freeze.</summary>
+    public static bool IsActive { get; private set; }
     /// <summary>true ao iniciar o freeze, false ao terminar.</summary>
     public static event System.Action<bool> OnFreezeChanged;
 
@@ -61,6 +63,10 @@ public class FreezeEffect : MonoBehaviour
 
     private IEnumerator FreezeRoutine()
     {
+        // Se o Power Time estiver ativo, o freeze fica na fila até ele acabar.
+        yield return new WaitUntil(() => !PowerEffect.IsRunning);
+
+        IsActive = true;
         yield return LerpTimeScale(defaultTimeScale, freezeTimeScale, slowDownDuration);
         AudioController.Instance.Play(TRANSITION_AUDIO);
         if (AudioEffect.Instance != null)
@@ -106,6 +112,7 @@ public class FreezeEffect : MonoBehaviour
         yield return LerpTimeScale(freezeTimeScale, defaultTimeScale, restoreDuration);
 
         IsFrozen = false;
+        IsActive = false;
         OnFreezeChanged?.Invoke(false);
         OnFinishFreezeTime?.Invoke();
         AudioController.Instance.Play(TRANSITION_AUDIO);
@@ -133,6 +140,10 @@ public class FreezeEffect : MonoBehaviour
 
     private void OnDestroy()
     {
+        // Estáticos sobrevivem à troca de cena
+        IsActive = false;
+        IsFrozen = false;
+
         objectScaleTween?.Kill();
         clockFillTween?.Kill();
     }

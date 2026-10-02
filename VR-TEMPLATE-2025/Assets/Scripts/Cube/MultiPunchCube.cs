@@ -114,6 +114,12 @@ public class MultiPunchCube : CubeCollider
                 OnFail += SkyboxVisual.Instance.TriggerFailDeboost;
             }
 
+            if (SwitchHandsController.Instance != null)
+            {
+                OnSuccess += SwitchHandsController.Instance.RandomizeCurrentBothHands;
+                OnFail += SwitchHandsController.Instance.RandomizeCurrentBothHands;
+            }
+
             eventsRegistered = true;
         }
 
@@ -153,6 +159,12 @@ public class MultiPunchCube : CubeCollider
                 OnFail -= SkyboxVisual.Instance.TriggerFailDeboost;
             }
 
+            if (SwitchHandsController.Instance != null)
+            {
+                OnSuccess -= SwitchHandsController.Instance.RandomizeCurrentBothHands;
+                OnFail -= SwitchHandsController.Instance.RandomizeCurrentBothHands;
+            }
+
             if (visualBoosters != null)
             {
                 foreach (var booster in visualBoosters)
@@ -170,7 +182,8 @@ public class MultiPunchCube : CubeCollider
     IEnumerator LifeTime()
     {
         yield return new WaitForSeconds(CubeLifeTime);
-        FailFeedback();
+        if (TryResolve())
+            FailFeedback();
     }
 
     #endregion
@@ -179,6 +192,19 @@ public class MultiPunchCube : CubeCollider
 
     protected override void OnCollisionEnter(Collision collision)
     {
+        PunchPoint point = null;
+
+        if (collision.gameObject.CompareTag(PLAYER_TAG))
+        {
+            // Cubo já resolvido ou ponto já tocado: ignora o toque (cada ponto registra um único toque).
+            if (IsResolved)
+                return;
+
+            point = GetClosestPoint(collision.transform.position);
+            if (point != null && point.isTouched && !PowerEffect.Instance.isPowered)
+                return;
+        }
+
         base.OnCollisionEnter(collision);
 
         if (collision.gameObject.CompareTag(WALL_TAG))
@@ -189,9 +215,6 @@ public class MultiPunchCube : CubeCollider
 
         if (collision.gameObject.CompareTag(PLAYER_TAG))
         {
-            Transform hit = collision.transform;
-
-            PunchPoint point = GetClosestPoint(hit.position);
             if (PowerEffect.Instance.isPowered)
             {
                 HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);

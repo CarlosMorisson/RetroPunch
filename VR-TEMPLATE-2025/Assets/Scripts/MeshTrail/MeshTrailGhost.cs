@@ -10,11 +10,15 @@ public class MeshTrailGhost : MonoBehaviour
     private float lifetime;
     private float minAlpha;
     private float timer;
+    private Mesh ownedMesh;
+    private Vector3 initialScale;
 
-    public void Init(float life, float minA)
+    public void Init(float life, float minA, Mesh bakedMesh = null)
     {
-        lifetime = life;
+        lifetime = Mathf.Max(0.01f, life);
         minAlpha = minA;
+        ownedMesh = bakedMesh;
+        initialScale = transform.localScale;
 
         mat = GetComponent<MeshRenderer>().material;
         if (mat == null)
@@ -39,6 +43,15 @@ public class MeshTrailGhost : MonoBehaviour
         return material.HasProperty("_BaseColor") ? "_BaseColor" : "_Color";
     }
 
+    // Libera a instância de material e o mesh bakeado para não vazar memória a cada ghost.
+    private void OnDestroy()
+    {
+        if (mat != null)
+            Destroy(mat);
+        if (ownedMesh != null)
+            Destroy(ownedMesh);
+    }
+
     void Update()
     {
         if (mat == null)
@@ -48,7 +61,10 @@ public class MeshTrailGhost : MonoBehaviour
         }
 
         timer += Time.deltaTime;
-        float t = timer / lifetime;
+        float t = Mathf.Clamp01(timer / lifetime);
+
+        // Encolhe do scale original até zero ao longo do lifetime.
+        transform.localScale = Vector3.Lerp(initialScale, Vector3.zero, t);
 
         float alpha = Mathf.Lerp(1f, 0f, t);
         if (alpha <= minAlpha)
@@ -58,7 +74,7 @@ public class MeshTrailGhost : MonoBehaviour
         c.a = alpha;
         mat.SetColor(colorProperty, c);
 
-        if (alpha <= 0f)
+        if (t >= 1f)
             Destroy(gameObject);
     }
 }

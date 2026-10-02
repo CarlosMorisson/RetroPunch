@@ -18,6 +18,11 @@ public class FeedbackCubeManager : MonoBehaviour
 
     public void NotifyFinished()
     {
+        // Tween de fragmento terminando depois que o cubo já voltou ao pool (ou foi reutilizado):
+        // não devolver o cubo novo ao pool.
+        if (!gameObject.activeInHierarchy)
+            return;
+
         finishedCount++;
 
         if (finishedCount >= cubes.Length)

@@ -64,7 +64,7 @@ public class UIResult : MonoBehaviour
     private GameObject RestartButton;
     [SerializeField]
     private GameObject MenuButton;
-    [Header("Settings de Animação")]
+    [Header("Settings de Animaï¿½ï¿½o")]
     [SerializeField] private float dropDuration = 0.5f;
     [SerializeField] private float scaleDuration = 0.3f;
     [SerializeField] private float startYOffset = 1000f;
@@ -264,7 +264,7 @@ public class UIResult : MonoBehaviour
     public void UpdatePercentAccuracy()
     {
         blockDestructedPercentText.text=PointController.Instance.GetPercentageSucessString();
-        blockImagePorcent.fillAmount=PointController.Instance.GetPercentageSucessInt()/100;
+        blockImagePorcent.fillAmount=PointController.Instance.GetPercentageSucess()/100;
     }
     public void UpdateBestConsecutive(int consecutive)
     {
@@ -286,7 +286,7 @@ public class UIResult : MonoBehaviour
         musicFinalNameText.text= name;
         musicNameText.transform.DOPunchScale(musicNameText.transform.localScale * MULTIPLIER_VALUE, PUNCH_TIME);
     }
-    public void UpdateCalorie(float calorie)=>caloriesText.text = calorie.ToString();
+    public void UpdateCalorie(float calorie)=>caloriesText.text = DecimalFormat.OneDecimal(calorie);
     private void Start()
     {
         PointController.Instance.OnAcceptInt += UpdateResult;

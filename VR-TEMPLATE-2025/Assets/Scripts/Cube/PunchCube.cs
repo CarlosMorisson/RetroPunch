@@ -100,6 +100,12 @@ public class PunchCube : CubeCollider
                 OnFail += ColorController.Instance.TriggerFailDim;
             }
 
+            if (SwitchHandsController.Instance != null)
+            {
+                OnSuccess += SwitchHandsController.Instance.RandomizeCurrentBothHands;
+                OnFail += SwitchHandsController.Instance.RandomizeCurrentBothHands;
+            }
+
             if (OnSucessLocal != null)
                 OnSuccess += OnSucessLocal.Invoke;
 
@@ -149,6 +155,12 @@ public class PunchCube : CubeCollider
                 OnFail -= ColorController.Instance.TriggerFailDim;
             }
 
+            if (SwitchHandsController.Instance != null)
+            {
+                OnSuccess -= SwitchHandsController.Instance.RandomizeCurrentBothHands;
+                OnFail -= SwitchHandsController.Instance.RandomizeCurrentBothHands;
+            }
+
             eventsRegistered = false;
         }
     }
@@ -157,7 +169,8 @@ public class PunchCube : CubeCollider
     public IEnumerator LifeTime()
     {
         yield return new WaitForSeconds(CubeLifeTime);
-        FailFeedback();
+        if (TryResolve())
+            FailFeedback();
     }
 
     #endregion
@@ -171,6 +184,10 @@ public class PunchCube : CubeCollider
 
     protected override void OnCollisionEnter(Collision collision)
     {
+        // Apenas o primeiro toque do jogador é registrado; os demais são bloqueados até o próximo OnEnable.
+        if (collision.gameObject.CompareTag(PLAYER_TAG) && !TryLockTouch())
+            return;
+
         base.OnCollisionEnter(collision);
 
         if (collision.gameObject.CompareTag(WALL_TAG))

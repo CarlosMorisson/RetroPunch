@@ -56,7 +56,7 @@ public class VictoryEffects : MonoBehaviour
         public bool FadeOut = true;
 
         [Header("Configuração do Tween")]
-        public float Duration = 0.5f;
+        public float Duration = 5f;
         public float Delay = 0f;
         public Ease EaseType = Ease.OutBack;
         [Tooltip("-1 = loop infinito, 0 = sem loop.")]
@@ -87,6 +87,9 @@ public class VictoryEffects : MonoBehaviour
 
         [Tooltip("BuildMovemmentVisual desse ambiente, de onde os objetos instanciados são obtidos.")]
         public BuildMovemmentVisual Source;
+
+        [Tooltip("Faixa de índices (inclusiva) das listas Left/Right do Source que vão CAIR. X = índice inicial, Y = índice final. Os tweens usam a lista inteira.")]
+        public Vector2Int IndexRange = new Vector2Int(50, 100);
 
         [Tooltip("Objetos instanciados do lado direito desse ambiente (preenchido a partir do Source).")]
         public List<GameObject> RightObjects = new List<GameObject>();
@@ -256,6 +259,25 @@ public class VictoryEffects : MonoBehaviour
     [Tooltip("Todos os objetos que vão cair (preenchido pelo refresh da queda).")]
     [SerializeField] private List<GameObject> fallObjects = new List<GameObject>();
 
+    [Header("Queda - Otimização")]
+    [Tooltip("Faixa de índices (inclusiva) usada pelos BuildMovemmentVisual que não estão na lista de Ambientes. Os que estão usam o Index Range do próprio ambiente.")]
+    [SerializeField] private Vector2Int fallIndexRange = new Vector2Int(50, 100);
+    [Tooltip("Pega 1 a cada N objetos dentro da faixa. 1 = todos, 2 = um sim um não, etc.")]
+    [Min(1)] [SerializeField] private int fallIndexStep = 1;
+    [Tooltip("Só derruba objetos até essa distância da câmera. 0 = sem limite.")]
+    [Min(0f)] [SerializeField] private float fallMaxDistance = 0f;
+    [Tooltip("Quantos objetos têm a física ligada por frame, pra não travar tudo num frame só.")]
+    [Min(1)] [SerializeField] private int fallDropsPerFrame = 10;
+    [Tooltip("Interpolação suaviza o movimento mas custa caro com muitos Rigidbodies.")]
+    [SerializeField] private bool fallUseInterpolation = false;
+    [SerializeField] private CollisionDetectionMode fallCollisionMode = CollisionDetectionMode.Discrete;
+    [Tooltip("Energia abaixo da qual o Rigidbody dorme (padrão da Unity é 0.005). Maior = dorme mais cedo e para de custar.")]
+    [Min(0f)] [SerializeField] private float fallSleepThreshold = 0.05f;
+    [Tooltip("Depois desse tempo o objeto congela (volta a ser kinematic) e sai da simulação. 0 = nunca.")]
+    [Min(0f)] [SerializeField] private float fallFreezeAfter = 4f;
+
+    private Coroutine dropRoutine;
+
     [Header("Eventos")]
     public UnityEvent OnVictoryEffectsComplete;
 
@@ -322,25 +344,58 @@ public class VictoryEffects : MonoBehaviour
 
         BuildMovemmentVisual[] visuals = FindObjectsByType<BuildMovemmentVisual>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
+        Transform cam = Camera.main != null ? Camera.main.transform : null;
+
         foreach (BuildMovemmentVisual visual in visuals)
         {
             fallSources.Add(visual);
 
-            foreach (Transform t in visual.RightList)
-            {
-                if (t != null)
-                    fallObjects.Add(t.gameObject);
-            }
-
-            foreach (Transform t in visual.LeftList)
-            {
-                if (t != null)
-                    fallObjects.Add(t.gameObject);
-            }
+            Vector2Int range = GetFallIndexRange(visual);
+            AddFallObjectsInRange(visual.RightList, range, cam);
+            AddFallObjectsInRange(visual.LeftList, range, cam);
         }
     }
 
-    // Liga a física de todos os objetos dos BuildMovemmentVisual e dá um empurrão fraco
+    // Usa o Index Range do ambiente que tem esse BuildMovemmentVisual como Source,
+    // ou o fallIndexRange geral se ele não estiver na lista de Ambientes
+    private Vector2Int GetFallIndexRange(BuildMovemmentVisual visual)
+    {
+        if (environmentGroups != null)
+        {
+            foreach (VictoryEnvironmentGroup group in environmentGroups)
+            {
+                if (group != null && group.Source == visual)
+                    return group.IndexRange;
+            }
+        }
+
+        return fallIndexRange;
+    }
+
+    // Adiciona só os objetos da faixa de índices (respeitando o passo e a distância máxima)
+    private void AddFallObjectsInRange(IList<Transform> list, Vector2Int range, Transform cam)
+    {
+        if (list == null || list.Count == 0)
+            return;
+
+        int start = Mathf.Clamp(Mathf.Min(range.x, range.y), 0, list.Count - 1);
+        int end = Mathf.Clamp(Mathf.Max(range.x, range.y), 0, list.Count - 1);
+        float maxSqrDistance = fallMaxDistance * fallMaxDistance;
+
+        for (int i = start; i <= end; i += fallIndexStep)
+        {
+            Transform t = list[i];
+            if (t == null)
+                continue;
+
+            if (fallMaxDistance > 0f && cam != null && (t.position - cam.position).sqrMagnitude > maxSqrDistance)
+                continue;
+
+            fallObjects.Add(t.gameObject);
+        }
+    }
+
+    // Liga a física dos objetos da faixa configurada e dá um empurrão fraco
     // no topo de cada um pra ele tombar
     [ContextMenu("Derrubar Objetos dos Ambientes")]
     public void DropEnvironmentObjects()
@@ -356,8 +411,29 @@ public class VictoryEffects : MonoBehaviour
             }
         }
 
+        if (dropRoutine != null)
+            StopCoroutine(dropRoutine);
+
+        dropRoutine = StartCoroutine(DropObjectsOverFrames());
+    }
+
+    // Espalha a ativação da física por vários frames em vez de ligar tudo de uma vez
+    private System.Collections.IEnumerator DropObjectsOverFrames()
+    {
+        int droppedThisFrame = 0;
+
         foreach (GameObject go in fallObjects)
+        {
             DropObject(go);
+
+            if (++droppedThisFrame >= fallDropsPerFrame)
+            {
+                droppedThisFrame = 0;
+                yield return null;
+            }
+        }
+
+        dropRoutine = null;
     }
 
     private void DropObject(GameObject go)
@@ -382,7 +458,9 @@ public class VictoryEffects : MonoBehaviour
 
         rb.isKinematic = false;
         rb.useGravity = true;
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.interpolation = fallUseInterpolation ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+        rb.collisionDetectionMode = fallCollisionMode;
+        rb.sleepThreshold = fallSleepThreshold;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.WakeUp();
@@ -392,6 +470,20 @@ public class VictoryEffects : MonoBehaviour
             PushTop(rb);
         else
             DOVirtual.DelayedCall(delay, () => PushTop(rb), useUnscaledTime).SetTarget(rb);
+
+        if (fallFreezeAfter > 0f)
+            DOVirtual.DelayedCall(delay + fallFreezeAfter, () => FreezeBody(rb), useUnscaledTime).SetTarget(rb);
+    }
+
+    // Tira o objeto da simulação depois que ele já caiu, parando o custo de física
+    private static void FreezeBody(Rigidbody rb)
+    {
+        if (rb == null)
+            return;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
     }
 
     // Procura o Rigidbody primeiro nos filhos do objeto da lista e só depois no próprio objeto
@@ -649,6 +741,9 @@ public class VictoryEffects : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (dropRoutine != null)
+            StopCoroutine(dropRoutine);
+
         StopVictoryEffects();
     }
 }

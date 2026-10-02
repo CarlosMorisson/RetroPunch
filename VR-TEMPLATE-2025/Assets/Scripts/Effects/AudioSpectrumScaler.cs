@@ -233,6 +233,13 @@ public class AudioSpectrumScaler : MonoBehaviour
         transform.localScale = initialScale * currentScaleFactor;
     }
 
+    // Toca o som de queda quando o objeto bate no chão
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground") && AudioController.Instance != null)
+            AudioController.Instance.Play("Fall");
+    }
+
     public void SetFrequencyBand(FrequencyBand band) => frequencyBand = band;
 
     public void SetAutoSwitchBand(bool value) => autoSwitchBand = value;

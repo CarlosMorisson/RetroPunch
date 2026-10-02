@@ -38,10 +38,24 @@ public class CubeCollider : MonoBehaviour
     protected const string PLAYER_TAG = "Player";
     private const float WAIT_TIME=2f;
 
+    // Trava de toque: apenas um toque do jogador é registrado por ciclo de vida (reseta no OnEnable).
+    protected bool IsTouchLocked { get; private set; }
+    // Trava de resultado: sucesso/falha só podem ser disparados uma vez por ciclo de vida.
+    protected bool IsResolved { get; private set; }
+
+    // Identifica o ciclo de vida atual; retornos ao pool agendados em ciclos anteriores são ignorados.
+    private int lifeId;
+    private bool returnScheduled;
+
     #region Unity Lifecycle
 
     protected virtual void OnEnable()
     {
+        lifeId++;
+        returnScheduled = false;
+        IsTouchLocked = false;
+        IsResolved = false;
+
         OnEnabled?.Invoke();
         GameState.OnGameStateChanged += GameStateChanged;
         StartRun();
@@ -61,13 +75,8 @@ public class CubeCollider : MonoBehaviour
     public void StopRun()
     {
         Transform parent = transform.parent;
-        if (parent != null)
-        {
-            CubeMovemment move = parent.GetComponent<CubeMovemment>();
-            if (move.boostFinished && GameState.Instance.CurrentState==State.Pause)
-                gameObject.SetActive(false);
-        }
-        parent.GetComponent<CubeMovemment>().normalSpeed = 0;
+        if (parent != null && parent.TryGetComponent<CubeMovemment>(out var move))
+            move.normalSpeed = 0;
     }
     public void FinishRun()
     {
@@ -91,18 +100,51 @@ public class CubeCollider : MonoBehaviour
                 break;
         }
     }
+    /// <summary>
+    /// Registra o toque do jogador. Retorna false se o cubo já foi tocado ou já foi resolvido.
+    /// </summary>
+    protected bool TryLockTouch()
+    {
+        if (IsTouchLocked || IsResolved)
+            return false;
+
+        IsTouchLocked = true;
+        return true;
+    }
+
+    /// <summary>
+    /// Marca o cubo como resolvido (sucesso/falha). Retorna false se já estava resolvido.
+    /// </summary>
+    protected bool TryResolve()
+    {
+        if (IsResolved)
+            return false;
+
+        IsResolved = true;
+        return true;
+    }
+
     protected void ReturnToPool(string poolTag)
     {
+        // Evita agendar o retorno mais de uma vez no mesmo ciclo de vida.
+        if (returnScheduled)
+            return;
+        returnScheduled = true;
+
         // Hospedada no ObjectPooler (sempre ativo) para sobreviver caso este GameObject
         // seja desativado imediatamente pelo feedback de sucesso/falha.
         if (ObjectPooler.Instance != null)
-            ObjectPooler.Instance.StartCoroutine(WaitReturnToPool(poolTag));
+            ObjectPooler.Instance.StartCoroutine(WaitReturnToPool(poolTag, lifeId));
         else
-            StartCoroutine(WaitReturnToPool(poolTag));
+            StartCoroutine(WaitReturnToPool(poolTag, lifeId));
     }
-    private IEnumerator WaitReturnToPool(string poolTag)
+    private IEnumerator WaitReturnToPool(string poolTag, int scheduledLifeId)
     {
         yield return new WaitForSeconds(WAIT_TIME);
+
+        // O cubo já voltou ao pool e foi reutilizado: não desativar o cubo novo.
+        if (scheduledLifeId != lifeId)
+            yield break;
         ObjectPooler.Instance.ReturnToPool(
             poolTag,
             transform.parent.gameObject
@@ -122,10 +164,11 @@ public class CubeCollider : MonoBehaviour
     protected virtual void OnCollisionEnter(Collision collision)
     {
         OnCollisionEnterEvent?.Invoke(collision);
-        if (collision.gameObject.CompareTag(WALL_TAG)){
 
-            HandleFail();
-        }
+        // Parede é tratada nas subclasses; aqui chamava HandleFail em duplicidade.
+        if (IsResolved)
+            return;
+
         AudioController.Instance.Play("Hit");
         StopRun();
     }
@@ -174,6 +217,9 @@ public class CubeCollider : MonoBehaviour
 
     protected virtual void HandleSuccess()
     {
+        if (!TryResolve())
+            return;
+
         StopParentMovement();
         OnSuccess?.Invoke();
 
@@ -196,6 +242,9 @@ public class CubeCollider : MonoBehaviour
     // CubeCollider ï¿½ HandleFail reseta fï¿½sica imediatamente, nï¿½o espera o pool
     protected virtual void HandleFail()
     {
+        if (!TryResolve())
+            return;
+
         StopParentMovement();
 
         OnFail?.Invoke();

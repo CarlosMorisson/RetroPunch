@@ -1,0 +1,19 @@
+# ninja log v5
+24	17289	8123539122683666	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	464c29f214b0a2b8
+35	17340	8123539122553633	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	f9e37a0dfeedada2
+20478	20846	8123539158750395	C:/Unity/Projects/RetroBeachPunch/UNITY6--VR-TEMPLATE/VR-TEMPLATE-2025/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/u2ni3873/obj/arm64-v8a/libgame.so	40c5106970b23e6b
+68	19364	8123539143031081	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	9c93950dd943f9ea
+9	17379	8123539123666204	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	8e40507f4b4548b9
+1	17950	8123539129659904	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	a8844464436bff2e
+60	17486	8123539125039309	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1b84bc8ce2893ac8
+48	19608	8123539146170159	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	b720f2dc9962f109
+18	20476	8123539154805451	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	4310a6a5698ecc99
+144	5522	8123543184442735	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	f9e37a0dfeedada2
+52	5524	8123543184442735	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	8e40507f4b4548b9
+62	5525	8123543184442735	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	464c29f214b0a2b8
+159	5526	8123543184555704	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1b84bc8ce2893ac8
+137	5530	8123543184606464	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	a8844464436bff2e
+151	5650	8123543185823599	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	b720f2dc9962f109
+166	5685	8123543186188827	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	9c93950dd943f9ea
+38	5703	8123543186329415	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	4310a6a5698ecc99
+5703	5913	8123543188473456	C:/Unity/Projects/RetroBeachPunch/UNITY6--VR-TEMPLATE/VR-TEMPLATE-2025/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/u2ni3873/obj/arm64-v8a/libgame.so	40c5106970b23e6b

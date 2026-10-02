@@ -31,11 +31,11 @@ public class MenuShowValues : MonoBehaviour
     public void ScoreUpdate()=>TotalScore.text=PlayerPrefs.GetInt(MAIN_TOTAL_SCORE).ToString();
     public void ErrorUpdate()=>TotalErrors.text=PlayerPrefs.GetInt(MAIN_TOTAL_ERRORS).ToString();
     public void ConsecutiveUpdate()=>TotalConsecutive.text=PlayerPrefs.GetInt(MAIN_BEST_CONSECUTIVE).ToString();
-    public void CaloriesUpdate()=>TotalCalories.text=PlayerPrefs.GetFloat(MAIN_TOTAL_CALORIES).ToString();
+    public void CaloriesUpdate()=>TotalCalories.text=DecimalFormat.OneDecimal(PlayerPrefs.GetFloat(MAIN_TOTAL_CALORIES));
 
     public void AccuracyUpdate()
     {
-        TotalAccuracy.text=PlayerPrefs.GetFloat(MAIN_TOTAL_ACCURACY).ToString();
+        TotalAccuracy.text=DecimalFormat.OneDecimal(PlayerPrefs.GetFloat(MAIN_TOTAL_ACCURACY));
         AccuracyImage.fillAmount = PlayerPrefs.GetFloat(MAIN_TOTAL_ACCURACY) / 100;
     }
 }

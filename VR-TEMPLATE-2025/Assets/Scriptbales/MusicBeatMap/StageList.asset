@@ -19,7 +19,7 @@ MonoBehaviour:
     - difficulty: 0
       gameModeBeatMaps:
       - gameType: 0
-        beatMap: {fileID: 11400000, guid: a42fa697545bd8f468b1a10b4ed99a34, type: 2}
+        beatMap: {fileID: 11400000, guid: 38e0b769b307de847821dd279a567478, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -58,7 +58,7 @@ MonoBehaviour:
           weight: 1
           allowConsecutiveSpawns: 0
       - gameType: 1
-        beatMap: {fileID: 11400000, guid: e8b2e5f3dd37b674a822ca73a5c57e02, type: 2}
+        beatMap: {fileID: 11400000, guid: 0729d177931866c4a8fdbd80e6fd2b1c, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -97,7 +97,7 @@ MonoBehaviour:
           weight: 1
           allowConsecutiveSpawns: 0
       - gameType: 2
-        beatMap: {fileID: 11400000, guid: a42fa697545bd8f468b1a10b4ed99a34, type: 2}
+        beatMap: {fileID: 11400000, guid: 38e0b769b307de847821dd279a567478, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -138,7 +138,7 @@ MonoBehaviour:
     - difficulty: 1
       gameModeBeatMaps:
       - gameType: 0
-        beatMap: {fileID: 11400000, guid: cd48b121c684dd043b18c9cfc943b6b2, type: 2}
+        beatMap: {fileID: 11400000, guid: 7080347de8a818a4a85eba3c1df2abe4, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -177,7 +177,7 @@ MonoBehaviour:
           weight: 1
           allowConsecutiveSpawns: 0
       - gameType: 1
-        beatMap: {fileID: 11400000, guid: e4397815fe6c94e429c5df5bba814f30, type: 2}
+        beatMap: {fileID: 11400000, guid: af16a61a66e028a4f96ea87bb2f650c2, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -216,7 +216,7 @@ MonoBehaviour:
           weight: 1
           allowConsecutiveSpawns: 0
       - gameType: 2
-        beatMap: {fileID: 11400000, guid: cd48b121c684dd043b18c9cfc943b6b2, type: 2}
+        beatMap: {fileID: 11400000, guid: 7080347de8a818a4a85eba3c1df2abe4, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -379,7 +379,7 @@ MonoBehaviour:
     - difficulty: 0
       gameModeBeatMaps:
       - gameType: 0
-        beatMap: {fileID: 11400000, guid: 920e4285f5b8d2e4e9136e31c3b3fdb2, type: 2}
+        beatMap: {fileID: 11400000, guid: 714f4ddebcab0aa4c8ffd81daa1be9a6, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -418,7 +418,7 @@ MonoBehaviour:
           weight: 1
           allowConsecutiveSpawns: 0
       - gameType: 1
-        beatMap: {fileID: 11400000, guid: 679b01180f9e3ec4fb98a3e6ab5fdd38, type: 2}
+        beatMap: {fileID: 11400000, guid: 2072aed107bfe2f4da981a5fb52f38bd, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -457,7 +457,7 @@ MonoBehaviour:
           weight: 1
           allowConsecutiveSpawns: 0
       - gameType: 2
-        beatMap: {fileID: 11400000, guid: 920e4285f5b8d2e4e9136e31c3b3fdb2, type: 2}
+        beatMap: {fileID: 11400000, guid: 714f4ddebcab0aa4c8ffd81daa1be9a6, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -498,7 +498,7 @@ MonoBehaviour:
     - difficulty: 1
       gameModeBeatMaps:
       - gameType: 0
-        beatMap: {fileID: 11400000, guid: b3698729f4f4d714aa4f8572e33b94c3, type: 2}
+        beatMap: {fileID: 11400000, guid: dae5137676c49654ba54e45fecb25e0a, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -537,7 +537,7 @@ MonoBehaviour:
           weight: 1
           allowConsecutiveSpawns: 0
       - gameType: 1
-        beatMap: {fileID: 11400000, guid: 29c9ff6e65329df43b48db4b679fd4be, type: 2}
+        beatMap: {fileID: 11400000, guid: bfd4c33698f04b540ba459d001d3d47a, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3
@@ -576,7 +576,7 @@ MonoBehaviour:
           weight: 10
           allowConsecutiveSpawns: 0
       - gameType: 2
-        beatMap: {fileID: 11400000, guid: 70326c56b7c642047ab3eabf0d213560, type: 2}
+        beatMap: {fileID: 11400000, guid: dae5137676c49654ba54e45fecb25e0a, type: 2}
         prefabSpawnData:
         - prefabTag: Cube1
           affinity: 3

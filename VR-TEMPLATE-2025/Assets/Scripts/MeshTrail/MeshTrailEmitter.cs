@@ -8,6 +8,8 @@ public class MeshTrailEmitter : MonoBehaviour
     public float spawnInterval = 0.05f;
     public float trailLifetime = 0.4f;
     public float minAlpha = 0.05f;
+    [Tooltip("Tempo de espera antes de voltar a emitir quando o emitter é desativado e reativado.")]
+    public float reactivationDelay = 2f;
 
     [Header("Hierarchy")]
     public Transform trailParent;
@@ -19,6 +21,9 @@ public class MeshTrailEmitter : MonoBehaviour
     private SkinnedMeshRenderer skinnedMesh;
     private MeshRenderer meshRenderer;
     private bool emitting;
+    private Coroutine emitRoutine;
+    private bool wasDisabled;
+    private float pendingDelay;
 
     private readonly List<GameObject> activeGhosts = new List<GameObject>();
 
@@ -30,23 +35,47 @@ public class MeshTrailEmitter : MonoBehaviour
 
     private void OnEnable()
     {
+        // Na reativação, destrói qualquer ghost remanescente e aguarda o delay antes de emitir de novo.
+        if (wasDisabled)
+        {
+            StopAndKillGhosts();
+            pendingDelay = reactivationDelay;
+        }
+
         StartTrail();
     }
 
+    // Ao desativar (componente ou GameObject), encerra a emissão e destrói todos os ghosts.
     private void OnDisable()
     {
-        StopTrail();
+        wasDisabled = true;
+        StopAndKillGhosts();
+    }
+
+    private void OnDestroy()
+    {
+        StopAndKillGhosts();
     }
 
     public void StartTrail()
     {
-        if (!emitting)
-            StartCoroutine(EmitTrail());
+        if (emitting || !isActiveAndEnabled)
+            return;
+
+        emitting = true;
+        emitRoutine = StartCoroutine(EmitTrail(pendingDelay));
+        pendingDelay = 0f;
     }
 
     public void StopTrail()
     {
         emitting = false;
+
+        if (emitRoutine != null)
+        {
+            StopCoroutine(emitRoutine);
+            emitRoutine = null;
+        }
     }
 
     /// <summary>
@@ -56,19 +85,24 @@ public class MeshTrailEmitter : MonoBehaviour
     {
         StopTrail();
 
-        activeGhosts.RemoveAll(g => g == null);
-
         foreach (GameObject ghost in activeGhosts)
+        {
+            if (ghost == null) continue;
+
+            // Esconde já neste frame; o Destroy só efetiva no fim do frame.
+            ghost.SetActive(false);
             Destroy(ghost);
+        }
 
         activeGhosts.Clear();
     }
 
-    IEnumerator EmitTrail()
+    IEnumerator EmitTrail(float delay)
     {
-        emitting = true;
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
 
-        while (emitting)
+        while (emitting && isActiveAndEnabled)
         {
             CreateAfterImage();
             yield return new WaitForSeconds(spawnInterval);
@@ -77,16 +111,21 @@ public class MeshTrailEmitter : MonoBehaviour
 
     void CreateAfterImage()
     {
+        if (!emitting || !isActiveAndEnabled)
+            return;
+
         GameObject ghost = new GameObject("MeshTrailGhost");
         ghost.transform.SetParent(trailParent != null ? trailParent : null);
         ghost.transform.SetPositionAndRotation(transform.position, transform.rotation);
         ghost.transform.localScale = transform.localScale;
 
-        Mesh mesh = new Mesh();
+        Mesh bakedMesh = null;
 
         if (skinnedMesh != null)
         {
+            Mesh mesh = new Mesh();
             skinnedMesh.BakeMesh(mesh);
+            bakedMesh = mesh;
             var mf = ghost.AddComponent<MeshFilter>();
             mf.mesh = mesh;
 
@@ -114,7 +153,10 @@ public class MeshTrailEmitter : MonoBehaviour
             return;
         }
 
-        ghost.AddComponent<MeshTrailGhost>().Init(trailLifetime, minAlpha);
+        ghost.AddComponent<MeshTrailGhost>().Init(trailLifetime, minAlpha, bakedMesh);
+
+        // Remove referências de ghosts que já se autodestruíram para a lista não crescer indefinidamente.
+        activeGhosts.RemoveAll(g => g == null);
         activeGhosts.Add(ghost);
     }
 
