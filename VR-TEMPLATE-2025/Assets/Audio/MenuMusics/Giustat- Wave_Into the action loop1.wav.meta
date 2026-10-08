@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: 50955f3ffe3f8244aa07330cc50073cd
+AudioImporter:
+  externalObjects: {}
+  serializedVersion: 6
+  defaultSettings:
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 44100
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+  platformSettingOverrides: {}
+  forceToMono: 0
+  normalize: 1
+  preloadAudioData: 1
+  loadInBackground: 0
+  ambisonic: 0
+  3D: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211024
+  packageName: ElectroRock Pack1
+  packageVersion: ElectroRockPack volume1
+  assetPath: Assets/ElectroRockNewPack/Giustat- ElectroRockTrip Compilation1- 24bit
+    48Hz/Giustat- Wave_Into the action loop1.wav
+  uploadId: 475617

@@ -1,0 +1,81 @@
+using UnityEngine;
+
+public class MeshTrailGhost : MonoBehaviour
+{
+    private const string SHADER_NAME_PROCEDURAL = "Custom/RetroWave Grid Procedural";
+    private const string SHADER_NAME_URP = "Custom/RetroWave Grid";
+
+    private Material mat;
+    private string colorProperty;
+    private float lifetime;
+    private float minAlpha;
+    private float timer;
+    private Mesh ownedMesh;
+    private Vector3 initialScale;
+
+    public void Init(float life, float minA, Mesh bakedMesh = null)
+    {
+        lifetime = Mathf.Max(0.01f, life);
+        minAlpha = minA;
+        ownedMesh = bakedMesh;
+        initialScale = transform.localScale;
+
+        // O emitter já entrega uma instância exclusiva deste ghost; .material aqui criaria/compartilharia outra.
+        mat = GetComponent<MeshRenderer>().sharedMaterial;
+        if (mat == null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        colorProperty = ResolveColorProperty(mat);
+    }
+
+    private static string ResolveColorProperty(Material material)
+    {
+        switch (material.shader.name)
+        {
+            case SHADER_NAME_PROCEDURAL:
+                return "_BaseColor";
+            case SHADER_NAME_URP:
+                return "_PrimaryColor";
+        }
+
+        return material.HasProperty("_BaseColor") ? "_BaseColor" : "_Color";
+    }
+
+    // Libera a instância de material e o mesh bakeado para não vazar memória a cada ghost.
+    private void OnDestroy()
+    {
+        if (mat != null)
+            Destroy(mat);
+        if (ownedMesh != null)
+            Destroy(ownedMesh);
+    }
+
+    void Update()
+    {
+        if (mat == null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        timer += Time.deltaTime;
+        float t = Mathf.Clamp01(timer / lifetime);
+
+        // Encolhe do scale original até zero ao longo do lifetime.
+        transform.localScale = Vector3.Lerp(initialScale, Vector3.zero, t);
+
+        float alpha = Mathf.Lerp(1f, 0f, t);
+        if (alpha <= minAlpha)
+            alpha = 0f;
+
+        Color c = mat.GetColor(colorProperty);
+        c.a = alpha;
+        mat.SetColor(colorProperty, c);
+
+        if (t >= 1f)
+            Destroy(gameObject);
+    }
+}
