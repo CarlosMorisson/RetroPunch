@@ -90,6 +90,10 @@ public class SwitchHandsController : MonoBehaviour
     [Tooltip("Cada entrada representa um tipo de input (ex: Controller, Hand Tracking). O jogador escolhe dinamicamente.")]
     public List<BothHands> inputHandsList = new List<BothHands>();
 
+    [Header("Push — Opções de Input do Jogador")]
+    [Tooltip("Mesma lógica do inputHandsList (Punch), mas com as mãos próprias do modo Push.")]
+    public List<BothHands> pushHandsList = new List<BothHands>();
+
     [Header("Op��o Atual")]
     public BothHands currentBothHands;
 
@@ -123,6 +127,9 @@ public class SwitchHandsController : MonoBehaviour
     [Header("�ndice de Input Atual (somente leitura)")]
     [SerializeField] private int currentInputIndex = 0;
 
+    [Header("Índice de Push Atual (somente leitura)")]
+    [SerializeField] private int currentPushIndex = 0;
+
     public static SwitchHandsController Instance;
 
     private Coroutine switchSlowRoutine;
@@ -135,25 +142,39 @@ public class SwitchHandsController : MonoBehaviour
 
         DeactivateAllParents();
 
-        // Na inicialização sempre escolhe um par, sem passar pela tolerância
-        if (StageLoadController.Instance.gameType == GameType.Shoot)
+        switch (StageLoadController.Instance.gameType)
         {
-            BothHands first = PickRandomBothHands(null);
-            if (first != null)
-            {
-                SetCurrentBothHands(first);
-                nextBothHands = PickRandomBothHands(first);
-            }
-            UpdateNextIndicators();
-            UpdateToleranceText();
+            case GameType.Shoot:
+                // Na inicialização sempre escolhe um par, sem passar pela tolerância
+                BothHands first = PickRandomBothHands(null);
+                if (first != null)
+                {
+                    SetCurrentBothHands(first);
+                    nextBothHands = PickRandomBothHands(first);
+                }
+                UpdateNextIndicators();
+                UpdateToleranceText();
+                break;
+
+            case GameType.Push:
+                SetCurrentPushHands(currentPushIndex);
+                HideToleranceTexts();
+                break;
+
+            case GameType.Punch:
+            default:
+                SetCurrentInputHands(currentInputIndex);
+                HideToleranceTexts();
+                break;
         }
-        else
-        {
-            SetCurrentInputHands(currentInputIndex);
-            SetToleranceTextActive(currentBothHands, false);
-            if (externalToleranceText != null)
-                externalToleranceText.gameObject.SetActive(false);
-        }
+    }
+
+    /// <summary>Esconde o contador de troca (só é usado no modo Shoot).</summary>
+    private void HideToleranceTexts()
+    {
+        SetToleranceTextActive(currentBothHands, false);
+        if (externalToleranceText != null)
+            externalToleranceText.gameObject.SetActive(false);
     }
 
     private void OnDisable()
@@ -402,6 +423,30 @@ public class SwitchHandsController : MonoBehaviour
     /// <summary>Volta para o par de input anterior (com wrap).</summary>
     public void PreviousInputHands() => SetCurrentInputHands(currentInputIndex - 1);
 
+    // ── Push ─────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Seleciona o par de mãos de pushHandsList pelo índice.
+    /// O índice faz wrap circular (negativo e maior que o tamanho são tratados corretamente).
+    /// </summary>
+    public void SetCurrentPushHands(int index)
+    {
+        if (pushHandsList == null || pushHandsList.Count == 0)
+        {
+            Debug.LogWarning("[SwitchHandsController] pushHandsList está vazia.");
+            return;
+        }
+
+        currentPushIndex = ((index % pushHandsList.Count) + pushHandsList.Count) % pushHandsList.Count;
+        SetCurrentBothHands(pushHandsList[currentPushIndex]);
+    }
+
+    /// <summary>Avança para o próximo par de push (com wrap).</summary>
+    public void NextPushHands() => SetCurrentPushHands(currentPushIndex + 1);
+
+    /// <summary>Volta para o par de push anterior (com wrap).</summary>
+    public void PreviousPushHands() => SetCurrentPushHands(currentPushIndex - 1);
+
     // ── Comum ─────────────────────────────────────────────────────────────────
 
     /// <summary>
@@ -444,6 +489,10 @@ public class SwitchHandsController : MonoBehaviour
 
         if (inputHandsList != null)
             foreach (BothHands bh in inputHandsList)
+                SetParentActive(bh, false);
+
+        if (pushHandsList != null)
+            foreach (BothHands bh in pushHandsList)
                 SetParentActive(bh, false);
     }
 }

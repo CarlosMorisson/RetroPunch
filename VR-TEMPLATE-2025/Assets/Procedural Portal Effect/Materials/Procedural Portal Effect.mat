@@ -26,36 +26,36 @@ Material:
     m_Ints: []
     m_Floats:
     - _AutoExpandMesh: 0
-    - _BandCount: 4.9
+    - _BandCount: 20
     - _BandSpeed: 2
     - _CenterFade: 3.46
     - _Distortion: 0.197
     - _EdgeFlicker: 0.2
-    - _EdgeNoiseScale: 15.3
-    - _EdgeNoiseSpeed: 8.4
-    - _EdgeSoftness: 0.059
+    - _EdgeNoiseScale: 30
+    - _EdgeNoiseSpeed: 15
+    - _EdgeSoftness: 0.25
     - _EdgeWobble: 0.035
     - _ExpandPadding: 0.05
     - _HaloIntensity: 10
-    - _InnerFrameIntensity: 2.34
-    - _InnerFrameOffset: 0.23
+    - _InnerFrameIntensity: 10
+    - _InnerFrameOffset: 0.6
     - _InnerFrameWidth: 0.156
-    - _InnerIntensity: 2.06
+    - _InnerIntensity: 10
     - _MeshExpand: 1.53
     - _NoiseScale: 16
-    - _NoiseSpeed: 1.26
+    - _NoiseSpeed: 3
     - _Opacity: 1
     - _OuterFrameWidth: 0.01
     - _OuterHaloWidth: 0.344
     - _OuterIntensity: 10
-    - _Rotation: 22
+    - _Rotation: 82
     - _SparkDensity: 89
     - _SparkIntensity: 2
     - _SparkRingBias: 0.7
     - _SparkSize: 0.04
     - _SparkSpeed: 2
-    - _SwirlSpeed: 1.8
-    - _SwirlStrength: 3.05
+    - _SwirlSpeed: 2
+    - _SwirlStrength: 8
     m_Colors:
     - _HoleColor: {r: 0, g: 0, b: 0, a: 1}
     - _InnerColorA: {r: 0.49640322, g: 0, b: 1, a: 1}

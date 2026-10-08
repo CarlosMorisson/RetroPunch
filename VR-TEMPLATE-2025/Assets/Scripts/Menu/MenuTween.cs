@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class MenuTween : MonoBehaviour
 {
+    [Header("MainCanva")]
+    public GameObject MainCanva;
+
     [Header("LeftCanva")]
     public GameObject LeftCanva;
     public GameObject MusicSelection;
@@ -31,6 +34,12 @@ public class MenuTween : MonoBehaviour
 
     void Start()
     {
+        if (MainCanva != null)
+        {
+            initialScales[MainCanva] = MainCanva.transform.localScale;
+            MainCanva.transform.localScale = Vector3.zero;
+        }
+
         if (LeftCanva != null)
         {
             initialScales[LeftCanva] = LeftCanva.transform.localScale;
@@ -59,6 +68,31 @@ public class MenuTween : MonoBehaviour
         MenuMainButton.OnMainButtonChanged -= AnimateLeftCanva;
         menuSequence?.Kill();
     }
+    [ContextMenu("Show Main Canva")]
+    public void ShowMainCanva()
+    {
+        if (MainCanva == null) return;
+
+        menuSequence?.Kill();
+        menuSequence = DOTween.Sequence().SetUpdate(true);
+        menuSequence.Append(MainCanva.transform.DOScale(initialScales[MainCanva], animDuration).SetEase(Ease.OutBack));
+    }
+
+    [ContextMenu("Hide Menu")]
+    public void HideMenu()
+    {
+        menuSequence?.Kill();
+        menuSequence = DOTween.Sequence().SetUpdate(true);
+
+        foreach (GameObject obj in subElements)
+        {
+            if (obj != null) menuSequence.Join(obj.transform.DOScale(Vector3.zero, animDuration).SetEase(Ease.InBack));
+        }
+
+        if (LeftCanva != null) menuSequence.Join(LeftCanva.transform.DOScale(Vector3.zero, animDuration).SetEase(Ease.InBack));
+        if (MainCanva != null) menuSequence.Join(MainCanva.transform.DOScale(Vector3.zero, animDuration).SetEase(Ease.InBack));
+    }
+
     private void AnimateLeftCanva(MainButton currentMainButton)
     {
         menuSequence?.Kill();

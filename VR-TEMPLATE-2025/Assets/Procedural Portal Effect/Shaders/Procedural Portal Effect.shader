@@ -115,16 +115,25 @@ Shader "FX/Procedural Portal Effect"
                 float _SparkRingBias;
             CBUFFER_END
 
+            // Oitavas de ruído por camada. Detalhe fino demais é invisível no headset,
+            // então dá para manter baixo. Aumente se sentir falta de detalhe.
+            #define EDGE_OCTAVES 2
+            #define HALO_OCTAVES 2
+            #define WARP_OCTAVES 2
+            #define SWIRL_OCTAVES 3
+
             struct Attributes
             {
                 float3 positionOS : POSITION;
                 float2 uv : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
             {
                 float4 positionHCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
+                float2 p : TEXCOORD0; // coordenada do portal já centrada, escalada e rotacionada
+                UNITY_VERTEX_OUTPUT_STEREO
             };
 
             float2 Rotate2(float2 p, float a)
@@ -137,6 +146,8 @@ Shader "FX/Procedural Portal Effect"
             Varyings Vert(Attributes input)
             {
                 Varyings o;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
                 float haloR = 1.0 + _OuterHaloWidth + _EdgeSoftness;
                 float maxSize = max(_Size.x, _Size.y);
@@ -147,18 +158,28 @@ Shader "FX/Procedural Portal Effect"
                 posOS.xy *= expand;
 
                 o.positionHCS = TransformObjectToHClip(posOS);
-                o.uv = input.uv;
+
+                // Escala/rotação são lineares, então podem ser feitas por vértice e interpoladas
+                float2 p = input.uv * 2.0 - 1.0;
+                p = float2(p.x / max(_Size.x, 1e-4), p.y / max(_Size.y, 1e-4));
+                o.p = Rotate2(p, radians(_Rotation));
                 return o;
             }
 
+            // Hash sem sin() (Dave Hoskins): mais barato e estável em GPU mobile
             float Hash11(float p)
             {
-                return frac(sin(p * 127.1) * 43758.5453123);
+                p = frac(p * 0.1031);
+                p *= p + 33.33;
+                p *= p + p;
+                return frac(p);
             }
 
             float Hash21(float2 p)
             {
-                return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453123);
+                float3 p3 = frac(float3(p.xyx) * 0.1031);
+                p3 += dot(p3, p3.yzx + 33.33);
+                return frac((p3.x + p3.y) * p3.z);
             }
 
             float Noise2(float2 p)
@@ -167,7 +188,7 @@ Shader "FX/Procedural Portal Effect"
                 float2 f = frac(p);
                 float2 u = f * f * (3.0 - 2.0 * f);
 
-                float a = Hash21(i + float2(0.0, 0.0));
+                float a = Hash21(i);
                 float b = Hash21(i + float2(1.0, 0.0));
                 float c = Hash21(i + float2(0.0, 1.0));
                 float d = Hash21(i + float2(1.0, 1.0));
@@ -175,18 +196,22 @@ Shader "FX/Procedural Portal Effect"
                 return lerp(lerp(a, b, u.x), lerp(c, d, u.x), u.y);
             }
 
-            float Fbm2(float2 p)
+            float Fbm2(float2 p, int octaves)
             {
                 float v = 0.0;
                 float a = 0.5;
+                float norm = 0.0;
 
-                for (int i = 0; i < 4; i++)
+                [unroll(4)]
+                for (int i = 0; i < octaves; i++)
                 {
                     v += Noise2(p) * a;
+                    norm += a;
                     p *= 2.0;
                     a *= 0.5;
                 }
-                return v;
+                // Normaliza para manter a mesma faixa de valores (~0..1) com menos oitavas
+                return v / norm * 0.9375;
             }
 
             float Ring(float r, float center, float width, float softness)
@@ -224,154 +249,94 @@ Shader "FX/Procedural Portal Effect"
                 return saturate(s * flicker);
             }
 
-            void EvaluatePortal(float2 uv, out float3 centerCol, out float centerA, out float3 glowCol, out float glowA)
+            // Passe único: o antigo "Center" (alpha blend) + "Glow" (aditivo) combinados
+            // via premultiplied alpha (Blend One OneMinusSrcAlpha). Mesmo resultado, metade do custo.
+            float4 Frag(Varyings i) : SV_Target
             {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
                 float t = _Time.y;
+                float2 p = i.p;
 
-                float2 p = uv * 2.0 - 1.0;
-                p = float2(p.x / max(_Size.x, 1e-4), p.y / max(_Size.y, 1e-4));
-
-                float rot = radians(_Rotation);
-                p = Rotate2(p, rot);
-
-                float edgeN = Fbm2(p * _EdgeNoiseScale + t * _EdgeNoiseSpeed);
+                float edgeN = Fbm2(p * _EdgeNoiseScale + t * _EdgeNoiseSpeed, EDGE_OCTAVES);
                 float wobble = (edgeN - 0.5) * _EdgeWobble;
 
                 float r = length(p) + wobble;
-                float a = atan2(p.y, p.x);
-                float a01 = (a + 3.14159265) / 6.2831853;
-
                 float outerR = 1.0;
                 float haloR = 1.0 + _OuterHaloWidth;
 
+                // Descarta cedo os pixels fora do halo (cantos do quad), antes do ruído pesado
                 float clipMask = 1.0 - smoothstep(haloR, haloR + _EdgeSoftness, r);
-                float portalMask = 1.0 - smoothstep(outerR, outerR + _EdgeSoftness, r);
+                clip(clipMask - 0.001);
 
-                float outerFrame = smoothstep(outerR - _OuterFrameWidth, outerR, r) * portalMask;
-                float innerArea = (1.0 - smoothstep(outerR - _OuterFrameWidth, outerR, r)) * portalMask;
+                float a = atan2(p.y, p.x);
+                float a01 = (a + 3.14159265) / 6.2831853;
+
+                float portalMask = 1.0 - smoothstep(outerR, outerR + _EdgeSoftness, r);
+                float frameStep = smoothstep(outerR - _OuterFrameWidth, outerR, r);
+                float outerFrame = frameStep * portalMask;
+                float innerArea = (1.0 - frameStep) * portalMask;
 
                 float innerFrameCenter = outerR - _OuterFrameWidth - _InnerFrameOffset;
                 float innerFrame = Ring(r, innerFrameCenter, _InnerFrameWidth, _EdgeSoftness) * portalMask;
 
-                float halo = 1.0 - smoothstep(outerR, haloR, r);
-                halo *= clipMask;
-                float haloN = Fbm2(p * (_EdgeNoiseScale * 0.6) + t * (_EdgeNoiseSpeed * 0.35));
-                halo *= lerp(0.65, 1.15, haloN);
+                float haloN = Fbm2(p * (_EdgeNoiseScale * 0.6) + t * (_EdgeNoiseSpeed * 0.35), HALO_OCTAVES);
+                float halo = (1.0 - smoothstep(outerR, haloR, r)) * clipMask * lerp(0.65, 1.15, haloN);
 
-                float n1 = Fbm2(p * _NoiseScale + t * _NoiseSpeed);
-                float n2 = Fbm2(p * (_NoiseScale * 1.37) + t * (_NoiseSpeed * 1.15) + 19.31);
-                float2 warp = float2(n1, n2) - 0.5;
-                float2 q = p + warp * _Distortion;
+                float3 innerCol = _HoleColor.rgb;
+                float n = 0.0;
 
-                float rq = length(q);
-                float aq = atan2(q.y, q.x);
+                // O redemoinho só aparece dentro do portal: pula o ruído mais caro no anel/halo
+                UNITY_BRANCH
+                if (innerArea > 0.001)
+                {
+                    float n1 = Fbm2(p * _NoiseScale + t * _NoiseSpeed, WARP_OCTAVES);
+                    float n2 = Fbm2(p * (_NoiseScale * 1.37) + t * (_NoiseSpeed * 1.15) + 19.31, WARP_OCTAVES);
+                    float2 q = p + (float2(n1, n2) - 0.5) * _Distortion;
 
-                float swirl = (1.0 - saturate(rq)) * _SwirlStrength;
-                float swirlTerm = sin(t * _SwirlSpeed + rq * 6.0 + n1 * 2.0);
-                aq += swirl * (0.65 + 0.35 * swirlTerm);
+                    float rq = length(q);
+                    float aq = atan2(q.y, q.x);
 
-                float2 w = float2(cos(aq), sin(aq)) * rq;
-                float n = Fbm2(w * _NoiseScale + t * _NoiseSpeed);
+                    float swirl = (1.0 - saturate(rq)) * _SwirlStrength;
+                    aq += swirl * (0.65 + 0.35 * sin(t * _SwirlSpeed + rq * 6.0 + n1 * 2.0));
 
-                float bands = 0.5 + 0.5 * sin(aq * _BandCount + t * _BandSpeed + n * 6.0);
-                float centerFade = pow(saturate(1.0 - rq), max(_CenterFade, 1e-3));
+                    float2 w = float2(cos(aq), sin(aq)) * rq;
+                    n = Fbm2(w * _NoiseScale + t * _NoiseSpeed, SWIRL_OCTAVES);
 
-                float3 innerMix = lerp(_InnerColorA.rgb, _InnerColorB.rgb, saturate(n));
-                float3 swirlCol = innerMix * (0.35 + 0.85 * bands) * (0.35 + 0.65 * centerFade);
+                    float bands = 0.5 + 0.5 * sin(aq * _BandCount + t * _BandSpeed + n * 6.0);
+                    float centerFade = pow(saturate(1.0 - rq), max(_CenterFade, 1e-3));
 
-                float3 holeCol = _HoleColor.rgb;
-                float3 innerCol = holeCol + swirlCol * _InnerIntensity;
+                    float3 innerMix = lerp(_InnerColorA.rgb, _InnerColorB.rgb, saturate(n));
+                    innerCol += innerMix * (0.35 + 0.85 * bands) * (0.35 + 0.65 * centerFade) * _InnerIntensity;
+                }
 
                 float flicker = 1.0 + (edgeN - 0.5) * _EdgeFlicker;
                 flicker *= 0.88 + 0.12 * sin(t * 9.0 + edgeN * 6.2831853);
 
-                float outerPow = pow(saturate(outerFrame), 0.35);
-                float3 outerCol = (_OuterColor.rgb * 0.75 + _OuterGlowColor.rgb * 0.55) * outerPow * (_OuterIntensity * flicker);
-
-                float innerFramePow = pow(saturate(innerFrame), 0.45);
-                float3 innerFrameCol = _InnerFrameColor.rgb * innerFramePow * (_InnerFrameIntensity * (0.9 + 0.1 * sin(t * 7.5 + n * 4.0)));
-
-                float spark = SparkField(a01, r, t, outerR, haloR);
-                float3 sparkCol = _SparkColor.rgb * spark * _SparkIntensity;
-
+                float3 outerCol = (_OuterColor.rgb * 0.75 + _OuterGlowColor.rgb * 0.55) * pow(saturate(outerFrame), 0.35) * (_OuterIntensity * flicker);
+                float3 innerFrameCol = _InnerFrameColor.rgb * pow(saturate(innerFrame), 0.45) * (_InnerFrameIntensity * (0.9 + 0.1 * sin(t * 7.5 + n * 4.0)));
+                float3 sparkCol = _SparkColor.rgb * SparkField(a01, r, t, outerR, haloR) * _SparkIntensity;
                 float3 haloCol = _OuterGlowColor.rgb * pow(saturate(halo), 1.35) * (_HaloIntensity * (0.8 + 0.2 * haloN));
 
-                centerCol = saturate(innerCol);
-                centerA = saturate(innerArea) * _Opacity;
+                float centerA = saturate(innerArea) * _Opacity;
+                float3 glow = saturate(outerCol + innerFrameCol + haloCol + sparkCol) * (saturate(clipMask) * _Opacity);
 
-                glowCol = saturate(outerCol + innerFrameCol + haloCol + sparkCol);
-                glowA = saturate(clipMask) * _Opacity;
-            }
-
-            float ClipMaskPortal(float2 uv)
-            {
-                float t = _Time.y;
-                float2 p = uv * 2.0 - 1.0;
-                p = float2(p.x / max(_Size.x, 1e-4), p.y / max(_Size.y, 1e-4));
-                p = Rotate2(p, radians(_Rotation));
-                float edgeN = Fbm2(p * _EdgeNoiseScale + t * _EdgeNoiseSpeed);
-                float wobble = (edgeN - 0.5) * _EdgeWobble;
-                float r = length(p) + wobble;
-                float haloR = 1.0 + _OuterHaloWidth;
-                return 1.0 - smoothstep(haloR, haloR + _EdgeSoftness, r);
-            }
-
-            float4 FragCenter(Varyings i) : SV_Target
-            {
-                float3 centerCol;
-                float centerA;
-                float3 glowCol;
-                float glowA;
-
-                EvaluatePortal(i.uv, centerCol, centerA, glowCol, glowA);
-
-                float clipMask = ClipMaskPortal(i.uv);
-                clip(clipMask - 0.001);
-
-                return float4(centerCol, centerA);
-            }
-
-            float4 FragGlow(Varyings i) : SV_Target
-            {
-                float3 centerCol;
-                float centerA;
-                float3 glowCol;
-                float glowA;
-
-                EvaluatePortal(i.uv, centerCol, centerA, glowCol, glowA);
-
-                float clipMask = ClipMaskPortal(i.uv);
-                clip(clipMask - 0.001);
-
-                return float4(glowCol * glowA, 1.0);
+                return float4(saturate(innerCol) * centerA + glow, centerA);
             }
             ENDHLSL
 
             Pass
             {
-                Name "Center"
+                Name "Portal"
                 Tags { "LightMode" = "UniversalForward" }
-                Blend SrcAlpha OneMinusSrcAlpha
+                Blend One OneMinusSrcAlpha
                 ZWrite Off
 
                 HLSLPROGRAM
                 #pragma target 3.0
+                #pragma multi_compile_instancing
                 #pragma vertex Vert
-                #pragma fragment FragCenter
-                ENDHLSL
-            }
-
-            Pass
-            {
-                Name "Glow"
-                Tags { "LightMode" = "SRPDefaultUnlit" }
-                Blend One One
-                ZWrite Off
-
-                HLSLPROGRAM
-                #pragma target 3.0
-                #pragma vertex Vert
-                #pragma fragment FragGlow
+                #pragma fragment Frag
                 ENDHLSL
             }
         }

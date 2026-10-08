@@ -1,0 +1,29 @@
+fileFormatVersion: 2
+guid: 0a3edfa9085ad194d93a6cf1a0307d6c
+AudioImporter:
+  externalObjects: {}
+  serializedVersion: 6
+  defaultSettings:
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 44100
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+  platformSettingOverrides: {}
+  forceToMono: 0
+  normalize: 1
+  preloadAudioData: 1
+  loadInBackground: 0
+  ambisonic: 0
+  3D: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211024
+  packageName: ElectroRock Pack1
+  packageVersion: ElectroRockPack volume1
+  assetPath: Assets/Audio/Musics/GIUSTAT-Wave_ The Discovery.wav
+  uploadId: 475617

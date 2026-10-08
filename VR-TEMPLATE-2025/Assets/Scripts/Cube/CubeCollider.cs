@@ -38,12 +38,12 @@ public class CubeCollider : MonoBehaviour
     protected const string PLAYER_TAG = "Player";
     private const float WAIT_TIME=2f;
 
-    // Trava de toque: apenas um toque do jogador é registrado por ciclo de vida (reseta no OnEnable).
+    // Trava de toque: apenas um toque do jogador ï¿½ registrado por ciclo de vida (reseta no OnEnable).
     protected bool IsTouchLocked { get; private set; }
-    // Trava de resultado: sucesso/falha só podem ser disparados uma vez por ciclo de vida.
+    // Trava de resultado: sucesso/falha sï¿½ podem ser disparados uma vez por ciclo de vida.
     protected bool IsResolved { get; private set; }
 
-    // Identifica o ciclo de vida atual; retornos ao pool agendados em ciclos anteriores são ignorados.
+    // Identifica o ciclo de vida atual; retornos ao pool agendados em ciclos anteriores sï¿½o ignorados.
     private int lifeId;
     private bool returnScheduled;
 
@@ -101,7 +101,7 @@ public class CubeCollider : MonoBehaviour
         }
     }
     /// <summary>
-    /// Registra o toque do jogador. Retorna false se o cubo já foi tocado ou já foi resolvido.
+    /// Registra o toque do jogador. Retorna false se o cubo jï¿½ foi tocado ou jï¿½ foi resolvido.
     /// </summary>
     protected bool TryLockTouch()
     {
@@ -113,7 +113,7 @@ public class CubeCollider : MonoBehaviour
     }
 
     /// <summary>
-    /// Marca o cubo como resolvido (sucesso/falha). Retorna false se já estava resolvido.
+    /// Marca o cubo como resolvido (sucesso/falha). Retorna false se jï¿½ estava resolvido.
     /// </summary>
     protected bool TryResolve()
     {
@@ -142,7 +142,7 @@ public class CubeCollider : MonoBehaviour
     {
         yield return new WaitForSeconds(WAIT_TIME);
 
-        // O cubo já voltou ao pool e foi reutilizado: não desativar o cubo novo.
+        // O cubo jï¿½ voltou ao pool e foi reutilizado: nï¿½o desativar o cubo novo.
         if (scheduledLifeId != lifeId)
             yield break;
         ObjectPooler.Instance.ReturnToPool(
@@ -165,7 +165,15 @@ public class CubeCollider : MonoBehaviour
     {
         OnCollisionEnterEvent?.Invoke(collision);
 
-        // Parede é tratada nas subclasses; aqui chamava HandleFail em duplicidade.
+        // Parede ï¿½ tratada nas subclasses; aqui chamava HandleFail em duplicidade.
+        RegisterHit();
+    }
+
+    /// <summary>
+    /// Som de impacto + para o movimento do cubo. Usado pela colisÃ£o e por detecÃ§Ãµes manuais (ex: sweep da raquete).
+    /// </summary>
+    protected void RegisterHit()
+    {
         if (IsResolved)
             return;
 

@@ -32,15 +32,9 @@ MonoBehaviour:
   - time: 10.21678
     intensity: 0.012126129
     affinity: 0
-  - time: 10.924989
-    intensity: 0.0103344405
-    affinity: 0
   - time: 12.2253065
     intensity: 0.26972988
     affinity: 1
-  - time: 12.875464
-    intensity: 0.023729153
-    affinity: 0
   - time: 13.746213
     intensity: 0.015285545
     affinity: 0
@@ -89,9 +83,6 @@ MonoBehaviour:
   - time: 30.51102
     intensity: 0.49210382
     affinity: 0
-  - time: 30.98703
-    intensity: 0.40925485
-    affinity: 0
   - time: 31.45143
     intensity: 0.5360997
     affinity: 0
@@ -131,9 +122,6 @@ MonoBehaviour:
   - time: 43.328434
     intensity: 0.69946676
     affinity: 0
-  - time: 43.746395
-    intensity: 0.56413364
-    affinity: 0
   - time: 44.187572
     intensity: 0.64214814
     affinity: 0
@@ -167,17 +155,14 @@ MonoBehaviour:
   - time: 51.80372
     intensity: 0.44715717
     affinity: 0
-  - time: 52.233288
-    intensity: 0.5475171
-    affinity: 0
+  - time: 52.616417
+    intensity: 0.62398005
+    affinity: 1
   - time: 53.324627
     intensity: 0.5237042
     affinity: 0
   - time: 54.230206
     intensity: 0.53346425
-    affinity: 0
-  - time: 54.648163
-    intensity: 0.44291386
     affinity: 0
   - time: 55.112564
     intensity: 0.8700492
@@ -299,9 +284,6 @@ MonoBehaviour:
   - time: 92.69406
     intensity: 0.24459834
     affinity: 0
-  - time: 93.41388
-    intensity: 0.20734541
-    affinity: 2
   - time: 94.214966
     intensity: 0.3512853
     affinity: 2
@@ -323,20 +305,17 @@ MonoBehaviour:
   - time: 100.61206
     intensity: 0.5141291
     affinity: 2
-  - time: 101.413155
-    intensity: 0.53674364
-    affinity: 2
-  - time: 102.21424
-    intensity: 0.5079903
-    affinity: 2
-  - time: 103.02694
-    intensity: 0.34738514
+  - time: 101.80789
+    intensity: 0.17042202
     affinity: 1
-  - time: 103.80481
-    intensity: 0.31377232
+  - time: 102.62059
+    intensity: 0.13661876
     affinity: 1
-  - time: 104.62911
-    intensity: 0.3059148
+  - time: 103.410065
+    intensity: 0.92325544
+    affinity: 2
+  - time: 104.21116
+    intensity: 0.8013378
     affinity: 2
   - time: 105.418594
     intensity: 0.076005705
@@ -377,9 +356,6 @@ MonoBehaviour:
   - time: 118.29406
     intensity: 0.13482614
     affinity: 1
-  - time: 119.02549
-    intensity: 0.14986558
-    affinity: 1
   - time: 119.814964
     intensity: 0.18847197
     affinity: 2
@@ -392,24 +368,21 @@ MonoBehaviour:
   - time: 123.86685
     intensity: 0.07163703
     affinity: 2
-  - time: 124.58667
-    intensity: 0.17375636
+  - time: 125.00462
+    intensity: 0.0639311
+    affinity: 2
+  - time: 126.18884
+    intensity: 0.1794064
     affinity: 1
-  - time: 125.72444
-    intensity: 0.12636922
-    affinity: 1
-  - time: 126.58358
-    intensity: 0.0012891751
-    affinity: 0
-  - time: 127.40789
-    intensity: 0.11411803
-    affinity: 1
+  - time: 127.024765
+    intensity: 0.07097054
+    affinity: 2
   - time: 128.60371
     intensity: 0.57253397
     affinity: 1
-  - time: 129.10295
-    intensity: 0.94783616
-    affinity: 0
+  - time: 129.41641
+    intensity: 0.8610421
+    affinity: 1
   - time: 130.53098
     intensity: 0.49175262
     affinity: 0
@@ -584,21 +557,15 @@ MonoBehaviour:
   - time: 179.01424
     intensity: 0.5048595
     affinity: 2
-  - time: 179.81532
-    intensity: 0.12321822
-    affinity: 2
-  - time: 180.62802
-    intensity: 0.040635884
+  - time: 180.22168
+    intensity: 0.068277515
     affinity: 1
-  - time: 181.81224
-    intensity: 0.0052488092
+  - time: 181.4059
+    intensity: 0.0063367994
     affinity: 2
   - time: 182.61333
     intensity: 0.00060756615
     affinity: 2
   - time: 183.79755
     intensity: 0.000023652767
-    affinity: 0
-  - time: 184.71474
-    intensity: 0.0000070658193
     affinity: 0

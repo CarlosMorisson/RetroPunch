@@ -130,7 +130,7 @@ public class MeshTrailEmitter : MonoBehaviour
             mf.mesh = mesh;
 
             var mr = ghost.AddComponent<MeshRenderer>();
-            mr.material = ResolveMaterial(skinnedMesh.material);
+            mr.sharedMaterial = CreateGhostMaterial(skinnedMesh.sharedMaterial);
         }
         else if (meshRenderer != null)
         {
@@ -145,7 +145,7 @@ public class MeshTrailEmitter : MonoBehaviour
             mf.mesh = sourceMF.mesh;
 
             var mr = ghost.AddComponent<MeshRenderer>();
-            mr.material = ResolveMaterial(meshRenderer.material);
+            mr.sharedMaterial = CreateGhostMaterial(meshRenderer.sharedMaterial);
         }
         else
         {
@@ -160,11 +160,12 @@ public class MeshTrailEmitter : MonoBehaviour
         activeGhosts.Add(ghost);
     }
 
-    // Retorna o material do materialSource se definido, senão usa o fallback.
-    private Material ResolveMaterial(Material fallback)
+    // Cria uma cópia exclusiva para o ghost a partir do material atual do materialSource (ou do fallback).
+    // Cada ghost destrói o próprio material ao morrer; compartilhar a instância do cubo/fragmento fazia
+    // o primeiro ghost destruído apagar o material dos outros ghosts e do próprio fragmento (render rosa).
+    private Material CreateGhostMaterial(Material fallback)
     {
-        if (materialSource != null)
-            return materialSource.material;
-        return fallback;
+        Material source = materialSource != null ? materialSource.sharedMaterial : fallback;
+        return source != null ? new Material(source) : null;
     }
 }

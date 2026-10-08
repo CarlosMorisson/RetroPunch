@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.Events;
@@ -17,10 +18,19 @@ public class PushCube : CubeCollider
 {
     [Header("Push Settings")]
     public PushType pushDirection;
-    [Tooltip("Fator de perda de velocidade natural no rebote (ex: 0.8f = 80% da velocidade original)")]
-    public float bounceRetainFactor = 0.8f;
     [Tooltip("Multiplicador de impacto baseado na velocidade da m�o do jogador")]
     public float handVelocityMultiplier = 1.2f;
+    [Tooltip("Velocidade mínima/máxima do cubo após o soco")]
+    public float minPushSpeed = 4f;
+    public float maxPushSpeed = 15f;
+    [Tooltip("Abaixo desta velocidade (m/s) a mão é considerada parada e usa a normal do contato")]
+    public float minHandSpeedForDirection = 0.5f;
+
+    // Cubos já tocados pelo jogador e ainda não resolvidos; os portais puxam apenas estes.
+    public static readonly List<PushCube> TouchedCubes = new List<PushCube>();
+
+    public Rigidbody Body => rb;
+    public bool CanBePulled => IsTouchLocked && !IsResolved && rb != null && !rb.isKinematic;
 
     public string PrefabTag;
 
@@ -51,6 +61,9 @@ public class PushCube : CubeCollider
     private bool hasMisstaken = false;
     private Rigidbody rb;
     private MeshTrailEmitter meshTrailEmitter;
+
+    // Pares bola/mão com colisão desligada após o toque; religados no OnDisable (pool).
+    private readonly List<(Collider, Collider)> ignoredPairs = new List<(Collider, Collider)>();
 
     private const string PORTAL_NAME = "Portal";
 
@@ -125,6 +138,9 @@ public class PushCube : CubeCollider
     {
         base.OnDisable();
 
+        TouchedCubes.Remove(this);
+        RestorePlayerCollision();
+
         OnSuccess -= SucessFeedback;
         OnFail -= FailFeedback;
 
@@ -189,11 +205,11 @@ public class PushCube : CubeCollider
 
         if (collision.gameObject.CompareTag(PLAYER_TAG))
         {
-            collisionLocation = collision.contacts[0].point;
+            HandVelocityTracker hand = collision.gameObject.GetComponentInParent<HandVelocityTracker>();
+            Vector3 handVelocity = hand != null ? hand.Velocity : Vector3.zero;
+            ContactPoint contact = collision.contacts[0];
 
-            ApplyBounceForce(collision);
-            HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
-            StartCoroutine(WaitToDestroy());
+            ApplyPlayerHit(collision.gameObject, contact.point, contact.normal, handVelocity);
         }
         if (collision.gameObject.CompareTag(PORTAL_NAME) && !IsResolved)
         {
@@ -215,28 +231,89 @@ public class PushCube : CubeCollider
         yield return new WaitForSeconds(DESTROY_AFTER_TOUCH);
         HandleFail();   
     }
-    private void ApplyBounceForce(Collision collision)
+    /// <summary>
+    /// Batida detectada fora do OnCollisionEnter (ex: sweep da raquete em golpes rápidos que atravessariam o collider).
+    /// Retorna false se o cubo já foi tocado ou resolvido.
+    /// </summary>
+    /// <param name="hitter">Objeto que bateu (usado para achar a mão no HandTouchFeedback).</param>
+    /// <param name="point">Ponto do impacto.</param>
+    /// <param name="pushNormal">Direção de empurrão usada se a mão estiver praticamente parada.</param>
+    /// <param name="handVelocity">Velocidade da mão/raquete no momento do golpe.</param>
+    public bool TryPlayerHit(GameObject hitter, Vector3 point, Vector3 pushNormal, Vector3 handVelocity)
+    {
+        if (!TryLockTouch())
+            return false;
+
+        RegisterHit();
+        ApplyPlayerHit(hitter, point, pushNormal, handVelocity);
+        return true;
+    }
+
+    private void ApplyPlayerHit(GameObject hitter, Vector3 point, Vector3 pushNormal, Vector3 handVelocity)
+    {
+        collisionLocation = point;
+
+        IgnorePlayerCollision(hitter);
+
+        ApplyBounceForce(pushNormal, handVelocity);
+        if (!TouchedCubes.Contains(this))
+            TouchedCubes.Add(this);
+        HandTouchFeedback.Instance.HandFeedback(hitter, true);
+        StartCoroutine(WaitToDestroy());
+    }
+
+    /// <summary>
+    /// Desliga a colisão entre a bola e a mão/raquete que bateu.
+    /// Em golpes rápidos a raquete já está enterrada na bola quando a batida é detectada; sem isso, no passo seguinte
+    /// a física empurra a bola pra fora pelo lado errado e anula a velocidade aplicada.
+    /// Como só o primeiro toque conta (TryLockTouch), a mão não precisa mais colidir com esta bola.
+    /// </summary>
+    private void IgnorePlayerCollision(GameObject hitter)
+    {
+        HandVelocityTracker tracker = hitter.GetComponentInParent<HandVelocityTracker>();
+        Transform handRoot = tracker != null ? tracker.transform : hitter.transform;
+        Transform ballRoot = rb != null ? rb.transform : transform;
+
+        Collider[] handColliders = handRoot.GetComponentsInChildren<Collider>(true);
+        Collider[] ballColliders = ballRoot.GetComponentsInChildren<Collider>(true);
+
+        foreach (Collider ball in ballColliders)
+        {
+            foreach (Collider hand in handColliders)
+            {
+                Physics.IgnoreCollision(ball, hand, true);
+                ignoredPairs.Add((ball, hand));
+            }
+        }
+    }
+
+    /// <summary>Religa as colisões ignoradas; necessário porque a bola volta pro pool e é reutilizada.</summary>
+    private void RestorePlayerCollision()
+    {
+        foreach ((Collider ball, Collider hand) in ignoredPairs)
+        {
+            if (ball != null && hand != null)
+                Physics.IgnoreCollision(ball, hand, false);
+        }
+        ignoredPairs.Clear();
+    }
+
+    private void ApplyBounceForce(Vector3 pushNormal, Vector3 handVelocity)
     {
         if (rb == null) return;
 
-        Vector3 bounceDirection = collision.contacts[0].normal;
+        float handSpeed = handVelocity.magnitude;
 
-        float currentSpeed = rb.linearVelocity.magnitude;
+        // Direção do golpe da mão; a normal do contato só é usada se a mão estiver praticamente parada
+        Vector3 pushDirectionVector = handSpeed >= minHandSpeedForDirection
+            ? handVelocity / handSpeed
+            : pushNormal;
 
-        if (currentSpeed < 0.1f) currentSpeed = 5f;
+        float finalSpeed = Mathf.Clamp(handSpeed * handVelocityMultiplier, minPushSpeed, maxPushSpeed);
 
-        float baseBounceSpeed = currentSpeed * bounceRetainFactor;
-
-        Rigidbody playerRb = collision.gameObject.GetComponent<Rigidbody>();
-        float playerSpeed = playerRb != null ? playerRb.linearVelocity.magnitude : 1f;
-
-        if (playerSpeed < 0.5f) playerSpeed = 0.5f;
-
-        float finalSpeed = baseBounceSpeed * (playerSpeed * handVelocityMultiplier);
-
-        rb.linearVelocity = Vector3.zero;
-        rb.AddForce(bounceDirection * finalSpeed, ForceMode.VelocityChange);
-        GetComponent<PushCubeFeedback>().HandlePushFeedback(transform.position, bounceDirection); ;
+        rb.linearVelocity = pushDirectionVector * finalSpeed;
+        rb.angularVelocity = Vector3.zero;
+        GetComponent<PushCubeFeedback>().HandlePushFeedback(transform.position, pushDirectionVector);
     }
 
     #endregion

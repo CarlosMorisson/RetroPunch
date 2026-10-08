@@ -88,6 +88,16 @@ public class HandTouchFeedback : MonoBehaviour
             InitializeHandSwitch(bh.LeftHand);
             InitializeHandSwitch(bh.RightHand);
         }
+
+        if (switchController.pushHandsList != null)
+        {
+            foreach (BothHands bh in switchController.pushHandsList)
+            {
+                if (bh == null) continue;
+                InitializeHandSwitch(bh.LeftHand);
+                InitializeHandSwitch(bh.RightHand);
+            }
+        }
     }
 
     /// <summary>

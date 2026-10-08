@@ -20,7 +20,8 @@ public class MeshTrailGhost : MonoBehaviour
         ownedMesh = bakedMesh;
         initialScale = transform.localScale;
 
-        mat = GetComponent<MeshRenderer>().material;
+        // O emitter já entrega uma instância exclusiva deste ghost; .material aqui criaria/compartilharia outra.
+        mat = GetComponent<MeshRenderer>().sharedMaterial;
         if (mat == null)
         {
             Destroy(gameObject);

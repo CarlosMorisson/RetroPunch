@@ -99,6 +99,7 @@ public class ObjectPooler : MonoBehaviour
 
             if (!obj.activeInHierarchy)
             {
+                DisableBreakCubes(obj);
                 obj.SetActive(true);
                 obj.transform.position = position;
                 obj.transform.rotation = rotation;
@@ -113,6 +114,7 @@ public class ObjectPooler : MonoBehaviour
         if (poolData != null && poolData.prefab != null)
         {
             GameObject newObj = Instantiate(poolData.prefab, poolData.Parent);
+            DisableBreakCubes(newObj);
             newObj.SetActive(true);
             newObj.transform.position = position;
             newObj.transform.rotation = rotation;
@@ -140,11 +142,25 @@ public class ObjectPooler : MonoBehaviour
             DOTween.Kill(child);
 
         ResetAllRigidbodies(obj);
-        ResetScale(obj);  
+        ResetScale(obj);
+        DisableBreakCubes(obj);
 
         obj.SetActive(false);
 
         OnObjectReturned?.Invoke(obj);
+    }
+
+    // O BreakCube é irmão do cubo e só se desativa sozinho ao fim da própria coroutine (~6s).
+    // Se o cubo volta ao pool antes disso, a coroutine morre e ele fica com activeSelf = true,
+    // reaparecendo no próximo spawn. Desativar aqui (com o root inativo) é seguro e não depende
+    // da ordem dos OnEnable dos filhos.
+    private void DisableBreakCubes(GameObject obj)
+    {
+        foreach (BreakCube breakCube in obj.GetComponentsInChildren<BreakCube>(true))
+        {
+            if (breakCube.gameObject.activeSelf)
+                breakCube.gameObject.SetActive(false);
+        }
     }
 
     private void ResetScale(GameObject obj)

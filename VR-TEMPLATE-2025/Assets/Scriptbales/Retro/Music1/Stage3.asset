@@ -15,8 +15,8 @@ MonoBehaviour:
   GameMusic: {fileID: 8300000, guid: d836ea0946ef046ef9227530ff03c0c2, type: 3}
   BuildSettings:
     PrimaryBaseColor: {r: 0.3433962, g: 0.3407029, b: 0, a: 1}
-    PrimaryColorLight: {r: 2.4438024, g: 2.6390157, b: 0.45311397, a: 1}
-    PrimaryColorDark: {r: 1.5964533, g: 1.5964533, b: 0, a: 1}
+    PrimaryColorLight: {r: 0.6936132, g: 0.7490197, b: 0.12860525, a: 1}
+    PrimaryColorDark: {r: 0.7490196, g: 0.7490196, b: 0, a: 1}
     SecondaryColorLight: {r: 1, g: 1, b: 1, a: 1}
     SecondaryColorDark: {r: 0.381132, g: 0.381132, b: 0.381132, a: 1}
     SecondaryBaseColor: {r: 0, g: 0, b: 0, a: 1}

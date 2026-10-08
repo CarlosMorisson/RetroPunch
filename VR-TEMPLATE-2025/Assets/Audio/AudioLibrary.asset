@@ -79,3 +79,9 @@ MonoBehaviour:
     volume: 0.5
     pitch: 1
     mixerGroup: {fileID: -8751936098316669874, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Thunder Wave
+    clip: {fileID: 8300000, guid: 1f9edd7360776f4419f45566e684b1c9, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
