@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BaseSpawnRate: 0.8
   SpawnRateMultiplier: 1
-  ErrorTolerance: 20
+  ErrorTolerance: 15
   MaxPrefabDifficulty: 2
   MaxSimultaneousObjects: 2
   MusicIntensityMultiplier: 1
@@ -22,3 +22,4 @@ MonoBehaviour:
   ShootSpeedMultiplier: 1
   PushDistanceMultiplier: 1
   RotationSpeedMultiplier: 1
+  MaxSpawnPerBeat: 3

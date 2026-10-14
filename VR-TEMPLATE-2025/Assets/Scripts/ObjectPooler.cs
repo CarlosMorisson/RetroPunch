@@ -20,6 +20,16 @@ public class ObjectPooler : MonoBehaviour
     public List<Pool> pools;
     public Dictionary<string, Queue<GameObject>> poolDictionary;
 
+    [Header("Watchdog")]
+    [Tooltip("Objeto ativo há mais que isso (s, tempo de jogo) é considerado preso: loga o estado e força a volta ao pool. 0 = desligado. Deve ser maior que o CubeLifeTime + tempo de viagem.")]
+    [SerializeField] private float maxAliveTime = 45f;
+    private const float WATCHDOG_INTERVAL = 1f;
+
+    // Objetos fora do pool: tag e tempo de jogo acumulado desde o spawn (pausa não conta)
+    private readonly Dictionary<GameObject, (string tag, float alive)> spawnedAt = new();
+    private readonly List<GameObject> watchdogBuffer = new();
+    private float lastWatchdogCheck;
+
     void Awake()
     {
         if (Instance == null)
@@ -82,6 +92,58 @@ public class ObjectPooler : MonoBehaviour
 
     }
 
+    // Rede de segurança contra cubos que nunca voltam ao pool. Loga o estado do objeto preso
+    // (para achar a causa) e o devolve, para ele não ficar ocupando o pool até o fim da música.
+    private void Update()
+    {
+        if (maxAliveTime <= 0f || Time.time - lastWatchdogCheck < WATCHDOG_INTERVAL)
+            return;
+
+        float elapsed = Time.time - lastWatchdogCheck;
+        lastWatchdogCheck = Time.time;
+
+        // Pausado/fim de jogo: os cubos param de propósito, então o tempo não conta
+        if (GameState.Instance != null && GameState.Instance.CurrentState != State.Game)
+            return;
+
+        watchdogBuffer.Clear();
+        watchdogBuffer.AddRange(spawnedAt.Keys);
+
+        foreach (GameObject obj in watchdogBuffer)
+        {
+            // Destruído ou desativado por fora do ReturnToPool: já está livre no pool
+            if (obj == null || !obj.activeSelf)
+            {
+                spawnedAt.Remove(obj);
+                continue;
+            }
+
+            (string tag, float alive) = spawnedAt[obj];
+            alive += elapsed;
+            spawnedAt[obj] = (tag, alive);
+
+            if (alive < maxAliveTime)
+                continue;
+
+            Debug.LogWarning($"[ObjectPooler] '{obj.name}' (pool '{tag}') preso há {alive:F0}s. Forçando volta ao pool.\n{DescribeState(obj)}", obj);
+            ReturnToPool(tag, obj);
+        }
+    }
+
+    private static string DescribeState(GameObject obj)
+    {
+        System.Text.StringBuilder sb = new();
+        sb.Append($"root pos={obj.transform.position} scale={obj.transform.localScale}");
+
+        if (obj.TryGetComponent<CubeMovemment>(out var move))
+            sb.Append($" normalSpeed={move.normalSpeed} enableSpeed={move.enableSpeed} boostFinished={move.boostFinished}");
+
+        foreach (Transform child in obj.transform)
+            sb.Append($"\n  {child.name}: activeSelf={child.gameObject.activeSelf} scale={child.localScale} tweens={DOTween.TweensByTarget(child)?.Count ?? 0}");
+
+        return sb.ToString();
+    }
+
     public GameObject SpawnFromPool(string tag, Vector3 position, Quaternion rotation)
     {
         if (!poolDictionary.ContainsKey(tag))
@@ -104,6 +166,7 @@ public class ObjectPooler : MonoBehaviour
                 obj.transform.position = position;
                 obj.transform.rotation = rotation;
                 pool.Enqueue(obj);
+                spawnedAt[obj] = (tag, 0f);
                 return obj;
             }
 
@@ -119,6 +182,7 @@ public class ObjectPooler : MonoBehaviour
             newObj.transform.position = position;
             newObj.transform.rotation = rotation;
             pool.Enqueue(newObj);
+            spawnedAt[newObj] = (tag, 0f);
             Debug.Log($"Pool '{tag}' expandido dinamicamente.");
             return newObj;
         }
@@ -137,9 +201,13 @@ public class ObjectPooler : MonoBehaviour
         if (!obj.activeSelf)
             return;
 
+        // Inclui filhos inativos: o cubo de sucesso já está desativado aqui, e tweens nele/nos fragmentos
+        // continuariam rodando por cima do próximo uso do objeto.
         DOTween.Kill(obj.transform);
-        foreach (Transform child in obj.GetComponentsInChildren<Transform>())
+        foreach (Transform child in obj.GetComponentsInChildren<Transform>(true))
             DOTween.Kill(child);
+
+        spawnedAt.Remove(obj);
 
         ResetAllRigidbodies(obj);
         ResetScale(obj);

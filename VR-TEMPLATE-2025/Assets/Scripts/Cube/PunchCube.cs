@@ -3,7 +3,7 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.Events;
 
-public class PunchCube : CubeCollider
+public class PunchCube : CubeCollider, IHandHittable
 {
     [Header("Overlap Sphere Settings")]
     public Transform overlapCenter;
@@ -199,24 +199,43 @@ public class PunchCube : CubeCollider
         if (collision.gameObject.CompareTag(PLAYER_TAG))
         {
                 print(collision.gameObject.name);
-            if (PowerEffect.Instance.isPowered)
-            {
-                collisionLocation = collision.contacts[0].point;
-                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
-                HandleSuccess();
-                return;
-            }
-            if (ConcludeCondition(collision.gameObject) && !hasMisstaken)
-            {
-                collisionLocation = collision.contacts[0].point;
-                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
-                HandleSuccess();
-            }
-            else
-            {
-                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, false);
-                HandleFail();
-            }
+            ApplyPlayerHit(collision.gameObject, collision.contacts[0].point);
+        }
+    }
+
+    /// <summary>
+    /// Golpe detectado fora do OnCollisionEnter (HandHitAssist do hand tracking).
+    /// Retorna false se o cubo já foi tocado ou resolvido.
+    /// </summary>
+    public bool TryHandAssistHit(GameObject hitter, Vector3 handPosition, Vector3 contactPoint)
+    {
+        if (!TryLockTouch())
+            return false;
+
+        RegisterHit();
+        ApplyPlayerHit(hitter, contactPoint);
+        return true;
+    }
+
+    private void ApplyPlayerHit(GameObject hitter, Vector3 point)
+    {
+        if (PowerEffect.Instance.isPowered)
+        {
+            collisionLocation = point;
+            HandTouchFeedback.Instance.HandFeedback(hitter, true);
+            HandleSuccess();
+            return;
+        }
+        if (ConcludeCondition(hitter) && !hasMisstaken)
+        {
+            collisionLocation = point;
+            HandTouchFeedback.Instance.HandFeedback(hitter, true);
+            HandleSuccess();
+        }
+        else
+        {
+            HandTouchFeedback.Instance.HandFeedback(hitter, false);
+            HandleFail();
         }
     }
 

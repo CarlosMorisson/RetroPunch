@@ -15,6 +15,11 @@ public class UIResult : MonoBehaviour
     private TextMeshProUGUI consecutiveText;
     [SerializeField]
     private TextMeshProUGUI errorText;
+    [Header("Consecutive Errors (quanto falta pra perder)")]
+    [SerializeField]
+    private Image consecutiveErrorFillImage;
+    [SerializeField]
+    private float consecutiveErrorFillDuration = 0.2f;
     [Header("Music")]
     [SerializeField]
     private TextMeshProUGUI musicNameText;
@@ -245,6 +250,7 @@ public class UIResult : MonoBehaviour
         resultText.transform.DOPunchScale(_resultScale, PUNCH_TIME).
             OnComplete(()=> resultText.transform.localScale=_resultTextInitialScale);
         finalResultText.text = result.ToString();
+        UpdateConsecutiveErrorFill(); // acerto zera os erros consecutivos
     }
     public void UpdateConsecutive(int consecutive)
     {
@@ -273,12 +279,39 @@ public class UIResult : MonoBehaviour
             highConsecutiveText.text=consecutive.ToString();
         }
     }
-    public void UpdateError(int error)
+    // O evento envia os erros consecutivos; os textos mostram sempre o total
+    public void UpdateError(int consecutiveErrors)
     {
-        errorText.text = error.ToString();
+        int totalErrors = PointController.Instance.Errors;
+        errorText.text = totalErrors.ToString();
         errorText.transform.DOPunchScale(_errorScale, PUNCH_TIME).
                     OnComplete(() => errorText.transform.localScale = _errorTextInitialScale);
-        finalErrorText.text=error.ToString();
+        finalErrorText.text = totalErrors.ToString();
+        UpdateConsecutiveErrorFill();
+    }
+    // Preenche a imagem conforme os erros consecutivos se aproximam da tolerancia
+    public void UpdateConsecutiveErrorFill()
+    {
+        if (consecutiveErrorFillImage == null)
+            return;
+
+        int tolerance = StageLoadController.Instance.CurrentDifficulty.ErrorTolerance;
+        float fill = tolerance > 0
+            ? Mathf.Clamp01((float)PointController.Instance.GetConsecutiveErrors() / tolerance)
+            : 0f;
+
+        consecutiveErrorFillImage.DOKill();
+        consecutiveErrorFillImage.DOFillAmount(fill, consecutiveErrorFillDuration);
+        consecutiveErrorFillImage.DOColor(GetConsecutiveErrorColor(fill), consecutiveErrorFillDuration);
+    }
+    // Tolerancia dividida em 3 faixas: verde, amarelo, vermelho
+    private Color GetConsecutiveErrorColor(float fill)
+    {
+        if (fill <= 1f / 3f)
+            return Color.green;
+        if (fill <= 2f / 3f)
+            return Color.yellow;
+        return Color.red;
     }
     public void UpdateMusicName(string name)
     {
@@ -292,5 +325,11 @@ public class UIResult : MonoBehaviour
         PointController.Instance.OnAcceptInt += UpdateResult;
         PointController.Instance.OnConsecutiveInt += UpdateConsecutive;
         PointController.Instance.OnErrorInt += UpdateError;
+
+        if (consecutiveErrorFillImage != null)
+        {
+            consecutiveErrorFillImage.fillAmount = 0f;
+            consecutiveErrorFillImage.color = GetConsecutiveErrorColor(0f);
+        }
     }
 }

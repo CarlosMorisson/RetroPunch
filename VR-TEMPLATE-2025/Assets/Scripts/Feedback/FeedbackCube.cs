@@ -51,10 +51,10 @@ public class FeedbackCube : MonoBehaviour
     {
         rb.AddForce(Vector3.up * bounceForce, ForceMode.Impulse);
 
-        Sequence seq = DOTween.Sequence();
-
-        seq.Append(transform.DOScale(Vector3.zero, scaleDuration).SetEase(Ease.InQuad));
-        seq.OnComplete(() =>
+        // Tween direto no transform (sem Sequence): uma Sequence não tem target, então o
+        // DOTween.Kill(transform) do ResetCube/ObjectPooler não a matava. Ela continuava rodando
+        // depois do cubo voltar ao pool e encolhia/desativava os fragmentos da explosão seguinte.
+        transform.DOScale(Vector3.zero, scaleDuration).SetEase(Ease.InQuad).OnComplete(() =>
         {
             tweenFinished = true;
             manager?.NotifyFinished();

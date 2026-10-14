@@ -15,7 +15,7 @@ public class PunchPoint
     public Vector3 sphereLocalScale;
 }
 
-public class MultiPunchCube : CubeCollider
+public class MultiPunchCube : CubeCollider, IHandHittable
 {
     [Header("Punch Points")]
     public List<PunchPoint> punchPoints = new();
@@ -43,7 +43,13 @@ public class MultiPunchCube : CubeCollider
 
     private bool hasMisstaken = false;
 
-    private bool eventsRegistered = false; 
+    private bool eventsRegistered = false;
+
+    // Janela (s) em que a colisão e o HandHitAssist da mesma mão são tratados como um único soco
+    private const float SAME_HIT_WINDOW = 0.15f;
+    private GameObject lastHitter;
+    private float lastHitTime;
+    private bool lastHitWasAssist;
 
     #region LIFECYCLE
 
@@ -70,6 +76,7 @@ public class MultiPunchCube : CubeCollider
 
         transform.localScale = originalLocalScale;
         hasMisstaken = false;
+        lastHitter = null;
 
         if (mainFeedback != null)
             mainFeedback.gameObject.SetActive(false);
@@ -200,6 +207,10 @@ public class MultiPunchCube : CubeCollider
             if (IsResolved)
                 return;
 
+            // Essa mão acabou de bater pelo HandHitAssist: a colisão atrasada do mesmo soco não conta de novo
+            if (lastHitWasAssist && IsRecentHitBy(collision.gameObject))
+                return;
+
             point = GetClosestPoint(collision.transform.position);
             if (point != null && point.isTouched && !PowerEffect.Instance.isPowered)
                 return;
@@ -215,32 +226,82 @@ public class MultiPunchCube : CubeCollider
 
         if (collision.gameObject.CompareTag(PLAYER_TAG))
         {
-            if (PowerEffect.Instance.isPowered)
+            RememberHit(collision.gameObject, false);
+            ApplyPlayerHit(collision.gameObject, point, collision.contacts[0].point);
+        }
+    }
+
+    /// <summary>
+    /// Golpe detectado fora do OnCollisionEnter (HandHitAssist do hand tracking).
+    /// Retorna false se o golpe foi ignorado (cubo resolvido, ponto já tocado ou mesmo soco já registrado).
+    /// </summary>
+    public bool TryHandAssistHit(GameObject hitter, Vector3 handPosition, Vector3 contactPoint)
+    {
+        if (IsResolved)
+            return false;
+
+        // Mesmo soco já registrado (pela colisão ou pelo assist): evita que um soco marque dois pontos
+        if (IsRecentHitBy(hitter))
+            return false;
+
+        PunchPoint point = GetClosestPoint(handPosition);
+        if (point != null && point.isTouched && !PowerEffect.Instance.isPowered)
+            return false;
+
+        RegisterHit();
+        RememberHit(hitter, true);
+        ApplyPlayerHit(hitter, point, contactPoint);
+        return true;
+    }
+
+    private void ApplyPlayerHit(GameObject hitter, PunchPoint point, Vector3 contactPoint)
+    {
+        if (PowerEffect.Instance.isPowered)
+        {
+            HandTouchFeedback.Instance.HandFeedback(hitter, true);
+            HandleSuccess();
+            collisionLocation = contactPoint;
+            return;
+        }
+
+        if (point != null && !point.isTouched && !hasMisstaken)
+        {
+
+            HitPoint(point);
+
+            if (AllPointsTouched())
             {
-                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
+                HandTouchFeedback.Instance.HandFeedback(hitter, true);
                 HandleSuccess();
-                collisionLocation = collision.contacts[0].point;
-                return;
-            }
-
-            if (point != null && !point.isTouched && !hasMisstaken)
-            {
-        
-                HitPoint(point);
-
-                if (AllPointsTouched())
-                {
-                    HandTouchFeedback.Instance.HandFeedback(collision.gameObject, true);
-                    HandleSuccess();
-                    collisionLocation = collision.contacts[0].point;
-                }
-            }
-            else
-            {
-                HandTouchFeedback.Instance.HandFeedback(collision.gameObject, false);
-                HandleFail();
+                collisionLocation = contactPoint;
             }
         }
+        else
+        {
+            HandTouchFeedback.Instance.HandFeedback(hitter, false);
+            HandleFail();
+        }
+    }
+
+    private void RememberHit(GameObject hitter, bool fromAssist)
+    {
+        lastHitter = hitter;
+        lastHitTime = Time.unscaledTime;
+        lastHitWasAssist = fromAssist;
+    }
+
+    /// <summary>
+    /// true se a mesma mão (o objeto ou um pai/filho dele) bateu neste cubo há menos de SAME_HIT_WINDOW.
+    /// Tempo real (unscaled), pois o tracking não desacelera com o slow motion.
+    /// </summary>
+    private bool IsRecentHitBy(GameObject hitter)
+    {
+        if (lastHitter == null || Time.unscaledTime - lastHitTime > SAME_HIT_WINDOW)
+            return false;
+
+        Transform a = hitter.transform;
+        Transform b = lastHitter.transform;
+        return a == b || a.IsChildOf(b) || b.IsChildOf(a);
     }
 
     #endregion
