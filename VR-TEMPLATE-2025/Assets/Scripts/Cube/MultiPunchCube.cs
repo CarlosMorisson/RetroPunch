@@ -356,11 +356,20 @@ public class MultiPunchCube : CubeCollider, IHandHittable
         return closest;
     }
 
+    /// <summary>
+    /// Volta os pontos ao estado inicial (chamado no OnEnable, ao sair do pool):
+    /// reativa a sphere, cancela o DOScale do HitPoint e restaura a escala original.
+    /// </summary>
     void ResetPoints()
     {
         foreach (var p in punchPoints)
         {
             p.isTouched = false;
+
+            if (p.sphere == null) continue;
+
+            p.sphere.DOKill();
+            p.sphere.gameObject.SetActive(true);
             p.sphere.localScale = p.sphereLocalScale;
         }
     }

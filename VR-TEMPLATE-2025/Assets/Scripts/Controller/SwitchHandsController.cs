@@ -36,9 +36,6 @@ public class HandSwitch
     [Tooltip("Toca enquanto o Freeze Time estiver ativo.")]
     public ParticleSystem freezeParticle;
 
-    [Tooltip("Mostra quantos golpes faltam pra trocar de mão (baseado no randomizeTolerance). Desativado fora do modo Shoot.")]
-    public TextMeshProUGUI toleranceText;
-
     [Tooltip("Ativado quando essa opção é a PRÓXIMA a entrar (modo Shoot). Não pode ser filho do parentObject, senão fica desativado junto com ele.")]
     public GameObject nextIndicator;
 
@@ -240,7 +237,6 @@ public class SwitchHandsController : MonoBehaviour
     /// <summary>Esconde o contador de troca (só é usado no modo Shoot).</summary>
     private void HideToleranceTexts()
     {
-        SetToleranceTextActive(currentBothHands, false);
         if (externalToleranceText != null)
             externalToleranceText.gameObject.SetActive(false);
     }
@@ -284,39 +280,16 @@ public class SwitchHandsController : MonoBehaviour
     }
 
     /// <summary>
-    /// Atualiza o texto das duas mãos do currentBothHands e o contador externo
-    /// com quantas chamadas faltam pra próxima troca.
+    /// Atualiza o contador externo com quantas chamadas faltam pra próxima troca.
     /// </summary>
     private void UpdateToleranceText()
     {
         int remaining = RemainingToSwitch;
-        string value = remaining.ToString();
 
         if (externalToleranceText != null)
-            externalToleranceText.text = value;
+            externalToleranceText.text = remaining.ToString();
 
         OnRemainingChanged?.Invoke(remaining);
-
-        if (currentBothHands == null)
-            return;
-
-        if (currentBothHands.LeftHand?.toleranceText != null)
-            currentBothHands.LeftHand.toleranceText.text = value;
-
-        if (currentBothHands.RightHand?.toleranceText != null)
-            currentBothHands.RightHand.toleranceText.text = value;
-    }
-
-    private void SetToleranceTextActive(BothHands hands, bool active)
-    {
-        if (hands == null)
-            return;
-
-        if (hands.LeftHand?.toleranceText != null)
-            hands.LeftHand.toleranceText.gameObject.SetActive(active);
-
-        if (hands.RightHand?.toleranceText != null)
-            hands.RightHand.toleranceText.gameObject.SetActive(active);
     }
 
     /// <summary>

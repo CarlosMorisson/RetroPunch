@@ -28,6 +28,9 @@ public class FinishGameController : MonoBehaviour
         }
         else
         {
+            if (StageLoadController.Instance != null)
+                StageLoadController.Instance.CompleteCurrentMusic();
+
             OnSuccess?.Invoke();
             OnSuccessEvent?.Invoke();
         }
