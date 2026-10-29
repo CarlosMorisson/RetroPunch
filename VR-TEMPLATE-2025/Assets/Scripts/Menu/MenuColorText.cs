@@ -20,11 +20,35 @@ public class MenuColorText : MonoBehaviour
     private void OnEnable()
     {
         MenuMainButton.OnMainButtonChanged += HandleMainButtonChanged;
+        ApplySelectedColor();
     }
 
     private void OnDisable()
     {
         MenuMainButton.OnMainButtonChanged -= HandleMainButtonChanged;
+    }
+
+    /// <summary>
+    /// Aplica a cor do botão selecionado instantaneamente (usado ao reativar o objeto)
+    /// </summary>
+    private void ApplySelectedColor()
+    {
+        MainButton selected = MenuMainButton.SelectedButton;
+        if (selected == null) return;
+
+        Color targetColor = selected.ButtonColor;
+
+        if (cachedImage != null)
+        {
+            cachedImage.DOKill();
+            cachedImage.color = targetColor;
+        }
+
+        if (cachedText != null)
+        {
+            cachedText.DOKill();
+            cachedText.color = targetColor;
+        }
     }
 
     private void HandleMainButtonChanged(MainButton newActiveButton)

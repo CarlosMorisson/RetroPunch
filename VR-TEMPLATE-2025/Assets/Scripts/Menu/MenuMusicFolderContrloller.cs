@@ -40,27 +40,6 @@ public class MenuMusicFolderContrloller : MonoBehaviour
         currentIndex = 0;
         CreateIndicators();
         RefreshFolders(false);
-        CheckLastFolderCompleted();
-    }
-
-    // Verifica as musicas do ultimo folder liberado; se todas estiverem concluidas, libera o proximo
-    private void CheckLastFolderCompleted()
-    {
-        if (openFolder >= folders.Count) return;
-
-        GameObject lastFolder = folders[openFolder - 1];
-        if (lastFolder == null) return;
-
-        MenuSetMusic[] musics = lastFolder.GetComponentsInChildren<MenuSetMusic>(true);
-        if (musics.Length == 0) return;
-
-        foreach (MenuSetMusic music in musics)
-        {
-            if (!StageLoadController.IsMusicCompleted(music.MusicToSet))
-                return;
-        }
-
-        UnlockNextFolder();
     }
 
     void OnEnable()
@@ -129,6 +108,22 @@ public class MenuMusicFolderContrloller : MonoBehaviour
         PlayerPrefs.Save();
 
         RefreshIndicators(true);
+    }
+
+    // Chamado pelo MusicFolderProgress: define quantos folders estao liberados com base nas musicas concluidas
+    public void SetOpenFolder(int count)
+    {
+        count = Mathf.Clamp(count, 1, Mathf.Max(1, folders.Count));
+        if (count == openFolder) return;
+
+        openFolder = count;
+        PlayerPrefs.SetInt(OpenFolderKey, openFolder);
+        PlayerPrefs.Save();
+
+        if (currentIndex >= AccessibleCount)
+            currentIndex = 0;
+
+        RefreshFolders(false);
     }
 
     public void CreateIndicators()

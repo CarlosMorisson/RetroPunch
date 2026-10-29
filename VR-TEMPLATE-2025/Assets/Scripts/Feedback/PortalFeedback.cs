@@ -105,7 +105,6 @@ public class PortalFeedback : MonoBehaviour
     private void FixedUpdate()
     {
         Transform center = PullCenter;
-        Vector3 centerPos = center.position;
         Vector3 normal = center.TransformDirection(localPortalNormal).normalized;
 
         float pullReach = MaxReach(pullBoxOffset, pullBoxSize);
@@ -114,41 +113,51 @@ public class PortalFeedback : MonoBehaviour
         foreach (PushCube cube in PushCube.TouchedCubes)
         {
             if (cube == null || !cube.CanBePulled) continue;
-
-            Rigidbody body = cube.Body;
-            Vector3 position = body.worldCenterOfMass;
-            Vector3 offset = position - centerPos;
-            float distance = offset.magnitude;
-            if (distance < 0.001f) continue;
-
-            Vector3 acceleration = Vector3.zero;
-
-            // Sucção principal (qualquer cubo tocado): cresce conforme o cubo se aproxima
-            if (pullReach > 0.001f && IsInsideBox(center, pullBoxOffset, pullBoxSize, position))
-            {
-                float proximity = Mathf.Clamp01(1f - distance / pullReach);
-                acceleration += -offset / distance * (pullStrength * Mathf.Pow(proximity, pullFalloffExponent));
-            }
-
-            // Sucção lateral (só cubos do mesmo tipo): puxa de volta para o eixo do portal para não passar pelo lado
-            if (cube.pushDirection == PushType && sideReach > 0.001f && IsInsideBox(center, sideBoxOffset, sideBoxSize, position))
-            {
-                float proximity = Mathf.Clamp01(1f - distance / sideReach);
-
-                // Parte do deslocamento que está "ao lado" da boca do portal (fora do eixo da normal)
-                Vector3 lateralOffset = offset - normal * Vector3.Dot(offset, normal);
-                float sideFactor = lateralOffset.magnitude / distance;
-
-                if (lateralOffset.sqrMagnitude > 0.0001f)
-                    acceleration += -lateralOffset.normalized * (sidePullStrength * proximity * sideFactor);
-
-                Vector3 lateralVelocity = body.linearVelocity - normal * Vector3.Dot(body.linearVelocity, normal);
-                acceleration += -lateralVelocity * (sideDamping * proximity);
-            }
-
-            if (acceleration != Vector3.zero)
-                body.AddForce(acceleration, ForceMode.Acceleration);
+            Pull(cube.Body, cube.pushDirection, center, normal, pullReach, sideReach);
         }
+
+        foreach (TutorialPushBall ball in TutorialPushBall.TouchedBalls)
+        {
+            if (ball == null || !ball.CanBePulled) continue;
+            Pull(ball.Body, ball.pushDirection, center, normal, pullReach, sideReach);
+        }
+    }
+
+    private void Pull(Rigidbody body, PushType pushDirection, Transform center, Vector3 normal, float pullReach, float sideReach)
+    {
+        Vector3 centerPos = center.position;
+        Vector3 position = body.worldCenterOfMass;
+        Vector3 offset = position - centerPos;
+        float distance = offset.magnitude;
+        if (distance < 0.001f) return;
+
+        Vector3 acceleration = Vector3.zero;
+
+        // Sucção principal (qualquer cubo tocado): cresce conforme o cubo se aproxima
+        if (pullReach > 0.001f && IsInsideBox(center, pullBoxOffset, pullBoxSize, position))
+        {
+            float proximity = Mathf.Clamp01(1f - distance / pullReach);
+            acceleration += -offset / distance * (pullStrength * Mathf.Pow(proximity, pullFalloffExponent));
+        }
+
+        // Sucção lateral (só cubos do mesmo tipo): puxa de volta para o eixo do portal para não passar pelo lado
+        if (pushDirection == PushType && sideReach > 0.001f && IsInsideBox(center, sideBoxOffset, sideBoxSize, position))
+        {
+            float proximity = Mathf.Clamp01(1f - distance / sideReach);
+
+            // Parte do deslocamento que está "ao lado" da boca do portal (fora do eixo da normal)
+            Vector3 lateralOffset = offset - normal * Vector3.Dot(offset, normal);
+            float sideFactor = lateralOffset.magnitude / distance;
+
+            if (lateralOffset.sqrMagnitude > 0.0001f)
+                acceleration += -lateralOffset.normalized * (sidePullStrength * proximity * sideFactor);
+
+            Vector3 lateralVelocity = body.linearVelocity - normal * Vector3.Dot(body.linearVelocity, normal);
+            acceleration += -lateralVelocity * (sideDamping * proximity);
+        }
+
+        if (acceleration != Vector3.zero)
+            body.AddForce(acceleration, ForceMode.Acceleration);
     }
 
     private static void DrawBoxGizmo(Transform center, Vector3 boxOffset, Vector3 boxSize, Color color)

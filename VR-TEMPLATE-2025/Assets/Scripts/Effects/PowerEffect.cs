@@ -60,7 +60,12 @@ public class PowerEffect : MonoBehaviour
     }
 
     [ContextMenu("teste")]
-    public void TriggerPower()
+    public void TriggerPower() => StartPower(true);
+
+    /// <summary>Power sem sons e sem preset de audio (usado no tutorial, antes da musica tocar).</summary>
+    public void TriggerPowerSilent() => StartPower(false);
+
+    private void StartPower(bool playAudio)
     {
         if (powerRoutine != null)
             StopCoroutine(powerRoutine);
@@ -68,14 +73,14 @@ public class PowerEffect : MonoBehaviour
         objectScaleTween?.Kill();
         clockFillTween?.Kill();
 
-        powerRoutine = StartCoroutine(FreezeRoutine());
+        powerRoutine = StartCoroutine(FreezeRoutine(playAudio));
     }
     [ContextMenu("Teste Explosion")]
     public void Explosion()
     {
         OnPowerStarted?.Invoke();
     }
-    private IEnumerator FreezeRoutine()
+    private IEnumerator FreezeRoutine(bool playAudio)
     {
         // Se o Freeze Time estiver ativo, o power fica na fila até ele acabar.
         yield return new WaitUntil(() => !FreezeEffect.IsActive);
@@ -83,12 +88,12 @@ public class PowerEffect : MonoBehaviour
         isPowered = true;
         OnPowerChanged?.Invoke(true);
 
-        if (AudioController.Instance != null)
+        if (playAudio && AudioController.Instance != null)
         {
             AudioController.Instance.Play(TRANSITION_AUDIO);
         }
 
-        if (AudioEffect.Instance != null)
+        if (playAudio && AudioEffect.Instance != null)
         {
             AudioEffect.Instance.ChangeAudioPreset(AudioEffect.EffectType.DarkSpace);
         }
@@ -121,14 +126,14 @@ public class PowerEffect : MonoBehaviour
                 .OnComplete(() => FreezeTimeObject.SetActive(false));
         }
 
-        if (AudioEffect.Instance != null)
+        if (playAudio && AudioEffect.Instance != null)
         {
             AudioEffect.Instance.ChangeAudioPreset(AudioEffect.EffectType.Normal);
         }
 
         OnFinishPowerTime?.Invoke();
 
-        if (AudioController.Instance != null)
+        if (playAudio && AudioController.Instance != null)
         {
             AudioController.Instance.Play(TRANSITION_AUDIO);
         }
@@ -140,6 +145,9 @@ public class PowerEffect : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (Instance == this)
+            Instance = null;
+
         objectScaleTween?.Kill();
         clockFillTween?.Kill();
     }

@@ -11,6 +11,9 @@ public class MenuMainButton : MonoBehaviour
 
     public static event Action<MainButton> OnMainButtonChanged;
 
+    // Último botão selecionado, para quem estava inativo durante o evento
+    public static MainButton SelectedButton { get; private set; }
+
     private MainButton currentButton;
 
     public MainButton CurrentButton
@@ -21,6 +24,7 @@ public class MenuMainButton : MonoBehaviour
             if (value != currentButton)
             {
                 currentButton = value;
+                SelectedButton = value;
 
                 if (currentButton != null)
                 {

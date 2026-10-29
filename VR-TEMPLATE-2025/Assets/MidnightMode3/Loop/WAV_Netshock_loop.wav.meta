@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: 572e51eef6ea11b42a3b8dfe305dfcf4
+AudioImporter:
+  externalObjects: {}
+  serializedVersion: 8
+  defaultSettings:
+    serializedVersion: 2
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 44100
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+    preloadAudioData: 0
+  platformSettingOverrides: {}
+  forceToMono: 0
+  normalize: 1
+  loadInBackground: 0
+  ambisonic: 0
+  3D: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 347296
+  packageName: Midnight Mode Vol.3 - Night themed soundtrack
+  packageVersion: 1.0
+  assetPath: Assets/MidnightMode3/Loop/WAV_Netshock_loop.wav
+  uploadId: 825986

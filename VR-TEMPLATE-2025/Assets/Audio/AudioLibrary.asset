@@ -85,3 +85,39 @@ MonoBehaviour:
     volume: 1
     pitch: 1
     mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Birefringence
+    clip: {fileID: 8300000, guid: 369629b940b3c48e4b0d6d61b998b2c8, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: SixTwo
+    clip: {fileID: 8300000, guid: 0f3bf78aa106ab04a80373bfbb33cf66, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Earthquake Flow
+    clip: {fileID: 8300000, guid: d6241f5762f47544bb218408878f9a32, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Hero Music
+    clip: {fileID: 8300000, guid: 3eb8db1751b10f445872a6ae33a8de52, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Rhytm Fit
+    clip: {fileID: 8300000, guid: dac1d492eb0981444a43cf4cd4e6fc21, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Synthstorm
+    clip: {fileID: 8300000, guid: fa1fbe41f56416545a0c21bdeb786da3, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}

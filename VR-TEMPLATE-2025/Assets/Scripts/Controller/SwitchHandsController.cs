@@ -280,6 +280,14 @@ public class SwitchHandsController : MonoBehaviour
     }
 
     /// <summary>
+    /// Reinicia a troca do zero: zera o contador e o ciclo de sorteio e escolhe as maos de novo.
+    /// </summary>
+    public void ResetSwitch()
+    {
+        SelectHandsForCurrentModality();
+    }
+
+    /// <summary>
     /// Atualiza o contador externo com quantas chamadas faltam pra próxima troca.
     /// </summary>
     private void UpdateToleranceText()

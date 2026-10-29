@@ -78,16 +78,22 @@ public class RacketSweep : MonoBehaviour
             if (col == null || col == box)
                 continue;
 
-            PushCube cube = col.GetComponentInParent<PushCube>();
-            if (cube == null && col.attachedRigidbody != null)
-                cube = col.attachedRigidbody.GetComponentInChildren<PushCube>();
-            if (cube == null)
-                continue;
-
             // distance 0 = a caixa já começou sobrepondo o collider; nesse caso o point vem zerado
             Vector3 point = hits[i].distance > 0f ? hits[i].point : col.ClosestPoint(from);
 
-            cube.TryPlayerHit(gameObject, point, direction, handVelocity);
+            PushCube cube = col.GetComponentInParent<PushCube>();
+            if (cube == null && col.attachedRigidbody != null)
+                cube = col.attachedRigidbody.GetComponentInChildren<PushCube>();
+            if (cube != null)
+            {
+                cube.TryPlayerHit(gameObject, point, direction, handVelocity);
+                continue;
+            }
+
+            // Bolas do tutorial do Push
+            TutorialPushBall ball = col.GetComponentInParent<TutorialPushBall>();
+            if (ball != null)
+                ball.TryPlayerHit(gameObject, point, direction, handVelocity);
         }
     }
 

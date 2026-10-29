@@ -94,22 +94,18 @@ public class StageLoadController : MonoBehaviour
         ResolveCurrentBeatMap();
     }
 
-    private const string COMPLETED_MUSIC_KEY = "CompletedMusic_";
-
     // Chamar no fim da musica (GameState End): marca a musica atual como concluida
     public void CompleteCurrentMusic()
     {
         if (ChooseMusic == null || IsTutorial)
             return;
 
-        PlayerPrefs.SetInt(COMPLETED_MUSIC_KEY + ChooseMusic.name, 1);
-        PlayerPrefs.Save();
-        Debug.Log($"Musica concluida: {ChooseMusic.name}");
+        MusicFolderProgress.CompleteMusic(ChooseMusic.name);
     }
 
     public static bool IsMusicCompleted(AudioClip clip)
     {
-        return clip != null && PlayerPrefs.GetInt(COMPLETED_MUSIC_KEY + clip.name, 0) == 1;
+        return clip != null && MusicFolderProgress.IsMusicCompleted(clip.name);
     }
 
     public void SetEasy()

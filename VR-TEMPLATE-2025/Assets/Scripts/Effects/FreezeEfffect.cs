@@ -7,6 +7,8 @@ using NUnit.Framework.Constraints; // Importante para o DOTween funcionar
 
 public class FreezeEffect : MonoBehaviour
 {
+    public static FreezeEffect Instance { get; private set; }
+
     [Header("Time Scale")]
     [SerializeField] private float defaultTimeScale = 1f;
     [SerializeField] private float freezeTimeScale = 0.05f;
@@ -35,6 +37,12 @@ public class FreezeEffect : MonoBehaviour
 
     private const string TRANSITION_AUDIO = "TransitionEffect";
 
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+    }
+
     private void Start()
     {
         Time.timeScale = defaultTimeScale;
@@ -50,7 +58,12 @@ public class FreezeEffect : MonoBehaviour
     }
 
     [ContextMenu("teste")]
-    public void TriggerFreeze()
+    public void TriggerFreeze() => StartFreeze(true);
+
+    /// <summary>Freeze sem sons e sem preset de audio (usado no tutorial, antes da musica tocar).</summary>
+    public void TriggerFreezeSilent() => StartFreeze(false);
+
+    private void StartFreeze(bool playAudio)
     {
         if (freezeRoutine != null)
             StopCoroutine(freezeRoutine);
@@ -58,20 +71,22 @@ public class FreezeEffect : MonoBehaviour
         objectScaleTween?.Kill();
         clockFillTween?.Kill();
 
-        freezeRoutine = StartCoroutine(FreezeRoutine());
+        freezeRoutine = StartCoroutine(FreezeRoutine(playAudio));
     }
 
-    private IEnumerator FreezeRoutine()
+    private IEnumerator FreezeRoutine(bool playAudio)
     {
         // Se o Power Time estiver ativo, o freeze fica na fila até ele acabar.
         yield return new WaitUntil(() => !PowerEffect.IsRunning);
 
         IsActive = true;
         yield return LerpTimeScale(defaultTimeScale, freezeTimeScale, slowDownDuration);
-        AudioController.Instance.Play(TRANSITION_AUDIO);
-        if (AudioEffect.Instance != null)
+        if (playAudio)
         {
-            AudioEffect.Instance.ChangeAudioPreset(AudioEffect.EffectType.DistortedSlow);
+            if (AudioController.Instance != null)
+                AudioController.Instance.Play(TRANSITION_AUDIO);
+            if (AudioEffect.Instance != null)
+                AudioEffect.Instance.ChangeAudioPreset(AudioEffect.EffectType.DistortedSlow);
         }
 
         if (FreezeTimeObject != null)
@@ -104,7 +119,7 @@ public class FreezeEffect : MonoBehaviour
                 .OnComplete(() => FreezeTimeObject.SetActive(false));
         }
 
-        if (AudioEffect.Instance != null)
+        if (playAudio && AudioEffect.Instance != null)
         {
             AudioEffect.Instance.ChangeAudioPreset(AudioEffect.EffectType.Normal);
         }
@@ -115,7 +130,8 @@ public class FreezeEffect : MonoBehaviour
         IsActive = false;
         OnFreezeChanged?.Invoke(false);
         OnFinishFreezeTime?.Invoke();
-        AudioController.Instance.Play(TRANSITION_AUDIO);
+        if (playAudio && AudioController.Instance != null)
+            AudioController.Instance.Play(TRANSITION_AUDIO);
         freezeRoutine = null;
     }
 
@@ -141,6 +157,8 @@ public class FreezeEffect : MonoBehaviour
     private void OnDestroy()
     {
         // Estáticos sobrevivem à troca de cena
+        if (Instance == this)
+            Instance = null;
         IsActive = false;
         IsFrozen = false;
 
