@@ -12,12 +12,16 @@ public class TutorialPunchCube : TutorialCondition
     public Transform EndPoint;
     public float Speed = 2f;
     public float StartDelay = 1f;
+    [Tooltip("Se ativo, o grupo para no EndPoint e fica la ate o jogador destruir todos os cubos (nao reinicia).")]
+    public bool StopAtEndPoint = false;
 
     [Header("Cubos")]
     public List<TutorialCube> Cubes = new();
 
     [Header("Final")]
     public float DestroyDelay = 2f;
+    [Tooltip("Som (AudioLibrary) tocado quando o step e concluido e o tutorial avanca.")]
+    public string AdvanceAudio = "Firework";
 
     private Tween moveTween;
     private int hitCount;
@@ -64,10 +68,16 @@ public class TutorialPunchCube : TutorialCondition
             .OnComplete(OnPassFinished);
     }
 
-    // O grupo chegou no fim e ainda sobrou cubo: reinicia o step.
+    // O grupo chegou no fim e ainda sobrou cubo: reinicia o step (ou para no EndPoint).
     private void OnPassFinished()
     {
-        if (completed) return;
+        if (completed || StopAtEndPoint) return;
+
+        // Se o jogador errou durante o Freeze/Power, o efeito e cancelado para o step voltar em tempo normal.
+        if (FreezeEffect.Instance != null)
+            FreezeEffect.Instance.CancelFreeze();
+        if (PowerEffect.Instance != null)
+            PowerEffect.Instance.CancelPower();
 
         if (Controller != null)
             Controller.RestartStep();
@@ -84,6 +94,9 @@ public class TutorialPunchCube : TutorialCondition
 
         completed = true;
         moveTween?.Kill();
+
+        if (AudioController.Instance != null && !string.IsNullOrEmpty(AdvanceAudio))
+            AudioController.Instance.Play(AdvanceAudio);
 
         if (Controller != null)
             Controller.AdvanceTutorial();

@@ -32,6 +32,7 @@ public class FreezeEffect : MonoBehaviour
     public static event System.Action<bool> OnFreezeChanged;
 
     private Coroutine freezeRoutine;
+    private bool routineWithAudio;
     private Tween objectScaleTween;
     private Tween clockFillTween;
 
@@ -71,7 +72,43 @@ public class FreezeEffect : MonoBehaviour
         objectScaleTween?.Kill();
         clockFillTween?.Kill();
 
+        routineWithAudio = playAudio;
         freezeRoutine = StartCoroutine(FreezeRoutine(playAudio));
+    }
+
+    /// <summary>Interrompe o freeze na hora e volta o time scale ao normal (ex: restart do step do tutorial).</summary>
+    public void CancelFreeze()
+    {
+        if (freezeRoutine == null) return;
+
+        StopCoroutine(freezeRoutine);
+        freezeRoutine = null;
+
+        objectScaleTween?.Kill();
+        clockFillTween?.Kill();
+
+        Time.timeScale = defaultTimeScale;
+
+        if (FreezeTimeObject != null)
+        {
+            FreezeTimeObject.transform.localScale = Vector3.zero;
+            FreezeTimeObject.SetActive(false);
+        }
+        if (FreezeClookImage != null)
+            FreezeClookImage.fillAmount = 0f;
+
+        if (routineWithAudio && AudioEffect.Instance != null)
+            AudioEffect.Instance.ChangeAudioPreset(AudioEffect.EffectType.Normal);
+
+        bool wasActive = IsActive;
+        IsFrozen = false;
+        IsActive = false;
+
+        if (wasActive)
+        {
+            OnFreezeChanged?.Invoke(false);
+            OnFinishFreezeTime?.Invoke();
+        }
     }
 
     private IEnumerator FreezeRoutine(bool playAudio)

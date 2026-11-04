@@ -21,6 +21,8 @@ public class TutorialPushCube : TutorialCondition
     public float DestroyDelay = 2f;
     [Tooltip("Espera (s) apos a ultima bola falhar antes de reiniciar o step, para o feedback aparecer.")]
     public float RestartDelay = 1f;
+    [Tooltip("Som (AudioLibrary) tocado quando o step e concluido e o tutorial avanca.")]
+    public string AdvanceAudio = "Firework";
 
     private Tween moveTween;
     private Tween restartTween;
@@ -103,18 +105,38 @@ public class TutorialPushCube : TutorialCondition
         if (failed)
         {
             restartTween?.Kill();
-            restartTween = DOVirtual.DelayedCall(RestartDelay, Restart);
+            // Ignora o time scale: com o Freeze ativo o delay demoraria ate 20x mais.
+            restartTween = DOVirtual.DelayedCall(RestartDelay, Restart, true);
             return;
         }
 
         completed = true;
 
+        if (AudioController.Instance != null && !string.IsNullOrEmpty(AdvanceAudio))
+            AudioController.Instance.Play(AdvanceAudio);
+
         if (Controller != null)
             Controller.AdvanceTutorial();
     }
 
+    // Bola Power acertou um portal: destroi so as bolas desta lista que ainda estao em jogo.
+    public void PowerExplosion()
+    {
+        foreach (var ball in Balls)
+        {
+            if (ball != null && !ball.IsResolved)
+                ball.PowerExplode();
+        }
+    }
+
     private void Restart()
     {
+        // Se o jogador errou durante o Freeze/Power, o efeito e cancelado para o step voltar em tempo normal.
+        if (FreezeEffect.Instance != null)
+            FreezeEffect.Instance.CancelFreeze();
+        if (PowerEffect.Instance != null)
+            PowerEffect.Instance.CancelPower();
+
         if (Controller != null)
             Controller.RestartStep();
         else

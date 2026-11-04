@@ -26,6 +26,7 @@ public class PowerEffect : MonoBehaviour
     public UnityEvent OnFinishPowerTime;
 
     private Coroutine powerRoutine;
+    private bool routineWithAudio;
     private Tween objectScaleTween;
     private Tween clockFillTween;
 
@@ -73,7 +74,40 @@ public class PowerEffect : MonoBehaviour
         objectScaleTween?.Kill();
         clockFillTween?.Kill();
 
+        routineWithAudio = playAudio;
         powerRoutine = StartCoroutine(FreezeRoutine(playAudio));
+    }
+
+    /// <summary>Interrompe o Power Time na hora (ex: restart do step do tutorial).</summary>
+    public void CancelPower()
+    {
+        if (powerRoutine == null) return;
+
+        StopCoroutine(powerRoutine);
+        powerRoutine = null;
+
+        objectScaleTween?.Kill();
+        clockFillTween?.Kill();
+
+        if (FreezeTimeObject != null)
+        {
+            FreezeTimeObject.transform.localScale = Vector3.zero;
+            FreezeTimeObject.SetActive(false);
+        }
+        if (FreezeClookImage != null)
+            FreezeClookImage.fillAmount = 0f;
+
+        if (routineWithAudio && AudioEffect.Instance != null)
+            AudioEffect.Instance.ChangeAudioPreset(AudioEffect.EffectType.Normal);
+
+        bool wasPowered = isPowered;
+        isPowered = false;
+
+        if (wasPowered)
+        {
+            OnFinishPowerTime?.Invoke();
+            OnPowerChanged?.Invoke(false);
+        }
     }
     [ContextMenu("Teste Explosion")]
     public void Explosion()

@@ -121,3 +121,165 @@ MonoBehaviour:
     volume: 1
     pitch: 1
     mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Sky Falling
+    clip: {fileID: 8300000, guid: 8744eb0075a036741812b1c2249019f1, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Type8B
+    clip: {fileID: 8300000, guid: 7f3d55ee1b9fa1e43b8d633e3453fa2d, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Phlogiston Particle
+    clip: {fileID: 8300000, guid: 0002f2cd169b543f0ba0bcd1fdca2dfe, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Wave Exploring
+    clip: {fileID: 8300000, guid: f986aa1dddcae3341b3b66aec449ece9, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Energy Bolt
+    clip: {fileID: 8300000, guid: 5ae286a9bf1290d4fa0a41e528086368, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: To New Horizons
+    clip: {fileID: 8300000, guid: 1d0ab3ca8b4e60d4696b86c459e69f0c, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Watching Out
+    clip: {fileID: 8300000, guid: 1e3f9581a1423a140bdaf2a8179e18ca, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Rebel Rocket
+    clip: {fileID: 8300000, guid: ab133654ac42d4412bbd81338d1d1447, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Wayfarers Outpost
+    clip: {fileID: 8300000, guid: bd0280d930204b443872cf7684ed8632, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: What's next
+    clip: {fileID: 8300000, guid: 81492fd43b37f1e4f8bd095b5b21ce6f, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: 351
+    clip: {fileID: 8300000, guid: 49b1c2d83a26ae84aa8c1f3c7c7a4f5f, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Battle  Of The Bits
+    clip: {fileID: 8300000, guid: 5b0d171eb3b82a341a4182abe14b26de, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Gravesite
+    clip: {fileID: 8300000, guid: baed9f9c864d86b46a7dcf3df98b0a71, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Biosphere
+    clip: {fileID: 8300000, guid: e51551eaf19a74544bca42b56174a2e9, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Plasma Bolt
+    clip: {fileID: 8300000, guid: a4a2e6e4166f24e5e8ecf04a6397138a, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Rain Apocalipse
+    clip: {fileID: 8300000, guid: b9aadcc66a2126b45ae276a95bb25312, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Jungle Realm
+    clip: {fileID: 8300000, guid: 29ecab889a2704b45ace0ea9550056fc, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Dead Code Dream
+    clip: {fileID: 8300000, guid: 8f727a2439136c74aada42e3f894a0d0, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Moonwake Temple
+    clip: {fileID: 8300000, guid: fa433031490b03246b4561d67e896c67, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Shooter Synthwave
+    clip: {fileID: 8300000, guid: 6ffe875774fef78499360ab28f84e2bd, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Twilight Harbours
+    clip: {fileID: 8300000, guid: e1648a340a9631845a06d7e6fe9c0c78, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: One Move Ahead
+    clip: {fileID: 8300000, guid: eea52e820924f6247a66df5bd6bfa4fa, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Crypt Crawler
+    clip: {fileID: 8300000, guid: 45bb42f207502444ea41a6a393f1d02e, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Akimbo Rockester
+    clip: {fileID: 8300000, guid: 736293587fba24db1bee11d85e5d7316, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Mirage
+    clip: {fileID: 8300000, guid: 768af043112e3e04cabba84024ba4abc, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Vulcanized Rubber
+    clip: {fileID: 8300000, guid: 288805f80eb434df994fbc114a5d9733, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}
+  - audioName: Traitors Pars
+    clip: {fileID: 8300000, guid: 01017bdce6e149b47a06677aa7523743, type: 3}
+    loop: 0
+    volume: 1
+    pitch: 1
+    mixerGroup: {fileID: 9175090799261917565, guid: 667fe1dc94aa61842a2760f21f697b53, type: 2}

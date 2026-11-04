@@ -38,7 +38,14 @@ public class InstancerController : MonoBehaviour
     public Transform boostEndPoint;       // mesmo ponto do CubeMovement
     public float timingOffset = 0f;
 
+    [Header("Spawn Overlap Check")]
+    [Tooltip("Raio verificado ao redor da célula. Se algum cube estiver dentro dele, outra célula é sorteada.")]
+    public float spawnCheckRadius = 0.6f;
+    public LayerMask spawnCheckMask = ~0;
+
     private bool stop;
+
+    private readonly Collider[] overlapBuffer = new Collider[16];
 
     private readonly List<Vector3> gridPositions = new();
 
@@ -214,9 +221,42 @@ public class InstancerController : MonoBehaviour
 
         if (freeCells.Count == 0) return -1;
 
-        int chosen = freeCells[Random.Range(0, freeCells.Count)];
-        usedCells.Add(chosen);
-        return chosen;
+        // Sorteia células livres até achar uma sem cube por perto
+        while (freeCells.Count > 0)
+        {
+            int index = Random.Range(0, freeCells.Count);
+            int candidate = freeCells[index];
+
+            if (!IsCellBlocked(gridPositions[candidate]))
+            {
+                usedCells.Add(candidate);
+                return candidate;
+            }
+
+            freeCells.RemoveAt(index);
+        }
+
+        Debug.Log("[InstancerController] Todas as células livres têm um cube por perto — spawn ignorado.");
+        return -1;
+    }
+
+    private bool IsCellBlocked(Vector3 position)
+    {
+        int count = Physics.OverlapSphereNonAlloc(
+            position,
+            spawnCheckRadius,
+            overlapBuffer,
+            spawnCheckMask,
+            QueryTriggerInteraction.Collide
+        );
+
+        for (int i = 0; i < count; i++)
+        {
+            if (overlapBuffer[i].GetComponentInParent<CubeCollider>() != null)
+                return true;
+        }
+
+        return false;
     }
 
     private PrefabSpawnData GetRandomPrefab(
@@ -391,6 +431,10 @@ public class InstancerController : MonoBehaviour
                     pos,
                     Vector3.one * 0.4f
                 );
+
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(pos, spawnCheckRadius);
+                Gizmos.color = Color.cyan;
             }
         }
     }

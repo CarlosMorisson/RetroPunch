@@ -1071,6 +1071,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &3940525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1140,6 +1141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &4672829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1224,7 +1226,7 @@ GameObject:
   - component: {fileID: 5749851}
   m_Layer: 0
   m_Name: FrontTutorial
-  m_TagString: FinalBoost
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1488,6 +1490,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 3940523}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &5855072
 MonoBehaviour:
@@ -23242,6 +23245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &66654371
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30968,6 +30972,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 88106048}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &77133578
 MonoBehaviour:
@@ -32895,6 +32900,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &88106050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40501,11 +40507,13 @@ MonoBehaviour:
   CubeGroup: {fileID: 96746741}
   StartPoint: {fileID: 2073753070}
   EndPoint: {fileID: 5749851}
-  Speed: 1
+  Speed: 20
   StartDelay: 1
+  StopAtEndPoint: 1
   Cubes:
   - {fileID: 156235972}
-  DestroyDelay: 30
+  DestroyDelay: 120
+  AdvanceAudio: Firework
 --- !u!1 &96944192
 GameObject:
   m_ObjectHideFlags: 0
@@ -62352,6 +62360,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 2063401976}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &129575753
 MonoBehaviour:
@@ -63828,6 +63837,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &137833395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63897,6 +63907,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &138058542
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87647,6 +87658,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &151347267
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88228,6 +88240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!1 &155028883
 GameObject:
   m_ObjectHideFlags: 0
@@ -88931,6 +88944,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 66654369}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &156235973
 MonoBehaviour:
@@ -121967,6 +121981,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &263988900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125914,6 +125929,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &288807074
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128660,11 +128676,13 @@ MonoBehaviour:
   EndPoint: {fileID: 2141120911}
   Speed: 2
   StartDelay: 1
+  StopAtEndPoint: 0
   Cubes:
   - {fileID: 960560359}
   - {fileID: 644820153}
   - {fileID: 1423354706}
   DestroyDelay: 2
+  AdvanceAudio: Firework
   TutorialTolerance: 2
 --- !u!1 &300237077
 GameObject:
@@ -146767,6 +146785,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!1 &337659194
 GameObject:
   m_ObjectHideFlags: 0
@@ -158331,11 +158350,13 @@ MonoBehaviour:
   EndPoint: {fileID: 2141120911}
   Speed: 2
   StartDelay: 1
+  StopAtEndPoint: 0
   Cubes:
   - {fileID: 2117581041}
   - {fileID: 535364807}
   - {fileID: 906714122}
   DestroyDelay: 2
+  AdvanceAudio: Firework
   TutorialTolerance: 2
 --- !u!1 &384508318 stripped
 GameObject:
@@ -164937,6 +164958,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 138058540}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &392754937
 MonoBehaviour:
@@ -178413,6 +178435,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &410475171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179866,6 +179889,7 @@ MonoBehaviour:
   TouchTimeout: 4
   FeedbackObject: {fileID: 888381441}
   FailScaleDuration: 0.4
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!120 &415297482
 LineRenderer:
@@ -181658,11 +181682,13 @@ MonoBehaviour:
   CubeGroup: {fileID: 421234328}
   StartPoint: {fileID: 2073753070}
   EndPoint: {fileID: 5749851}
-  Speed: 1
+  Speed: 20
   StartDelay: 1
+  StopAtEndPoint: 1
   Cubes:
   - {fileID: 2011271167}
-  DestroyDelay: 30
+  DestroyDelay: 120
+  AdvanceAudio: Firework
 --- !u!1 &421362433
 GameObject:
   m_ObjectHideFlags: 0
@@ -198192,6 +198218,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 810098615}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &467591215
 MonoBehaviour:
@@ -199488,6 +199515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &475910139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217467,12 +217495,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d81568341eb48449b57c758fdb962a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameType: 2
-  ChooseMusic: {fileID: 8300000, guid: d6241f5762f47544bb218408878f9a32, type: 3}
+  gameType: 1
+  ChooseMusic: {fileID: 8300000, guid: b9aadcc66a2126b45ae276a95bb25312, type: 3}
   difficulty: 1
   IsTutorial: 0
   stageList: {fileID: 11400000, guid: 2144c16c06633e245a99823df639c876, type: 2}
-  CurrentColor: {fileID: 11400000, guid: 61bcfc5b6fea0bd48a84b91764771277, type: 2}
+  CurrentColor: {fileID: 11400000, guid: 64db27a9bdd1d4d49b472c52eda44503, type: 2}
   RandomColors:
   - {fileID: 11400000, guid: e7a65fe4be90e2e48a70abf763e90ad7, type: 2}
   - {fileID: 11400000, guid: a89520274afb16e4391cb41523847531, type: 2}
@@ -217482,6 +217510,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c665dfcfc00c2614098d036a61c638b7, type: 2}
   - {fileID: 11400000, guid: 3a036125bb1e48749be2207c23a4f0d1, type: 2}
   - {fileID: 11400000, guid: 61bcfc5b6fea0bd48a84b91764771277, type: 2}
+  - {fileID: 11400000, guid: 4868747460c694f47b0485875d569db7, type: 2}
+  - {fileID: 11400000, guid: 64db27a9bdd1d4d49b472c52eda44503, type: 2}
   CurrentDifficulty: {fileID: 11400000, guid: 03bfa961589689f4293826187447e4a9, type: 2}
   Difficulties:
   - {fileID: 11400000, guid: 7f008d5abfaa6904b9bca3c8fdc37744, type: 2}
@@ -217921,6 +217951,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &508664451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221329,7 +221360,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Using your hands, you should press the circle in the center of the cube.
+  m_text: Hit the ball toward the gate that matches the ball's color and direction
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9889e864230851d418e8a330480bdb9f, type: 2}
   m_sharedMaterial: {fileID: -7909087439692457431, guid: 9889e864230851d418e8a330480bdb9f, type: 2}
@@ -225770,6 +225801,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 1322924677}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &535364808
 MonoBehaviour:
@@ -232984,6 +233016,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &544510592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245553,6 +245586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!1 &573426706
 GameObject:
   m_ObjectHideFlags: 0
@@ -254900,6 +254934,7 @@ MonoBehaviour:
   TouchTimeout: 4
   FeedbackObject: {fileID: 602901989}
   FailScaleDuration: 0.4
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!120 &592199487
 LineRenderer:
@@ -268030,6 +268065,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &602901991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -269904,7 +269940,7 @@ Transform:
   m_GameObject: {fileID: 610489612}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.684, y: -2.17, z: 26.181}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -281587,7 +281623,7 @@ Transform:
   m_GameObject: {fileID: 618950698}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.684, y: -2.17, z: 26.181}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -286209,6 +286245,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 137833393}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &644820154
 MonoBehaviour:
@@ -288321,7 +288358,7 @@ Transform:
   m_GameObject: {fileID: 649542315}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.684, y: -2.17, z: 26.181}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -291298,6 +291335,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 1962655835}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &660645110
 MonoBehaviour:
@@ -292420,7 +292458,7 @@ Transform:
   m_GameObject: {fileID: 665156081}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.684, y: -2.17, z: 26.181}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -297069,6 +297107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube2
+  ReturnToPoolOnFinish: 1
 --- !u!114 &684807538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301202,6 +301241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 410475169}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &703397375
 MonoBehaviour:
@@ -301570,6 +301610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &704818245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -303903,6 +303944,7 @@ MonoBehaviour:
   TouchTimeout: 4
   FeedbackObject: {fileID: 4672827}
   FailScaleDuration: 0.4
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!54 &715021799
 Rigidbody:
@@ -323558,6 +323600,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 2055720191}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &736782247
 MonoBehaviour:
@@ -324091,6 +324134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 1314840879}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &740370513
 MonoBehaviour:
@@ -343867,6 +343911,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &780014376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -370021,6 +370066,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &810098617
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374607,6 +374653,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &838832254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376663,6 +376710,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &846620246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -393130,6 +393178,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 1100160822}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &879105813
 MonoBehaviour:
@@ -395237,6 +395286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &888381443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -399379,6 +399429,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 838832252}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &906714123
 MonoBehaviour:
@@ -408716,11 +408767,13 @@ MonoBehaviour:
   CubeGroup: {fileID: 946683258}
   StartPoint: {fileID: 2073753070}
   EndPoint: {fileID: 5749851}
-  Speed: 1
+  Speed: 20
   StartDelay: 1
+  StopAtEndPoint: 1
   Cubes:
   - {fileID: 1386706873}
-  DestroyDelay: 30
+  DestroyDelay: 120
+  AdvanceAudio: Firework
 --- !u!1 &947103056
 GameObject:
   m_ObjectHideFlags: 0
@@ -411439,6 +411492,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 1
   FeedbackObject: {fileID: 1102885682}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &960560360
 MonoBehaviour:
@@ -414058,6 +414112,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 1530909329}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &969639269
 MonoBehaviour:
@@ -426264,6 +426319,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 1
   FeedbackObject: {fileID: 1216072394}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &1000477429
 MonoBehaviour:
@@ -453207,6 +453263,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1100160824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -453772,6 +453829,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1102885684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -482085,11 +482143,13 @@ MonoBehaviour:
   EndPoint: {fileID: 2141120911}
   Speed: 2
   StartDelay: 1
+  StopAtEndPoint: 0
   Cubes:
   - {fileID: 1000477428}
   - {fileID: 1892080027}
   - {fileID: 740370512}
   DestroyDelay: 2
+  AdvanceAudio: Firework
 --- !u!1 &1135246440
 GameObject:
   m_ObjectHideFlags: 0
@@ -486346,6 +486406,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: CubePower
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1152108525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -499606,6 +499667,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 2
   FeedbackObject: {fileID: 780014374}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &1187350089
 MonoBehaviour:
@@ -516465,6 +516527,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1216072396
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -538487,7 +538550,7 @@ Transform:
   m_GameObject: {fileID: 1267582100}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.684, y: -2.17, z: 26.181}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -548571,6 +548634,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1314840881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -549718,6 +549782,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1320259427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -550640,6 +550705,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1322924679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -561232,7 +561298,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1343326994
 Transform:
   m_ObjectHideFlags: 0
@@ -561270,6 +561336,7 @@ MonoBehaviour:
   TouchTimeout: 4
   FeedbackObject: {fileID: 846620244}
   FailScaleDuration: 0.4
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!54 &1343326996
 Rigidbody:
@@ -572403,11 +572470,13 @@ MonoBehaviour:
   EndPoint: {fileID: 2141120911}
   Speed: 2
   StartDelay: 1
+  StopAtEndPoint: 0
   Cubes:
   - {fileID: 1364158282}
   - {fileID: 969639268}
   - {fileID: 1622148215}
   DestroyDelay: 2
+  AdvanceAudio: Firework
 --- !u!1 &1351135337
 GameObject:
   m_ObjectHideFlags: 0
@@ -576042,6 +576111,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 475910137}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &1364158283
 MonoBehaviour:
@@ -582075,11 +582145,13 @@ MonoBehaviour:
   EndPoint: {fileID: 2141120911}
   Speed: 2
   StartDelay: 1
+  StopAtEndPoint: 0
   Cubes:
   - {fileID: 1459792384}
   - {fileID: 5855071}
   - {fileID: 660645109}
   DestroyDelay: 2
+  AdvanceAudio: Firework
   TutorialTolerance: 2
 --- !u!1 &1386706871
 GameObject:
@@ -582133,6 +582205,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 704818243}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &1386706874
 MonoBehaviour:
@@ -591718,7 +591791,7 @@ Transform:
   m_GameObject: {fileID: 1409698967}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.684, y: -2.17, z: 26.181}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -594597,6 +594670,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 1981271831}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &1423354707
 MonoBehaviour:
@@ -600511,6 +600585,7 @@ MonoBehaviour:
   - {fileID: 1937436304}
   DestroyDelay: 2
   RestartDelay: 1
+  AdvanceAudio: Firework
 --- !u!1 &1428752724
 GameObject:
   m_ObjectHideFlags: 0
@@ -601006,6 +601081,7 @@ MonoBehaviour:
   TouchTimeout: 4
   FeedbackObject: {fileID: 1320259425}
   FailScaleDuration: 0.4
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!54 &1430043031
 Rigidbody:
@@ -607676,6 +607752,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 2
   FeedbackObject: {fileID: 151347265}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &1459792385
 MonoBehaviour:
@@ -630020,6 +630097,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1518846488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637263,6 +637341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1530909331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -638989,6 +639068,7 @@ MonoBehaviour:
   TouchTimeout: 4
   FeedbackObject: {fileID: 1631168262}
   FailScaleDuration: 0.4
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!54 &1535614175
 Rigidbody:
@@ -646392,11 +646472,13 @@ MonoBehaviour:
   CubeGroup: {fileID: 1543736056}
   StartPoint: {fileID: 2073753070}
   EndPoint: {fileID: 5749851}
-  Speed: 1
+  Speed: 20
   StartDelay: 1
+  StopAtEndPoint: 1
   Cubes:
   - {fileID: 392754936}
-  DestroyDelay: 30
+  DestroyDelay: 120
+  AdvanceAudio: Firework
 --- !u!1 &1544134039
 GameObject:
   m_ObjectHideFlags: 0
@@ -650797,6 +650879,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!1 &1556458762
 GameObject:
   m_ObjectHideFlags: 0
@@ -679604,9 +679687,13 @@ MonoBehaviour:
   EndPoint: {fileID: 2141120911}
   Speed: 2
   StartDelay: 1
-  Balls: []
+  Balls:
+  - {fileID: 1343326995}
+  - {fileID: 592199486}
+  - {fileID: 1430043030}
   DestroyDelay: 2
   RestartDelay: 1
+  AdvanceAudio: Firework
 --- !u!1 &1587184687
 GameObject:
   m_ObjectHideFlags: 0
@@ -689033,6 +689120,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 1941918778}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &1622148216
 MonoBehaviour:
@@ -690187,6 +690275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1631168264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -695829,6 +695918,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube3
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1643679912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -698488,6 +698578,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 544510590}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &1655128432
 MonoBehaviour:
@@ -740278,6 +740369,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: CubeFreeze
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1752796676
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -740468,6 +740560,7 @@ MonoBehaviour:
   TouchTimeout: 4
   FeedbackObject: {fileID: 1875530122}
   FailScaleDuration: 0.4
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!54 &1753482863
 Rigidbody:
@@ -745382,11 +745475,13 @@ MonoBehaviour:
   CubeGroup: {fileID: 1775639756}
   StartPoint: {fileID: 2073753070}
   EndPoint: {fileID: 5749851}
-  Speed: 1
+  Speed: 20
   StartDelay: 1
+  StopAtEndPoint: 1
   Cubes:
   - {fileID: 77133577}
-  DestroyDelay: 30
+  DestroyDelay: 120
+  AdvanceAudio: Firework
 --- !u!1 &1776955488
 GameObject:
   m_ObjectHideFlags: 0
@@ -765301,6 +765396,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!1 &1816472973
 GameObject:
   m_ObjectHideFlags: 0
@@ -767211,6 +767307,7 @@ MonoBehaviour:
   TouchTimeout: 4
   FeedbackObject: {fileID: 1518846486}
   FailScaleDuration: 0.4
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!120 &1824402026
 LineRenderer:
@@ -788949,6 +789046,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1875530124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -793111,11 +793209,13 @@ MonoBehaviour:
   EndPoint: {fileID: 2141120911}
   Speed: 2
   StartDelay: 1
+  StopAtEndPoint: 0
   Cubes:
   - {fileID: 1187350088}
   - {fileID: 1655128431}
   - {fileID: 467591214}
   DestroyDelay: 2
+  AdvanceAudio: Firework
 --- !u!1 &1892080025
 GameObject:
   m_ObjectHideFlags: 0
@@ -793168,6 +793268,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 263988898}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &1892080028
 MonoBehaviour:
@@ -801623,6 +801724,7 @@ MonoBehaviour:
   TouchTimeout: 4
   FeedbackObject: {fileID: 1981168252}
   FailScaleDuration: 0.4
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!120 &1937436305
 LineRenderer:
@@ -802929,6 +803031,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1941918780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -804185,11 +804288,13 @@ MonoBehaviour:
   CubeGroup: {fileID: 1948468826}
   StartPoint: {fileID: 2073753070}
   EndPoint: {fileID: 5749851}
-  Speed: 1
+  Speed: 20
   StartDelay: 1
+  StopAtEndPoint: 1
   Cubes:
   - {fileID: 879105812}
-  DestroyDelay: 30
+  DestroyDelay: 120
+  AdvanceAudio: Firework
 --- !u!1 &1948790912
 GameObject:
   m_ObjectHideFlags: 0
@@ -806781,6 +806886,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube4
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1961494533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -806951,6 +807057,7 @@ MonoBehaviour:
   - {fileID: 1535614174}
   DestroyDelay: 2
   RestartDelay: 1
+  AdvanceAudio: Firework
 --- !u!1 &1962655834
 GameObject:
   m_ObjectHideFlags: 0
@@ -807000,6 +807107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1962655837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -812303,6 +812411,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1981168254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -812372,6 +812481,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &1981271833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -823819,6 +823929,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 508664449}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &2011271168
 MonoBehaviour:
@@ -832173,6 +832284,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &2055720193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -832975,11 +833087,13 @@ MonoBehaviour:
   EndPoint: {fileID: 2141120911}
   Speed: 2
   StartDelay: 1
+  StopAtEndPoint: 0
   Cubes:
   - {fileID: 129575752}
   - {fileID: 736782246}
   - {fileID: 703397374}
   DestroyDelay: 2
+  AdvanceAudio: Firework
   TutorialTolerance: 2
 --- !u!1 &2057796261
 GameObject:
@@ -834944,6 +835058,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabTag: Cube1
+  ReturnToPoolOnFinish: 1
 --- !u!114 &2063401978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -856370,6 +856485,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialCube
   CubeType: 0
   FeedbackObject: {fileID: 288807072}
+  DestroyAudio: Hit
   Owner: {fileID: 0}
 --- !u!114 &2117581042
 MonoBehaviour:
@@ -861782,7 +861898,7 @@ GameObject:
   - component: {fileID: 2141120911}
   m_Layer: 0
   m_Name: Tutorial Target
-  m_TagString: FinalBoost
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -19,6 +19,8 @@ public class TutorialCube : MonoBehaviour, IHandHittable
 
     [Header("Feedback")]
     public Transform FeedbackObject;
+    [Tooltip("Som (AudioLibrary) tocado quando o cubo e destruido.")]
+    public string DestroyAudio = "Hit";
 
     [HideInInspector]
     public TutorialPunchCube Owner;
@@ -52,6 +54,11 @@ public class TutorialCube : MonoBehaviour, IHandHittable
         initialRotation = transform.localRotation;
         initialScale = transform.localScale;
         initialized = true;
+
+        // O feedback e copiado dos cubos do jogo: sem isto, o FeedbackCubeManager devolveria o pai
+        // (o objeto do tutorial) ao pool ao fim da explosao, e ele nao voltaria mais no restart.
+        if (FeedbackObject != null && FeedbackObject.TryGetComponent(out FeedbackCubeManager feedbackManager))
+            feedbackManager.ReturnToPoolOnFinish = false;
     }
 
     public void Restore()
@@ -96,8 +103,8 @@ public class TutorialCube : MonoBehaviour, IHandHittable
 
         ResetPhysics();
 
-        if (AudioController.Instance != null)
-            AudioController.Instance.Play("Hit");
+        if (AudioController.Instance != null && !string.IsNullOrEmpty(DestroyAudio))
+            AudioController.Instance.Play(DestroyAudio);
 
         if (HandTouchFeedback.Instance != null)
             HandTouchFeedback.Instance.HandFeedback(hitter, true);

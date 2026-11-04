@@ -3,6 +3,8 @@ using UnityEngine;
 public class FeedbackCubeManager : MonoBehaviour
 {
     public string PrefabTag;
+    [Tooltip("Desligado: ao terminar so desativa o feedback, sem devolver o pai ao pool (cubos do tutorial, que nao vem do pool).")]
+    public bool ReturnToPoolOnFinish = true;
     private FeedbackCube[] cubes;
     private int finishedCount;
 
@@ -37,7 +39,24 @@ public class FeedbackCubeManager : MonoBehaviour
         {
             cubes[i].ResetCube();
         }
+
+        if (!ReturnToPoolOnFinish)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
         GameObject parent = transform.parent.gameObject;
+
+        // BreakCube de um ponto do MultiPunchCube: o pai é o PunchArea, não o root do pool.
+        // Devolver o pai desativava o PunchArea, que nunca era reativado, e o cubo voltava do pool sem o ponto.
+        CubeMovemment poolRoot = GetComponentInParent<CubeMovemment>();
+        if (poolRoot != null && poolRoot.gameObject != parent)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
         ObjectPooler.Instance.ReturnToPool(PrefabTag, parent);
     }
 }

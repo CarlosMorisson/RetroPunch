@@ -5,8 +5,8 @@ using UnityEngine;
 
 // Bola do tutorial do Push: ao ser golpeada e lancada na direcao da mao (mesma logica do PushCube).
 // Entrar no portal do mesmo PushType e sucesso; portal errado, parede ou tempo esgotado e falha.
-// Power e Freeze valem em qualquer portal: Freeze dispara o Freeze Time e Power dispara o Power Time
-// e destroi (com sucesso) todas as bolas que ainda estao em jogo, como o PushCube faz no OnPowerStarted.
+// Power e Freeze valem em qualquer portal: Freeze dispara o Freeze Time e Power destroi (com sucesso)
+// as outras bolas do TutorialPushCube que ainda estao em jogo, sem Power Time e sem afetar cubos fora do tutorial.
 // Avisa o TutorialPushCube e pode ser restaurada para o estado inicial quando o step reinicia.
 [RequireComponent(typeof(Rigidbody))]
 public class TutorialPushBall : MonoBehaviour
@@ -19,7 +19,7 @@ public class TutorialPushBall : MonoBehaviour
     public static readonly List<TutorialPushBall> TouchedBalls = new();
 
     [Header("Tipo")]
-    [Tooltip("Power e Freeze valem em qualquer portal e disparam o Power Time / Freeze Time (sem os sons, pois o tutorial roda antes da musica).")]
+    [Tooltip("Power e Freeze valem em qualquer portal. Freeze dispara o Freeze Time; Power so destroi as outras bolas do tutorial.")]
     public TutorialCubeType BallType = TutorialCubeType.Ordinary;
 
     [Header("Push")]
@@ -39,6 +39,8 @@ public class TutorialPushBall : MonoBehaviour
     [Tooltip("Objeto com BreakCube. Nao pode ser filho desta bola, pois ela e desativada no sucesso.")]
     public Transform FeedbackObject;
     public float FailScaleDuration = 0.4f;
+    [Tooltip("Som (AudioLibrary) tocado quando a bola e destruida com sucesso.")]
+    public string DestroyAudio = "Hit";
 
     [HideInInspector]
     public TutorialPushCube Owner;
@@ -70,11 +72,6 @@ public class TutorialPushBall : MonoBehaviour
         Lock();
     }
 
-    private void OnEnable()
-    {
-        PowerEffect.OnPowerStarted += OnPowerExplosion;
-    }
-
     private void CacheInitialState()
     {
         if (initialized) return;
@@ -86,6 +83,11 @@ public class TutorialPushBall : MonoBehaviour
         initialRotation = transform.localRotation;
         initialScale = transform.localScale;
         initialized = true;
+
+        // O feedback e copiado dos cubos do jogo: sem isto, o FeedbackCubeManager devolveria o pai
+        // (o objeto do tutorial) ao pool ao fim da explosao, e ele nao voltaria mais no restart.
+        if (FeedbackObject != null && FeedbackObject.TryGetComponent(out FeedbackCubeManager feedbackManager))
+            feedbackManager.ReturnToPoolOnFinish = false;
     }
 
     // Antes do toque a bola e levada pelo grupo (tween); a fisica so serve para detectar o golpe.
@@ -118,12 +120,16 @@ public class TutorialPushBall : MonoBehaviour
         IsResolved = false;
         hitPoint = transform.position;
 
+        // Ativa antes de mexer no Rigidbody: num objeto inativo zerar velocidade/travar nao tem efeito,
+        // e a bola que foi desativada voando (sucesso) voltaria com a velocidade antiga.
+        gameObject.SetActive(true);
         transform.SetParent(initialParent, false);
         transform.localPosition = initialPosition;
         transform.localRotation = initialRotation;
         transform.localScale = initialScale;
+        rb.position = transform.position;
+        rb.rotation = transform.rotation;
         Lock();
-        gameObject.SetActive(true);
 
         if (FeedbackObject != null)
             FeedbackObject.gameObject.SetActive(false);
@@ -282,6 +288,9 @@ public class TutorialPushBall : MonoBehaviour
 
     private void SuccessFeedback()
     {
+        if (AudioController.Instance != null && !string.IsNullOrEmpty(DestroyAudio))
+            AudioController.Instance.Play(DestroyAudio);
+
         if (PointController.Instance != null)
             PointController.Instance.IncreasePoint();
 
@@ -297,6 +306,7 @@ public class TutorialPushBall : MonoBehaviour
 
         TriggerTypeEffect();
 
+        Lock();
         gameObject.SetActive(false);
     }
 
@@ -317,12 +327,9 @@ public class TutorialPushBall : MonoBehaviour
         switch (BallType)
         {
             case TutorialCubeType.Power:
-                if (PowerEffect.Instance != null)
-                {
-                    PowerEffect.Instance.TriggerPowerSilent();
-                    // Destroi as outras bolas na hora (via OnPowerStarted), sem depender do evento configurado na cena.
-                    PowerEffect.Instance.Explosion();
-                }
+                // So destroi as bolas da lista do TutorialPushCube; nao dispara o Power Time.
+                if (Owner != null)
+                    Owner.PowerExplosion();
                 break;
 
             case TutorialCubeType.Freeze:
@@ -333,7 +340,7 @@ public class TutorialPushBall : MonoBehaviour
     }
 
     // Explosao do Power: toda bola ainda em jogo (tocada ou nao) conta como sucesso.
-    private void OnPowerExplosion()
+    public void PowerExplode()
     {
         if (IsResolved) return;
 
@@ -347,7 +354,6 @@ public class TutorialPushBall : MonoBehaviour
 
     private void OnDisable()
     {
-        PowerEffect.OnPowerStarted -= OnPowerExplosion;
         StopTimeout();
         TouchedBalls.Remove(this);
         RestorePlayerCollision();

@@ -1,0 +1,313 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d7d472e82169d142bc5cfdeaff7837e, type: 3}
+  m_Name: PUSH-Vulcanized Rubber_Medium_BeatMap 1
+  m_EditorClassIdentifier: Assembly-CSharp::SongBeatMap
+  audioClip: {fileID: 8300000, guid: 288805f80eb434df994fbc114a5d9733, type: 3}
+  beats:
+  - time: 0.510839
+    intensity: 0.8622218
+    affinity: 1
+  - time: 2.5425851
+    intensity: 0.8398342
+    affinity: 2
+  - time: 4.5743313
+    intensity: 0.55912817
+    affinity: 1
+  - time: 6.1068482
+    intensity: 0.5061666
+    affinity: 1
+  - time: 8.138594
+    intensity: 0.79229385
+    affinity: 1
+  - time: 9.520182
+    intensity: 0.42088836
+    affinity: 0
+  - time: 10.681179
+    intensity: 0.9885901
+    affinity: 2
+  - time: 11.853786
+    intensity: 0.41680953
+    affinity: 0
+  - time: 12.968345
+    intensity: 0.42943782
+    affinity: 2
+  - time: 14.640182
+    intensity: 0.77571696
+    affinity: 1
+  - time: 16.044989
+    intensity: 0.42425886
+    affinity: 1
+  - time: 16.950567
+    intensity: 0.63699144
+    affinity: 0
+  - time: 18.703674
+    intensity: 0.34694335
+    affinity: 1
+  - time: 19.96916
+    intensity: 0.47639894
+    affinity: 0
+  - time: 21.10694
+    intensity: 0.48204595
+    affinity: 2
+  - time: 22.767166
+    intensity: 0.3883285
+    affinity: 1
+  - time: 24.055874
+    intensity: 0.2661641
+    affinity: 2
+  - time: 25.06594
+    intensity: 0.48571476
+    affinity: 0
+  - time: 26.470749
+    intensity: 0.117098086
+    affinity: 0
+  - time: 27.457596
+    intensity: 0.40402672
+    affinity: 1
+  - time: 29.489342
+    intensity: 0.39101753
+    affinity: 1
+  - time: 30.51102
+    intensity: 0.53744966
+    affinity: 2
+  - time: 31.532698
+    intensity: 0.37600335
+    affinity: 1
+  - time: 32.50794
+    intensity: 0.47272512
+    affinity: 0
+  - time: 33.564445
+    intensity: 0.44005495
+    affinity: 2
+  - time: 34.829933
+    intensity: 0.26630563
+    affinity: 1
+  - time: 36.36245
+    intensity: 0.60175985
+    affinity: 1
+  - time: 37.627937
+    intensity: 0.36595666
+    affinity: 1
+  - time: 38.870205
+    intensity: 0.43087316
+    affinity: 0
+  - time: 39.659683
+    intensity: 0.42396137
+    affinity: 1
+  - time: 40.681362
+    intensity: 0.57746446
+    affinity: 2
+  - time: 42.202267
+    intensity: 0.58937615
+    affinity: 2
+  - time: 43.456146
+    intensity: 0.48208916
+    affinity: 1
+  - time: 44.744854
+    intensity: 0.45609027
+    affinity: 2
+  - time: 45.4995
+    intensity: 0.6904143
+    affinity: 0
+  - time: 46.27737
+    intensity: 0.68552357
+    affinity: 2
+  - time: 47.171337
+    intensity: 0.2273034
+    affinity: 1
+  - time: 48.367165
+    intensity: 0.7301393
+    affinity: 0
+  - time: 49.83002
+    intensity: 0.37763825
+    affinity: 0
+  - time: 50.8517
+    intensity: 0.44028854
+    affinity: 2
+  - time: 52.140408
+    intensity: 0.54266447
+    affinity: 0
+  - time: 53.162086
+    intensity: 0.4834288
+    affinity: 0
+  - time: 54.91519
+    intensity: 0.5446949
+    affinity: 2
+  - time: 55.93687
+    intensity: 0.5601711
+    affinity: 2
+  - time: 56.946938
+    intensity: 0.4684159
+    affinity: 2
+  - time: 57.968616
+    intensity: 0.4586722
+    affinity: 2
+  - time: 59.025124
+    intensity: 0.16342875
+    affinity: 0
+  - time: 60.000362
+    intensity: 0.4436118
+    affinity: 2
+  - time: 61.02204
+    intensity: 0.59894836
+    affinity: 1
+  - time: 62.03211
+    intensity: 0.44180012
+    affinity: 0
+  - time: 63.564625
+    intensity: 0.791722
+    affinity: 2
+  - time: 65.08553
+    intensity: 0.7644619
+    affinity: 2
+  - time: 66.10721
+    intensity: 0.32991907
+    affinity: 1
+  - time: 67.16372
+    intensity: 0.16430046
+    affinity: 0
+  - time: 68.138954
+    intensity: 0.46052608
+    affinity: 1
+  - time: 69.41605
+    intensity: 0.3997467
+    affinity: 0
+  - time: 70.53061
+    intensity: 0.29723337
+    affinity: 1
+  - time: 72.202446
+    intensity: 0.6124792
+    affinity: 2
+  - time: 73.22413
+    intensity: 0.71789384
+    affinity: 2
+  - time: 73.99039
+    intensity: 0.5465038
+    affinity: 1
+  - time: 75.00045
+    intensity: 0.53531724
+    affinity: 2
+  - time: 76.9161
+    intensity: 0.51126033
+    affinity: 0
+  - time: 78.05388
+    intensity: 0.4128969
+    affinity: 2
+  - time: 79.180046
+    intensity: 0.3538979
+    affinity: 1
+  - time: 80.34104
+    intensity: 0.6201748
+    affinity: 2
+  - time: 81.35111
+    intensity: 0.47603887
+    affinity: 0
+  - time: 82.88363
+    intensity: 0.8336704
+    affinity: 1
+  - time: 84.11429
+    intensity: 0.37938792
+    affinity: 0
+  - time: 85.414604
+    intensity: 0.5210881
+    affinity: 0
+  - time: 86.15764
+    intensity: 0.41452032
+    affinity: 0
+  - time: 87.31864
+    intensity: 0.4722517
+    affinity: 1
+  - time: 88.735054
+    intensity: 0.6937167
+    affinity: 1
+  - time: 89.48971
+    intensity: 0.43635482
+    affinity: 1
+  - time: 90.23274
+    intensity: 0.4761749
+    affinity: 0
+  - time: 91.022224
+    intensity: 0.7261748
+    affinity: 2
+  - time: 92.54313
+    intensity: 0.28672707
+    affinity: 1
+  - time: 93.30939
+    intensity: 0.67503923
+    affinity: 1
+  - time: 94.31946
+    intensity: 0.72426873
+    affinity: 0
+  - time: 95.34113
+    intensity: 0.42287785
+    affinity: 1
+  - time: 96.10739
+    intensity: 0.7096182
+    affinity: 2
+  - time: 96.86204
+    intensity: 0.5494485
+    affinity: 0
+  - time: 97.628296
+    intensity: 0.79887545
+    affinity: 2
+  - time: 98.38295
+    intensity: 0.8892978
+    affinity: 0
+  - time: 99.41624
+    intensity: 0.41601658
+    affinity: 0
+  - time: 100.681725
+    intensity: 0.50676
+    affinity: 2
+  - time: 101.80789
+    intensity: 0.92128253
+    affinity: 0
+  - time: 102.43483
+    intensity: 0.11710197
+    affinity: 0
+  - time: 103.46812
+    intensity: 0.36674017
+    affinity: 1
+  - time: 104.74522
+    intensity: 0.57814854
+    affinity: 2
+  - time: 105.511475
+    intensity: 0.5131611
+    affinity: 1
+  - time: 106.13841
+    intensity: 0.4333045
+    affinity: 1
+  - time: 106.77696
+    intensity: 0.31519547
+    affinity: 1
+  - time: 107.54322
+    intensity: 0.4047268
+    affinity: 0
+  - time: 108.30948
+    intensity: 0.8784883
+    affinity: 1
+  - time: 109.064125
+    intensity: 0.29325813
+    affinity: 1
+  - time: 109.83038
+    intensity: 0.6242683
+    affinity: 2
+  - time: 110.573425
+    intensity: 0.76378226
+    affinity: 0
+  - time: 111.5951
+    intensity: 0.37732336
+    affinity: 1
+  - time: 112.88381
+    intensity: 0.56208503
+    affinity: 2
